@@ -3,7 +3,7 @@ package client
 import (
 	"time"
 
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/types"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client/types"
 )
 
 type Client interface {

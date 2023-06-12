@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/types"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client/types"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models"
 )
 
 var (
@@ -47,17 +47,15 @@ func (r *PipelineResource) Configure(_ context.Context, req resource.ConfigureRe
 // Create implements resource.Resource.
 func (r *PipelineResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan pipelineResourceModel
+	var plan PipelineResourceModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	pipeline := Pipeline{
-		Title: plan.Title.String(),
-	}
-	stored, err := r.client.CreatePipeline(&pipeline)
+	pipeline := PipelineFromModel(&plan)
+	stored, err := r.client.CreatePipeline(pipeline)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating pipeline",
@@ -65,17 +63,15 @@ func (r *PipelineResource) Create(ctx context.Context, req resource.CreateReques
 		)
 		return
 	}
-	plan.Id = StringValue(stored.Id)
-	plan.UpdatedAt = StringValue(stored.UpdatedAt.Format(time.RFC3339))
 
-	// Set the plan
+	PipelineToModel(&plan, stored)
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 }
 
 // Delete implements resource.Resource.
 func (r *PipelineResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state pipelineResourceModel
+	var state PipelineResourceModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -101,7 +97,7 @@ func (*PipelineResource) Metadata(_ context.Context, req resource.MetadataReques
 // Read implements resource.Resource.
 func (r *PipelineResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state pipelineResourceModel
+	var state PipelineResourceModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -117,19 +113,18 @@ func (r *PipelineResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	state.Title = StringValue(pipeline.Title)
-	state.UpdatedAt = StringValue(pipeline.UpdatedAt.String())
+	PipelineToModel(&state, pipeline)
 }
 
 // Schema implements resource.Resource.
 func (*PipelineResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = pipelineResourceSchema()
+	resp.Schema = PipelineResourceSchema()
 }
 
 // Update implements resource.Resource.
 func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Retrieve values from plan
-	var plan pipelineResourceModel
+	var plan PipelineResourceModel
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -152,6 +147,10 @@ func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	plan.Title = StringValue(stored.Title)
-	plan.UpdatedAt = StringValue(stored.UpdatedAt.String())
+	PipelineToModel(&plan, stored)
+    diags = resp.State.Set(ctx, plan)
+    resp.Diagnostics.Append(diags...)
+    if resp.Diagnostics.HasError() {
+        return
+    }
 }
