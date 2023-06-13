@@ -148,9 +148,6 @@ func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	PipelineToModel(&plan, stored)
-    diags = resp.State.Set(ctx, plan)
-    resp.Diagnostics.Append(diags...)
-    if resp.Diagnostics.HasError() {
-        return
-    }
+	diags = resp.State.Set(ctx, plan)
+	resp.Diagnostics.Append(diags...)
 }

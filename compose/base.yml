@@ -1,0 +1,73 @@
+version: '2.4'
+
+services:
+
+  timescaledb-service:
+    image: timescale/timescaledb:latest-pg14
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - TIMESCALEDB_TELEMETRY=off
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - -U
+        - postgres
+      interval: 2s
+      timeout: 2s
+      retries: 50
+
+  timescaledb-metrics:
+    image: timescale/timescaledb:latest-pg14
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - TIMESCALEDB_TELEMETRY=off
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - -U
+        - postgres
+      interval: 2s
+      timeout: 2s
+      retries: 50
+
+  localstack:
+    image: localstack/localstack:1.4
+    environment:
+      SERVICES: s3
+
+  pipeline-service:
+    image: us.gcr.io/logdna-k8s/pipeline-service:3.39.0
+    ports:
+      - "19095:3000"
+    depends_on:
+      timescaledb-service:
+        condition: service_healthy
+      timescaledb-metrics:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+    command: node index.js
+    environment:
+      LOGLEVEL: debug
+      LOGPRETTY: 1
+      DATABASE_URL: postgresql://postgres:password@timescaledb-service/postgres
+      METRICS_DATABASE_URL: postgresql://postgres:password@timescaledb-metrics/postgres
+      PAL_URL: http://localhost:4004
+      AWS_ENDPOINT: http://localstack:4566
+      AWS_ACCESS_KEY: abcd
+      AWS_SECRET_KEY: abcd'
+      S3_BUCKET: pipeline-vector-config
+      SWAGGER_UI: true
+      PIPELINE_CONTROL_KEY: mezmo
+      LOG_ANALYSIS_HOSTNAME: logs.use.dev.logdna.net
+      DEFAULT_PARTITION_ID: test0
+      VECTOR_DATA_DIR: /tmp
+      VECTOR_DNS_TEMPLATE: localhost
+      SAMPLES_S3_BUCKET: pipeline-sample-data
+      SAMPLES_AWS_ACCESS_KEY: abcd
+      SAMPLES_AWS_SECRET_KEY: abcd
+      RESHAPE_MESSAGE_IN_VECTOR: 1

@@ -31,8 +31,8 @@ func PipelineResourceSchema() schema.Schema {
 }
 
 func PipelineFromModel(model *PipelineResourceModel) *Pipeline {
-	pipeline := Pipeline {
-		Title:     model.Title.ValueString(),
+	pipeline := Pipeline{
+		Title: model.Title.ValueString(),
 	}
 	if !model.Id.IsUnknown() {
 		pipeline.Id = model.Id.ValueString()
