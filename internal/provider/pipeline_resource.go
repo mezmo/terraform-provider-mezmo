@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
@@ -131,12 +130,9 @@ func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	updatedAt, _ := time.Parse(time.RFC3339, plan.UpdatedAt.ValueString())
-
 	pipeline := Pipeline{
-		Id:        plan.Id.ValueString(),
-		Title:     plan.Title.ValueString(),
-		UpdatedAt: updatedAt,
+		Id:    plan.Id.ValueString(),
+		Title: plan.Title.ValueString(),
 	}
 	stored, err := r.client.UpdatePipeline(&pipeline)
 	if err != nil {

@@ -20,7 +20,9 @@ type MezmoProvider struct {
 
 // MezmoProviderModel describes the provider data model.
 type MezmoProviderModel struct {
-	Endpoint types.String `tfsdk:"endpoint"`
+	Endpoint   types.String `tfsdk:"endpoint"`
+	AuthKey    types.String `tfsdk:"auth_key"`
+	AuthHeader types.String `tfsdk:"auth_header"`
 }
 
 func (p *MezmoProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -32,8 +34,15 @@ func (p *MezmoProvider) Schema(ctx context.Context, req provider.SchemaRequest, 
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "Mezmo provider attribute",
+				MarkdownDescription: "Mezmo API endpoint containing the url scheme, host and port",
 				Optional:            true,
+			},
+			"auth_key": schema.StringAttribute{
+				MarkdownDescription: "The authentication key",
+				Required:            true,
+			},
+			"auth_header": schema.StringAttribute{
+				Optional: true,
 			},
 		},
 	}
@@ -48,10 +57,17 @@ func (p *MezmoProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		return
 	}
 
-	// Configuration values are now available.
-	// if data.Endpoint.IsNull() { /* ... */ }
+	endpoint := "https://api.pipeline.mezmo.com"
+	authHeader := "Authorization"
 
-	c := client.NewClient()
+	if !data.Endpoint.IsNull() {
+		endpoint = data.Endpoint.ValueString()
+	}
+	if !data.AuthHeader.IsNull() {
+		authHeader = data.AuthHeader.ValueString()
+	}
+
+	c := client.NewClient(endpoint, data.AuthKey.ValueString(), authHeader)
 	resp.DataSourceData = c
 	resp.ResourceData = c
 }
