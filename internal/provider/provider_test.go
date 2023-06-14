@@ -15,7 +15,6 @@ import (
 )
 
 const authAccountId = "tf_test_01"
-const endpoint = "http://localhost:19095"
 
 // testAccProtoV6ProviderFactories are used to instantiate a provider during
 // acceptance testing. The factory function will be invoked for every Terraform
@@ -37,14 +36,23 @@ func init() {
 	os.Setenv("TF_ACC", "1")
 }
 
+func getTestEndpoint() string {
+	endpoint := os.Getenv("TEST_ENDPOINT")
+	if endpoint == "" {
+		// Use port exposed in docker compose service
+		endpoint = "http://localhost:19095"
+	}
+	return endpoint
+}
+
 func getProviderConfig() string {
 	return fmt.Sprintf(`
 		provider "mezmo" {
 			auth_key = %q
 			endpoint = %q
-			auth_header = "x-auth-account-id" // Use for authenticating against the service directly
+			auth_header = "x-auth-account-id" // Used for authenticating against the service directly
 		}
-		`, authAccountId, endpoint)
+		`, authAccountId, getTestEndpoint())
 }
 
 func testAccPreCheck(t *testing.T) {
@@ -55,11 +63,11 @@ func testAccPreCheck(t *testing.T) {
 		return
 	}
 
-	controlToken := os.Getenv("CONTROL_TOKEN")
+	controlToken := os.Getenv("TEST_CONTROL_TOKEN")
 	client := http.Client{Timeout: 5 * time.Second}
 	req, _ := http.NewRequest(
 		http.MethodPut,
-		endpoint+"/v1/control/account",
+		getTestEndpoint()+"/v1/control/account",
 		strings.NewReader(fmt.Sprintf(`{"log_analysis_id": %q}`, authAccountId)))
 	req.Header.Add("x-control-token", controlToken)
 	req.Header.Add("Content-Type", "application/json")

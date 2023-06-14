@@ -56,6 +56,12 @@ services:
       - |
         node migrate.js
         node index.js
+    healthcheck:
+      test: curl --fail http://localhost:3000/health_check || exit 1
+      interval: 1s
+      retries: 10
+      start_period: 3s
+      timeout: 10s
     environment:
       LOGLEVEL: debug
       LOGPRETTY: 1
@@ -64,9 +70,9 @@ services:
       PAL_URL: http://localhost:4004
       AWS_ENDPOINT: http://localstack:4566
       AWS_ACCESS_KEY: abcd
-      AWS_SECRET_KEY: abcd'
+      AWS_SECRET_KEY: abcd
       S3_BUCKET: pipeline-vector-config
-      SWAGGER_UI: true
+      SWAGGER_UI: "true"
       PIPELINE_CONTROL_KEY: mezmo
       LOG_ANALYSIS_HOSTNAME: logs.use.dev.logdna.net
       DEFAULT_PARTITION_ID: test0
