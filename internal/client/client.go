@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client/types"
 )
 
 type Client interface {

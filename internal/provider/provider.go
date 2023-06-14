@@ -85,6 +85,7 @@ func (p *MezmoProvider) Configure(ctx context.Context, req provider.ConfigureReq
 func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewPipelineResource,
+		NewDemoSourceResource,
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client/types"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
 )
 
 type DemoSourceModel struct {
@@ -68,7 +68,8 @@ func DemoSourceToModel(model *DemoSourceModel, component *Component) {
 	model.Title = StringValue(component.Title)
 	model.Description = StringValue(component.Description)
 	if component.UserOptions["string"] != nil {
-		model.Format = StringValue(component.UserOptions["string"].(string))
+		format, _ := component.UserOptions["string"].(string)
+		model.Format = StringValue(format)
 	}
 	if component.CreatedAt != nil {
 		model.CreatedAt = StringValue(component.CreatedAt.Format(time.RFC3339))
