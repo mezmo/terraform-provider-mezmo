@@ -8,20 +8,48 @@ programmatically via Terraform.
 - [Terraform](https://www.terraform.io/downloads.html) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.19
 
-## Building The Provider
+## Building the Provider
 
 ```shell
 go build ./...
 ```
 
-### Running integration tests
+## Running Integration Tests
+
+### Within Docker
 
 ```shell
-go test ./...
+make test
 ```
 
-## Developing the Provider
+### Locally
 
-To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
+Start the services:
+
+```shell
+docker-compose -f compose/base.yml up --remove-orphans
+```
+
+Run the test suite:
+
+```shell
+make local-test
+```
+
+## Generating the Docs
 
 To generate or update documentation, run `go generate`.
+
+## Using the Provider
+
+To install the provider in development, run `go install .`. This will build the provider and put the provider
+binary in the `$GOPATH/bin` directory.
+
+Then, you can `plan` or `apply` a terraform files:
+
+```bash
+pushd examples/pipeline
+terraform plan
+popd
+```
+

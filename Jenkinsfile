@@ -68,7 +68,6 @@ pipeline {
   }
 
   stages {
-
     stage('Test') {
       when {
         not {
@@ -88,7 +87,7 @@ pipeline {
             }
           }
           steps {
-            sh 'docker-compose -f compose/base.yml -f compose/test.yml up --remove-orphans --exit-code-from terraform-provider-mezmo --build'
+            sh 'make test'
           }
         }
       }

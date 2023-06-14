@@ -8,6 +8,7 @@ terraform {
 }
 
 provider "mezmo" {
+  auth_key = "my secret"
 }
 
 resource "mezmo_pipeline" "pipeline1" {
