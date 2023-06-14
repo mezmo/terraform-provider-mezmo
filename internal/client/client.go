@@ -15,6 +15,11 @@ type Client interface {
 	CreatePipeline(pipeline *Pipeline) (*Pipeline, error)
 	UpdatePipeline(pipeline *Pipeline) (*Pipeline, error)
 	DeletePipeline(id string) error
+
+	Source(id string) (*Component, error)
+	CreateSource(component *Component) (*Component, error)
+	UpdateSource(component *Component) (*Component, error)
+	DeleteSource(id string) error
 }
 
 func NewClient(endpoint string, authKey string, authHeader string, authAdditional string) Client {
@@ -33,6 +38,26 @@ type client struct {
 	authHeader     string
 	endpoint       string
 	authAdditional string
+}
+
+// CreateSource implements Client.
+func (*client) CreateSource(component *Component) (*Component, error) {
+	panic("unimplemented")
+}
+
+// DeleteSource implements Client.
+func (*client) DeleteSource(id string) error {
+	panic("unimplemented")
+}
+
+// Source implements Client.
+func (*client) Source(id string) (*Component, error) {
+	panic("unimplemented")
+}
+
+// UpdateSource implements Client.
+func (*client) UpdateSource(component *Component) (*Component, error) {
+	panic("unimplemented")
 }
 
 // CreatePipeline implements Client.

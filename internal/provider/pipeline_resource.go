@@ -137,7 +137,7 @@ func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateReques
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating Pipeline",
-			"Could not pipeline, unexpected error: "+err.Error(),
+			"Could not update pipeline, unexpected error: "+err.Error(),
 		)
 		return
 	}
