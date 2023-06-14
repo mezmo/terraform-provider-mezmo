@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client/types"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models"
 )
 
@@ -97,9 +97,7 @@ func (*PipelineResource) Metadata(_ context.Context, req resource.MetadataReques
 func (r *PipelineResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state PipelineResourceModel
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
+	if diags := req.State.Get(ctx, &state); setDiagnosticsHasError(diags, &resp.Diagnostics) {
 		return
 	}
 
@@ -124,17 +122,18 @@ func (*PipelineResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Retrieve values from plan
 	var plan PipelineResourceModel
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
+	if diags := req.Plan.Get(ctx, &plan); setDiagnosticsHasError(diags, &resp.Diagnostics) {
+		return
+	}
+	var state PipelineResourceModel
+	if diags := req.State.Get(ctx, &state); setDiagnosticsHasError(diags, &resp.Diagnostics) {
 		return
 	}
 
-	pipeline := Pipeline{
-		Id:    plan.Id.ValueString(),
-		Title: plan.Title.ValueString(),
-	}
-	stored, err := r.client.UpdatePipeline(&pipeline)
+	pipeline := PipelineFromModel(&plan)
+	// Set id from the current state (not in plan)
+	pipeline.Id = state.Id.ValueString()
+	stored, err := r.client.UpdatePipeline(pipeline)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating Pipeline",
@@ -144,6 +143,11 @@ func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	PipelineToModel(&plan, stored)
-	diags = resp.State.Set(ctx, plan)
+	diags := resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
+}
+
+func setDiagnosticsHasError(source diag.Diagnostics, target *diag.Diagnostics) bool {
+	target.Append(source...)
+	return target.HasError()
 }

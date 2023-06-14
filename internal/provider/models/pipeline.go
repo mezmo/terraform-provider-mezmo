@@ -21,7 +21,7 @@ func PipelineResourceSchema() schema.Schema {
 				Computed: true,
 			},
 			"title": schema.StringAttribute{
-				Optional: true,
+				Required: true,
 			},
 			"created_at": schema.StringAttribute{
 				Computed: true,

@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -11,6 +12,13 @@ func TestPipelineResource(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { testAccPreCheck(t) },
 		Steps: []resource.TestStep{
+			// Required fields test
+			{
+				Config: getProviderConfig() + `
+					resource "mezmo_pipeline" "test" {
+					}`,
+				ExpectError: regexp.MustCompile("Missing required argument"),
+			},
 			// Create and Read testing
 			{
 				Config: getProviderConfig() + `
@@ -26,15 +34,15 @@ func TestPipelineResource(t *testing.T) {
 				),
 			},
 			// Update and Read testing
-			// {
-			// 	Config: getProviderConfig() + `
-			// 		resource "mezmo_pipeline" "test" {
-			// 			title = "updated title"
-			// 		}`,
-			// 	Check: resource.ComposeAggregateTestCheckFunc(
-			// 		resource.TestCheckResourceAttr("mezmo_pipeline.test", "title", "updated title"),
-			// 	),
-			// },
+			{
+				Config: getProviderConfig() + `
+					resource "mezmo_pipeline" "test" {
+						title = "updated title"
+					}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("mezmo_pipeline.test", "title", "updated title"),
+				),
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})

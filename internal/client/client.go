@@ -42,13 +42,7 @@ func (c *client) CreatePipeline(pipeline *Pipeline) (*Pipeline, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO: Extract request creation logic
-	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewReader(reqBody))
-	req.Header.Add(c.authHeader, c.authKey)
-	if c.authHeader == "x-auth-account-id" {
-		req.Header.Add("x-auth-user-email", c.authAdditional)
-	}
-	req.Header.Add("Content-Type", "application/json")
+	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
 	var stored Pipeline
 	if err := readJson(&stored, resp, err); err != nil {
@@ -58,32 +52,39 @@ func (c *client) CreatePipeline(pipeline *Pipeline) (*Pipeline, error) {
 }
 
 // DeletePipeline implements Client.
-func (*client) DeletePipeline(id string) error {
-	return nil
+func (c *client) DeletePipeline(id string) error {
+	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, id)
+	req := c.newRequest(http.MethodDelete, url, nil)
+	_, err := readBody(c.httpClient.Do(req))
+	return err
 }
 
 // Pipeline implements Client.
 func (c *client) Pipeline(id string) (*Pipeline, error) {
 	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, id)
-	req, _ := http.NewRequest(http.MethodGet, url, nil)
-	req.Header.Add(c.authHeader, c.authKey)
-	if c.authHeader == "x-auth-account-id" {
-		req.Header.Add("x-auth-user-email", c.authAdditional)
-	}
-	body, err := readBody(c.httpClient.Do(req))
-	if err != nil {
+	req := c.newRequest(http.MethodGet, url, nil)
+	resp, err := c.httpClient.Do(req)
+	var stored Pipeline
+	if err := readJson(&stored, resp, err); err != nil {
 		return nil, err
 	}
-	var pipeline Pipeline
-	if err := json.Unmarshal(body, &pipeline); err != nil {
-		return nil, err
-	}
-	return &pipeline, nil
+	return &stored, nil
 }
 
 // UpdatePipeline implements Client.
-func (*client) UpdatePipeline(pipeline *Pipeline) (*Pipeline, error) {
-	return pipeline, nil
+func (c *client) UpdatePipeline(pipeline *Pipeline) (*Pipeline, error) {
+	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, pipeline.Id)
+	reqBody, err := json.Marshal(pipeline)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var stored Pipeline
+	if err := readJson(&stored, resp, err); err != nil {
+		return nil, err
+	}
+	return &stored, nil
 }
 
 func readBody(resp *http.Response, err error) ([]byte, error) {
@@ -108,10 +109,27 @@ func readJson(result any, resp *http.Response, err error) error {
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode <= http.StatusOK || resp.StatusCode > http.StatusNoContent {
+	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
 		body, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("%s: %s", resp.Status, string(body))
 	}
 
 	return json.NewDecoder(resp.Body).Decode(result)
+}
+
+func (c *client) newRequest(method string, url string, body io.Reader) *http.Request {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		// Creating a request only fails if the method is invalid
+		panic(err)
+	}
+	req.Header.Add(c.authHeader, c.authKey)
+	if c.authHeader == "x-auth-account-id" {
+		req.Header.Add("x-auth-user-email", c.authAdditional)
+	}
+
+	if method != http.MethodGet {
+		req.Header.Add("Content-Type", "application/json")
+	}
+	return req
 }
