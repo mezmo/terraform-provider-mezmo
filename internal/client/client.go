@@ -17,20 +17,22 @@ type Client interface {
 	DeletePipeline(id string) error
 }
 
-func NewClient(endpoint string, authKey string, authHeader string) Client {
+func NewClient(endpoint string, authKey string, authHeader string, authAdditional string) Client {
 	return &client{
-		httpClient: &http.Client{},
-		authKey:    authKey,
-		authHeader: authHeader,
-		endpoint:   endpoint,
+		httpClient:     &http.Client{},
+		authKey:        authKey,
+		authHeader:     authHeader,
+		endpoint:       endpoint,
+		authAdditional: authAdditional,
 	}
 }
 
 type client struct {
-	httpClient *http.Client
-	authKey    string
-	authHeader string
-	endpoint   string
+	httpClient     *http.Client
+	authKey        string
+	authHeader     string
+	endpoint       string
+	authAdditional string
 }
 
 // CreatePipeline implements Client.
@@ -40,11 +42,11 @@ func (c *client) CreatePipeline(pipeline *Pipeline) (*Pipeline, error) {
 	if err != nil {
 		return nil, err
 	}
+	// TODO: Extract request creation logic
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	req.Header.Add(c.authHeader, c.authKey)
 	if c.authHeader == "x-auth-account-id" {
-		// TODO: Move this code out / refactor
-		req.Header.Add("x-auth-user-email", "info@mezmo.com")
+		req.Header.Add("x-auth-user-email", c.authAdditional)
 	}
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := c.httpClient.Do(req)
@@ -66,8 +68,7 @@ func (c *client) Pipeline(id string) (*Pipeline, error) {
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 	req.Header.Add(c.authHeader, c.authKey)
 	if c.authHeader == "x-auth-account-id" {
-		// TODO: Move this code out / refactor
-		req.Header.Add("x-auth-user-email", "info@mezmo.com")
+		req.Header.Add("x-auth-user-email", c.authAdditional)
 	}
 	body, err := readBody(c.httpClient.Do(req))
 	if err != nil {

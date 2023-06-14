@@ -20,9 +20,10 @@ type MezmoProvider struct {
 
 // MezmoProviderModel describes the provider data model.
 type MezmoProviderModel struct {
-	Endpoint   types.String `tfsdk:"endpoint"`
-	AuthKey    types.String `tfsdk:"auth_key"`
-	AuthHeader types.String `tfsdk:"auth_header"`
+	Endpoint       types.String `tfsdk:"endpoint"`
+	AuthKey        types.String `tfsdk:"auth_key"`
+	AuthHeader     types.String `tfsdk:"auth_header"`
+	AuthAdditional types.String `tfsdk:"auth_additional"`
 }
 
 func (p *MezmoProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -40,9 +41,14 @@ func (p *MezmoProvider) Schema(ctx context.Context, req provider.SchemaRequest, 
 			"auth_key": schema.StringAttribute{
 				MarkdownDescription: "The authentication key",
 				Required:            true,
+				Sensitive:           true,
 			},
 			"auth_header": schema.StringAttribute{
 				Optional: true,
+			},
+			"auth_additional": schema.StringAttribute{
+				Optional:    true,
+				Description: "Used for direct auth schemes in test scenarios",
 			},
 		},
 	}
@@ -59,6 +65,7 @@ func (p *MezmoProvider) Configure(ctx context.Context, req provider.ConfigureReq
 
 	endpoint := "https://api.pipeline.mezmo.com"
 	authHeader := "Authorization"
+	authAdditional := ""
 
 	if !data.Endpoint.IsNull() {
 		endpoint = data.Endpoint.ValueString()
@@ -66,8 +73,11 @@ func (p *MezmoProvider) Configure(ctx context.Context, req provider.ConfigureReq
 	if !data.AuthHeader.IsNull() {
 		authHeader = data.AuthHeader.ValueString()
 	}
+	if !data.AuthAdditional.IsNull() {
+		authAdditional = data.AuthAdditional.ValueString()
+	}
 
-	c := client.NewClient(endpoint, data.AuthKey.ValueString(), authHeader)
+	c := client.NewClient(endpoint, data.AuthKey.ValueString(), authHeader, authAdditional)
 	resp.DataSourceData = c
 	resp.ResourceData = c
 }

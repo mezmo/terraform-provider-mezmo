@@ -17,9 +17,10 @@ description: |-
 
 ### Required
 
-- `auth_key` (String) The authentication key
+- `auth_key` (String, Sensitive) The authentication key
 
 ### Optional
 
+- `auth_additional` (String) Used for direct auth schemes in test scenarios
 - `auth_header` (String)
 - `endpoint` (String) Mezmo API endpoint containing the url scheme, host and port

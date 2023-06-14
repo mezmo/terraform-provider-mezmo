@@ -48,9 +48,10 @@ func getTestEndpoint() string {
 func getProviderConfig() string {
 	return fmt.Sprintf(`
 		provider "mezmo" {
-			auth_key = %q
-			endpoint = %q
-			auth_header = "x-auth-account-id" // Used for authenticating against the service directly
+			auth_key        = %q
+			endpoint        = %q
+			auth_header     = "x-auth-account-id" // Used for authenticating against the service directly
+			auth_additional = "info@mezmo.com"
 		}
 		`, authAccountId, getTestEndpoint())
 }
