@@ -18,7 +18,7 @@ description: |-
 ### Required
 
 - `auth` (Attributes) (see [below for nested schema](#nestedatt--auth))
-- `pipeline` (String)
+- `pipeline` (String) The pipeline identifier
 - `region` (String) The name of the AWS region
 - `sqs_queue_url` (String) The URL of a AWS SQS queue configured to receive S3 bucket notifications
 

@@ -30,8 +30,9 @@ func S3SourceResourceSchema() schema.Schema {
 				Computed: true,
 			},
 			"pipeline": schema.StringAttribute{
-				Required:   true,
-				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+				Required:    true,
+				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				Description: "The pipeline identifier",
 			},
 			"title": schema.StringAttribute{
 				Optional: true,

@@ -16,6 +16,7 @@ type Pipeline struct {
 type Component struct {
 	Id           string         `json:"id,omitempty"`
 	Type         string         `json:"type"`
+	Inputs       []string       `json:"inputs,omitempty"`
 	Title        string         `json:"title,omitempty"`
 	Description  string         `json:"description,omitempty"`
 	UserConfig   map[string]any `json:"user_config"`

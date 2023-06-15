@@ -18,6 +18,16 @@ type Client interface {
 	CreateSource(pipelineId string, component *Component) (*Component, error)
 	UpdateSource(pipelineId string, component *Component) (*Component, error)
 	DeleteSource(pipelineId string, id string) error
+
+	Sink(pipelineId string, id string) (*Component, error)
+	CreateSink(pipelineId string, component *Component) (*Component, error)
+	UpdateSink(pipelineId string, component *Component) (*Component, error)
+	DeleteSink(pipelineId string, id string) error
+
+	Transform(pipelineId string, id string) (*Component, error)
+	CreateTransform(pipelineId string, component *Component) (*Component, error)
+	UpdateTransform(pipelineId string, component *Component) (*Component, error)
+	DeleteTransform(pipelineId string, id string) error
 }
 
 func NewClient(endpoint string, authKey string, authHeader string, authAdditional string) Client {
@@ -36,57 +46,6 @@ type client struct {
 	authHeader     string
 	endpoint       string
 	authAdditional string
-}
-
-// CreateSource implements Client.
-func (c *client) CreateSource(pipelineId string, component *Component) (*Component, error) {
-	url := fmt.Sprintf("%s/v1/pipelines/%s/sources", c.endpoint, pipelineId)
-	reqBody, err := json.Marshal(component)
-	if err != nil {
-		return nil, err
-	}
-	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
-	resp, err := c.httpClient.Do(req)
-	var stored Component
-	if err := readJson(&stored, resp, err); err != nil {
-		return nil, err
-	}
-	return &stored, nil
-}
-
-// DeleteSource implements Client.
-func (c *client) DeleteSource(pipelineId string, id string) error {
-	url := fmt.Sprintf("%s/v1/pipelines/%s/sources/%s", c.endpoint, pipelineId, id)
-	req := c.newRequest(http.MethodDelete, url, nil)
-	return readBody(c.httpClient.Do(req))
-}
-
-// Source implements Client.
-func (c *client) Source(pipelineId string, id string) (*Component, error) {
-	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, pipelineId)
-	req := c.newRequest(http.MethodGet, url, nil)
-	resp, err := c.httpClient.Do(req)
-	var pipeline pipelineResponse
-	if err := readJson(&pipeline, resp, err); err != nil {
-		return nil, err
-	}
-	return pipeline.findSource(id)
-}
-
-// UpdateSource implements Client.
-func (c *client) UpdateSource(pipelineId string, component *Component) (*Component, error) {
-	url := fmt.Sprintf("%s/v1/pipelines/%s/sources/%s", c.endpoint, pipelineId, component.Id)
-	reqBody, err := json.Marshal(component)
-	if err != nil {
-		return nil, err
-	}
-	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
-	resp, err := c.httpClient.Do(req)
-	var stored Component
-	if err := readJson(&stored, resp, err); err != nil {
-		return nil, err
-	}
-	return &stored, nil
 }
 
 // CreatePipeline implements Client.
@@ -185,4 +144,101 @@ func (c *client) newRequest(method string, url string, body io.Reader) *http.Req
 		req.Header.Add("Content-Type", "application/json")
 	}
 	return req
+}
+
+// CreateSource implements Client.
+func (c *client) CreateSource(pipelineId string, component *Component) (*Component, error) {
+	url := fmt.Sprintf("%s/v1/pipelines/%s/sources", c.endpoint, pipelineId)
+	reqBody, err := json.Marshal(component)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var stored Component
+	if err := readJson(&stored, resp, err); err != nil {
+		return nil, err
+	}
+	return &stored, nil
+}
+
+// DeleteSource implements Client.
+func (c *client) DeleteSource(pipelineId string, id string) error {
+	url := fmt.Sprintf("%s/v1/pipelines/%s/sources/%s", c.endpoint, pipelineId, id)
+	req := c.newRequest(http.MethodDelete, url, nil)
+	return readBody(c.httpClient.Do(req))
+}
+
+// Source implements Client.
+// Gets a source.
+func (c *client) Source(pipelineId string, id string) (*Component, error) {
+	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, pipelineId)
+	req := c.newRequest(http.MethodGet, url, nil)
+	resp, err := c.httpClient.Do(req)
+	var pipeline pipelineResponse
+	if err := readJson(&pipeline, resp, err); err != nil {
+		return nil, err
+	}
+	return pipeline.findSource(id)
+}
+
+// UpdateSource implements Client.
+func (c *client) UpdateSource(pipelineId string, component *Component) (*Component, error) {
+	url := fmt.Sprintf("%s/v1/pipelines/%s/sources/%s", c.endpoint, pipelineId, component.Id)
+	reqBody, err := json.Marshal(component)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var stored Component
+	if err := readJson(&stored, resp, err); err != nil {
+		return nil, err
+	}
+	return &stored, nil
+}
+
+// TODO: The following methods need an implementation
+// using Source(), CreateSource(), UpdateSource(), DeleteSource() as examples.
+
+// Sink implements Client.
+// Gets a sink.
+func (*client) Sink(pipelineId string, id string) (*Component, error) {
+	panic("unimplemented")
+}
+
+// CreateSink implements Client.
+func (*client) CreateSink(pipelineId string, component *Component) (*Component, error) {
+	panic("unimplemented")
+}
+
+// DeleteSink implements Client.
+func (*client) DeleteSink(pipelineId string, id string) error {
+	panic("unimplemented")
+}
+
+// UpdateSink implements Client.
+func (*client) UpdateSink(pipelineId string, component *Component) (*Component, error) {
+	panic("unimplemented")
+}
+
+// Transform implements Client.
+// Gets a Transform.
+func (*client) Transform(pipelineId string, id string) (*Component, error) {
+	panic("unimplemented")
+}
+
+// CreateTransform implements Client.
+func (*client) CreateTransform(pipelineId string, component *Component) (*Component, error) {
+	panic("unimplemented")
+}
+
+// DeleteTransform implements Client.
+func (*client) DeleteTransform(pipelineId string, id string) error {
+	panic("unimplemented")
+}
+
+// UpdateTransform implements Client.
+func (*client) UpdateTransform(pipelineId string, component *Component) (*Component, error) {
+	panic("unimplemented")
 }
