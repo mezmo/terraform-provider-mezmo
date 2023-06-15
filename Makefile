@@ -13,6 +13,12 @@ test:
 	docker-compose -f compose/base.yml -f compose/test.yml up --remove-orphans --exit-code-from terraform-provider-mezmo --build
 
 .PHONY: local-test
-include ./env/local.env
+ENV := $(PWD)/env/local.env
+include $(ENV)
+export
 local-test:
-	go test -v ./...
+	go test -v -count=1 ./...
+
+.PHONY: lint
+lint:
+	golangci-lint run

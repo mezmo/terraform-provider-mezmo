@@ -1,8 +1,6 @@
 package sources
 
 import (
-	"time"
-
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -11,12 +9,12 @@ import (
 )
 
 type DemoSourceModel struct {
-	Id          String `tfsdk:"id"`
-	PipelineId  String `tfsdk:"pipeline"`
-	Title       String `tfsdk:"title"`
-	Description String `tfsdk:"description"`
-	Format      String `tfsdk:"format"`
-	CreatedAt   String `tfsdk:"created_at"`
+	Id           String `tfsdk:"id"`
+	PipelineId   String `tfsdk:"pipeline"`
+	Title        String `tfsdk:"title"`
+	Description  String `tfsdk:"description"`
+	Format       String `tfsdk:"format"`
+	GenerationId Int64  `tfsdk:"generation_id"`
 }
 
 func DemoSourceResourceSchema() schema.Schema {
@@ -26,13 +24,19 @@ func DemoSourceResourceSchema() schema.Schema {
 				Computed: true,
 			},
 			"pipeline": schema.StringAttribute{
-				Required: true,
+				Required:   true,
+				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 			},
 			"title": schema.StringAttribute{
 				Optional: true,
+				Validators: []validator.String{
+					stringvalidator.LengthAtLeast(1),
+					stringvalidator.LengthAtMost(256),
+				},
 			},
 			"description": schema.StringAttribute{
-				Optional: true,
+				Optional:   true,
+				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 			},
 			"format": schema.StringAttribute{
 				Required:    true,
@@ -43,21 +47,24 @@ func DemoSourceResourceSchema() schema.Schema {
 						"apache_error", "bsd_syslog", "syslog", "http_metrics", "generic_metrics"),
 				},
 			},
-			"created_at": schema.StringAttribute{
+			"generation_id": schema.Int64Attribute{
 				Computed: true,
 			},
 		},
 	}
 }
 
-func DemoSourceFromModel(model *DemoSourceModel) *Component {
+func DemoSourceFromModel(model *DemoSourceModel, previousState *DemoSourceModel) *Component {
 	component := Component{
+		Type:        "demo-logs",
 		Title:       model.Title.ValueString(),
-		Description: model.Format.ValueString(),
-		UserOptions: map[string]any{"format": model.Format.ValueString()},
+		Description: model.Description.ValueString(),
+		UserConfig:  map[string]any{"format": model.Format.ValueString()},
 	}
-	if !model.Id.IsUnknown() {
-		component.Id = model.Id.ValueString()
+
+	if previousState != nil {
+		component.Id = previousState.Id.ValueString()
+		component.GenerationId = previousState.GenerationId.ValueInt64()
 	}
 
 	return &component
@@ -65,13 +72,15 @@ func DemoSourceFromModel(model *DemoSourceModel) *Component {
 
 func DemoSourceToModel(model *DemoSourceModel, component *Component) {
 	model.Id = StringValue(component.Id)
-	model.Title = StringValue(component.Title)
-	model.Description = StringValue(component.Description)
-	if component.UserOptions["string"] != nil {
-		format, _ := component.UserOptions["string"].(string)
+	if component.Title != "" {
+		model.Title = StringValue(component.Title)
+	}
+	if component.Description != "" {
+		model.Description = StringValue(component.Description)
+	}
+	if component.UserConfig["format"] != nil {
+		format, _ := component.UserConfig["format"].(string)
 		model.Format = StringValue(format)
 	}
-	if component.CreatedAt != nil {
-		model.CreatedAt = StringValue(component.CreatedAt.Format(time.RFC3339))
-	}
+	model.GenerationId = Int64Value(component.GenerationId)
 }

@@ -1,20 +1,11 @@
 package provider
 
 import (
-	"fmt"
-	"io"
-	"net/http"
 	"os"
-	"strings"
-	"sync"
-	"testing"
-	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 )
-
-const authAccountId = "tf_test_01"
 
 // testAccProtoV6ProviderFactories are used to instantiate a provider during
 // acceptance testing. The factory function will be invoked for every Terraform
@@ -24,9 +15,6 @@ var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServe
 	"mezmo": providerserver.NewProtocol6WithError(New("test")()),
 }
 
-var setupMutex sync.Mutex
-var isAccountCreated bool
-
 // Terraform uses a flag to prevent tests from running unintentionally,
 // as Terraform resources are often linked to real-world resources and infrastructure.
 // In our case, we support running the integration tests against a pipeline-service container.
@@ -34,58 +22,4 @@ var isAccountCreated bool
 // behind the Gateway.
 func init() {
 	os.Setenv("TF_ACC", "1")
-}
-
-func getTestEndpoint() string {
-	endpoint := os.Getenv("TEST_ENDPOINT")
-	if endpoint == "" {
-		// Use port exposed in docker compose service
-		endpoint = "http://localhost:19095"
-	}
-	return endpoint
-}
-
-func getProviderConfig() string {
-	return fmt.Sprintf(`
-		provider "mezmo" {
-			auth_key        = %q
-			endpoint        = %q
-			auth_header     = "x-auth-account-id" // Used for authenticating against the service directly
-			auth_additional = "info@mezmo.com"
-		}
-		`, authAccountId, getTestEndpoint())
-}
-
-func testAccPreCheck(t *testing.T) {
-	defer setupMutex.Unlock()
-	setupMutex.Lock()
-
-	if isAccountCreated {
-		return
-	}
-
-	controlToken := os.Getenv("TEST_CONTROL_TOKEN")
-	client := http.Client{Timeout: 5 * time.Second}
-	req, _ := http.NewRequest(
-		http.MethodPut,
-		getTestEndpoint()+"/v1/control/account",
-		strings.NewReader(fmt.Sprintf(`{"log_analysis_id": %q}`, authAccountId)))
-	req.Header.Add("x-control-token", controlToken)
-	req.Header.Add("Content-Type", "application/json")
-	resp, err := client.Do(req)
-	if err != nil {
-		t.Fatalf("Error while creating the account: %s", err.Error())
-	}
-	body, err := io.ReadAll(resp.Body)
-	resp.Body.Close()
-	if err != nil {
-		t.Fatalf("Error while reading body: %s", err.Error())
-	}
-
-	if resp.StatusCode >= http.StatusOK && resp.StatusCode <= http.StatusNoContent {
-		t.Log("Created account for testing", string(body))
-		isAccountCreated = true
-	} else {
-		t.Fatalf("Unexpected response when creating the test account: %s %s", resp.Status, string(body))
-	}
 }

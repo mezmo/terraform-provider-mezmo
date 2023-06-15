@@ -12,26 +12,17 @@ import (
 )
 
 type SourceModel interface {
-	DemoSourceModel
+	DemoSourceModel | S3SourceModel
 }
 
 type SourceResource[T SourceModel] struct {
 	client              Client
 	typeName            string
-	sourceFromModelFunc func(model *T) *Component
+	sourceFromModelFunc func(model *T, previousState *T) *Component
 	sourceToModelFunc   func(model *T, component *Component)
-	getIdFunc           func(m *T) basetypes.StringValue
+	getIdFunc           func(*T) basetypes.StringValue
+	getPipelineIdFunc   func(*T) basetypes.StringValue
 	getSchemaFunc       func() schema.Schema
-}
-
-func NewDemoSourceResource() resource.Resource {
-	return &SourceResource[DemoSourceModel]{
-		typeName:            "demo",
-		sourceFromModelFunc: DemoSourceFromModel,
-		sourceToModelFunc:   DemoSourceToModel,
-		getIdFunc:           func(m *DemoSourceModel) basetypes.StringValue { return m.Id },
-		getSchemaFunc:       DemoSourceResourceSchema,
-	}
 }
 
 // Configure implements resource.ResourceWithConfigure.
@@ -62,8 +53,8 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	component := r.sourceFromModelFunc(&plan)
-	stored, err := r.client.CreateSource(component)
+	component := r.sourceFromModelFunc(&plan, nil)
+	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating pipeline",
@@ -87,7 +78,7 @@ func (r *SourceResource[T]) Delete(ctx context.Context, req resource.DeleteReque
 	}
 
 	// Delete existing order
-	err := r.client.DeleteSource(r.getIdFunc(&state).ValueString())
+	err := r.client.DeleteSource(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting Source",
@@ -110,11 +101,12 @@ func (r *SourceResource[T]) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	component, err := r.client.Source(r.getIdFunc(&state).ValueString())
+	component, err := r.client.Source(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Source",
-			"Could not read source with id  "+r.getIdFunc(&state).ValueString()+": "+err.Error(),
+			fmt.Sprintf("Could not read source with id %s and pipeline_id %s: %s",
+				r.getIdFunc(&state), r.getPipelineIdFunc(&state), err.Error()),
 		)
 		return
 	}
@@ -134,10 +126,9 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	component := r.sourceFromModelFunc(&plan)
+	component := r.sourceFromModelFunc(&plan, &state)
 	// Set id from the current state (not in plan)
-	component.Id = r.getIdFunc(&state).ValueString()
-	stored, err := r.client.UpdateSource(component)
+	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating Source",

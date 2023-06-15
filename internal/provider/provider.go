@@ -86,6 +86,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 	return []func() resource.Resource{
 		NewPipelineResource,
 		NewDemoSourceResource,
+		NewS3SourceResource,
 	}
 }
 
