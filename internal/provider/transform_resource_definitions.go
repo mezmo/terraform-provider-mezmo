@@ -9,11 +9,11 @@ import (
 
 func NewStringifyTransformResource() resource.Resource {
 	return &TransformResource[StringifyTransformModel]{
-		typeName:            "stringify",
-		sourceFromModelFunc: StringifyTransformFromModel,
-		sourceToModelFunc:   StringifyTransformToModel,
-		getIdFunc:           func(m *StringifyTransformModel) basetypes.StringValue { return m.Id },
-		getPipelineIdFunc:   func(m *StringifyTransformModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:       StringifyTransformResourceSchema,
+		typeName:          "stringify",
+		fromModelFunc:     StringifyTransformFromModel,
+		toModelFunc:       StringifyTransformToModel,
+		getIdFunc:         func(m *StringifyTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *StringifyTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     StringifyTransformResourceSchema,
 	}
 }

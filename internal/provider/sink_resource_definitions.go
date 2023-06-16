@@ -9,11 +9,11 @@ import (
 
 func NewBlackholeSinkResource() resource.Resource {
 	return &SinkResource[BlackholeSinkModel]{
-		typeName:            "blackhole",
-		sourceFromModelFunc: BlackholeSinkFromModel,
-		sourceToModelFunc:   BlackholeSinkToModel,
-		getIdFunc:           func(m *BlackholeSinkModel) basetypes.StringValue { return m.Id },
-		getPipelineIdFunc:   func(m *BlackholeSinkModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:       BlackholeSinkResourceSchema,
+		typeName:          "blackhole",
+		fromModelFunc:     BlackholeSinkFromModel,
+		toModelFunc:       BlackholeSinkToModel,
+		getIdFunc:         func(m *BlackholeSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *BlackholeSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     BlackholeSinkResourceSchema,
 	}
 }

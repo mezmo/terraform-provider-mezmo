@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/sources"
 )
@@ -16,13 +14,13 @@ type SourceModel interface {
 }
 
 type SourceResource[T SourceModel] struct {
-	client              Client
-	typeName            string
-	sourceFromModelFunc func(model *T, previousState *T) *Component
-	sourceToModelFunc   func(model *T, component *Component)
-	getIdFunc           func(*T) basetypes.StringValue
-	getPipelineIdFunc   func(*T) basetypes.StringValue
-	getSchemaFunc       func() schema.Schema
+	client            Client
+	typeName          string
+	fromModelFunc     componentFromModelFunc[T]
+	toModelFunc       componentToModelFunc[T]
+	getIdFunc         idGetterFunc[T]
+	getPipelineIdFunc idGetterFunc[T]
+	getSchemaFunc     getSchemaFunc
 }
 
 // Configure implements resource.ResourceWithConfigure.
@@ -53,7 +51,7 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	component := r.sourceFromModelFunc(&plan, nil)
+	component := r.fromModelFunc(&plan, nil)
 	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -63,7 +61,7 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	r.sourceToModelFunc(&plan, stored)
+	r.toModelFunc(&plan, stored)
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 }
@@ -111,7 +109,7 @@ func (r *SourceResource[T]) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	r.sourceToModelFunc(&state, component)
+	r.toModelFunc(&state, component)
 }
 
 // Update implements resource.Resource.
@@ -126,7 +124,7 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	component := r.sourceFromModelFunc(&plan, &state)
+	component := r.fromModelFunc(&plan, &state)
 	// Set id from the current state (not in plan)
 	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component)
 	if err != nil {
@@ -137,7 +135,7 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	r.sourceToModelFunc(&plan, stored)
+	r.toModelFunc(&plan, stored)
 	diags := resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
 }

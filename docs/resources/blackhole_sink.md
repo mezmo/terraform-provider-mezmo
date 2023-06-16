@@ -3,12 +3,12 @@
 page_title: "mezmo_blackhole_sink Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  
+  Represents a blackhole sink.
 ---
 
 # mezmo_blackhole_sink (Resource)
 
-
+Represents a blackhole sink.
 
 
 
