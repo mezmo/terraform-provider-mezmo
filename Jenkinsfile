@@ -75,23 +75,10 @@ pipeline {
         }
       }
 
-      parallel {
-        stage('Integration Tests') {
-          tools {
-            nodejs 'NodeJS 16'
-          }
-          agent {
-            node {
-              label 'ec2-fleet'
-              customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}-integration_tests"
-            }
-          }
-          steps {
-            sh 'printenv'
-            sh 'echo "--starting"'
-            sh 'make test'
-          }
-        }
+      steps {
+        sh 'printenv'
+        sh 'echo "--starting"'
+        sh 'make test'
       }
     }
   }
