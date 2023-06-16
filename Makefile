@@ -10,6 +10,7 @@ generate-doc:
 
 .PHONY: test
 test:
+	printenv
 	docker-compose -p terraform-provider-mezmo-${BUILD_TAG:1} -f compose/base.yml -f compose/test.yml up --remove-orphans --exit-code-from terraform-provider-mezmo --build
 
 .PHONY: local-test

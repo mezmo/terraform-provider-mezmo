@@ -87,6 +87,8 @@ pipeline {
             }
           }
           steps {
+            sh 'printenv'
+            sh 'echo "--starting"'
             sh 'make test'
           }
         }
