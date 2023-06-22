@@ -1,3 +1,5 @@
+BUILD_TAG ?= "1"
+
 default: build
 
 .PHONY: build

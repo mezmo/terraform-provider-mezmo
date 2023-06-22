@@ -110,6 +110,8 @@ func (r *TransformResource[T]) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	r.toModelFunc(&state, component)
+	diags := resp.State.Set(ctx, state)
+	resp.Diagnostics.Append(diags...)
 }
 
 // Update implements resource.Resource.

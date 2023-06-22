@@ -110,6 +110,8 @@ func (r *SourceResource[T]) Read(ctx context.Context, req resource.ReadRequest, 
 	}
 
 	r.toModelFunc(&state, component)
+	diags := resp.State.Set(ctx, state)
+	resp.Diagnostics.Append(diags...)
 }
 
 // Update implements resource.Resource.

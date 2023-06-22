@@ -67,7 +67,8 @@ func TestDemoSourceResource(t *testing.T) {
 					// Verify user-defined properties
 					resource.TestCheckResourceAttr("mezmo_demo_source.my_source", "format", "json"),
 					// Verify computed properties
-					resource.TestCheckResourceAttrSet("mezmo_demo_source.my_source", "id"),
+					resource.TestMatchResourceAttr(
+						"mezmo_demo_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 					resource.TestCheckResourceAttrSet("mezmo_demo_source.my_source", "generation_id"),
 				),
 			},

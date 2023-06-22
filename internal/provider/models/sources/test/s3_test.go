@@ -56,7 +56,7 @@ func TestS3SourceResource(t *testing.T) {
 					resource.TestCheckResourceAttr("mezmo_s3_source.my_source", "sqs_queue_url", "https://hello.com/sqs"),
 					resource.TestCheckResourceAttr("mezmo_s3_source.my_source", "region", "us-east-2"),
 					// Verify computed properties
-					resource.TestCheckResourceAttrSet("mezmo_s3_source.my_source", "id"),
+					resource.TestMatchResourceAttr("mezmo_s3_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 					resource.TestCheckResourceAttr("mezmo_s3_source.my_source", "generation_id", "0"),
 				),
 			},
