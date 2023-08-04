@@ -40,7 +40,7 @@ services:
       SERVICES: s3
 
   pipeline-service:
-    image: us.gcr.io/logdna-k8s/pipeline-service:3.39.0
+    image: us.gcr.io/logdna-k8s/pipeline-service:3-latest
     ports:
       - "19095:3000"
     depends_on:
@@ -49,6 +49,8 @@ services:
       timescaledb-metrics:
         condition: service_healthy
       localstack:
+        condition: service_healthy
+      account-service:
         condition: service_healthy
     command:
       - /bin/bash
@@ -79,3 +81,23 @@ services:
       SAMPLES_AWS_ACCESS_KEY: abcd
       SAMPLES_AWS_SECRET_KEY: abcd
       RESHAPE_MESSAGE_IN_VECTOR: 1
+      ACCOUNT_SERVICE_URL: http://account-service:8030
+
+  account-service:
+    image: us.gcr.io/logdna-k8s/account-service:1-latest
+    environment:
+      LOGLEVEL: info
+      HTTP_PORT: 8030
+      ACCOUNT_BACKEND: 'memory'
+      FEATURE_FLAGS_API_KEY: 'abc123'
+      ENV_NAME: 'docker'
+      VENDOR: 'logdna'
+      FEATURE_FLAGS_BACKEND: 'memory'
+      IN_MEMORY_FEATURE_FLAGS: 'pipeline_per_account_limit:true,pipeline_node_limit:true'
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - "http://account-service:8030/health_check"
+    command: node index.js

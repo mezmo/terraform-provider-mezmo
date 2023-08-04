@@ -48,7 +48,7 @@ func TestPreCheck(t *testing.T) {
 	client := http.Client{Timeout: 5 * time.Second}
 	req, _ := http.NewRequest(
 		http.MethodPut,
-		GetTestEndpoint()+"/v1/control/account",
+		GetTestEndpoint()+"/internal/account",
 		strings.NewReader(fmt.Sprintf(`{"log_analysis_id": %q}`, authAccountId)))
 	req.Header.Add("x-control-token", controlToken)
 	req.Header.Add("Content-Type", "application/json")
