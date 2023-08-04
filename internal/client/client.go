@@ -40,6 +40,11 @@ func NewClient(endpoint string, authKey string, authHeader string, authAdditiona
 	}
 }
 
+// Envelope is {meta, data}, but meta is not used
+type apiResponseEnvelope[T any] struct {
+	Data T `json:"data"`
+}
+
 type client struct {
 	httpClient     *http.Client
 	authKey        string
@@ -50,53 +55,56 @@ type client struct {
 
 // CreatePipeline implements Client.
 func (c *client) CreatePipeline(pipeline *Pipeline) (*Pipeline, error) {
-	url := fmt.Sprintf("%s/v1/pipelines", c.endpoint)
+	url := fmt.Sprintf("%s/v3/pipeline", c.endpoint)
 	reqBody, err := json.Marshal(pipeline)
 	if err != nil {
 		return nil, err
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
-	var stored Pipeline
-	if err := readJson(&stored, resp, err); err != nil {
+	var envelope apiResponseEnvelope[Pipeline]
+	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	return &stored, nil
+	created := &envelope.Data
+	return created, nil
 }
 
 // DeletePipeline implements Client.
 func (c *client) DeletePipeline(id string) error {
-	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, id)
+	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }
 
 // Pipeline implements Client.
 func (c *client) Pipeline(id string) (*Pipeline, error) {
-	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, id)
+	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
-	var stored Pipeline
-	if err := readJson(&stored, resp, err); err != nil {
+	var envelope apiResponseEnvelope[Pipeline]
+	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	return &stored, nil
+	pipeline := &envelope.Data
+	return pipeline, nil
 }
 
 // UpdatePipeline implements Client.
 func (c *client) UpdatePipeline(pipeline *Pipeline) (*Pipeline, error) {
-	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, pipeline.Id)
+	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, pipeline.Id)
 	reqBody, err := json.Marshal(pipeline)
 	if err != nil {
 		return nil, err
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
-	var stored Pipeline
-	if err := readJson(&stored, resp, err); err != nil {
+	var envelope apiResponseEnvelope[Pipeline]
+	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	return &stored, nil
+	updated := &envelope.Data
+	return updated, nil
 }
 
 func readBody(resp *http.Response, err error) error {
@@ -148,54 +156,57 @@ func (c *client) newRequest(method string, url string, body io.Reader) *http.Req
 
 // CreateSource implements Client.
 func (c *client) CreateSource(pipelineId string, component *Component) (*Component, error) {
-	url := fmt.Sprintf("%s/v1/pipelines/%s/sources", c.endpoint, pipelineId)
+	url := fmt.Sprintf("%s/v3/pipeline/%s/source", c.endpoint, pipelineId)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
-	var stored Component
-	if err := readJson(&stored, resp, err); err != nil {
+	var envelope apiResponseEnvelope[Component]
+	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	return &stored, nil
+	source := &envelope.Data
+	return source, nil
 }
 
 // DeleteSource implements Client.
 func (c *client) DeleteSource(pipelineId string, id string) error {
-	url := fmt.Sprintf("%s/v1/pipelines/%s/sources/%s", c.endpoint, pipelineId, id)
+	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }
 
 // Source implements Client.
-// Gets a source.
+// Gets a source from a pipeline.
 func (c *client) Source(pipelineId string, id string) (*Component, error) {
-	url := fmt.Sprintf("%s/v1/pipelines/%s", c.endpoint, pipelineId)
+	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, pipelineId)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
-	var pipeline pipelineResponse
-	if err := readJson(&pipeline, resp, err); err != nil {
+	var envelope apiResponseEnvelope[pipelineResponse]
+	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	pipeline := &envelope.Data
 	return pipeline.findSource(id)
 }
 
 // UpdateSource implements Client.
 func (c *client) UpdateSource(pipelineId string, component *Component) (*Component, error) {
-	url := fmt.Sprintf("%s/v1/pipelines/%s/sources/%s", c.endpoint, pipelineId, component.Id)
+	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, component.Id)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
-	var stored Component
-	if err := readJson(&stored, resp, err); err != nil {
+	var envelope apiResponseEnvelope[Component]
+	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	return &stored, nil
+	source := &envelope.Data
+	return source, nil
 }
 
 // TODO: The following methods need an implementation

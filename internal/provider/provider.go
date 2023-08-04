@@ -63,7 +63,7 @@ func (p *MezmoProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		return
 	}
 
-	endpoint := "https://api.pipeline.mezmo.com"
+	endpoint := "https://api.mezmo.com"
 	authHeader := "Authorization"
 	authAdditional := ""
 
