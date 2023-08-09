@@ -44,6 +44,8 @@ func TestS3SourceResource(t *testing.T) {
 					}
 					resource "mezmo_s3_source" "my_source" {
 						pipeline = mezmo_pipeline.test_parent.id
+						title = "my title"
+						description = "my description"
 						region = "us-east-2"
 						sqs_queue_url = "https://hello.com/sqs"
 						auth = {
@@ -51,13 +53,17 @@ func TestS3SourceResource(t *testing.T) {
 							secret_access_key = "secret123"
 						}
 					}`,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					// Verify user-defined properties
-					resource.TestCheckResourceAttr("mezmo_s3_source.my_source", "sqs_queue_url", "https://hello.com/sqs"),
-					resource.TestCheckResourceAttr("mezmo_s3_source.my_source", "region", "us-east-2"),
-					// Verify computed properties
+				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr("mezmo_s3_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
-					resource.TestCheckResourceAttr("mezmo_s3_source.my_source", "generation_id", "0"),
+					StateHasExpectedValues("mezmo_s3_source.my_source", map[string]any{
+						"description":            "my description",
+						"title":                  "my title",
+						"region":                 "us-east-2",
+						"sqs_queue_url":          "https://hello.com/sqs",
+						"auth.access_key_id":     "123",
+						"auth.secret_access_key": "secret123",
+						"generation_id":          "0",
+					}),
 				),
 			},
 			// Update and Read testing
@@ -68,16 +74,25 @@ func TestS3SourceResource(t *testing.T) {
 					}
 					resource "mezmo_s3_source" "my_source" {
 						pipeline = mezmo_pipeline.test_parent.id
-						region = "us-east-2"
+						title = "new title"
+						description = "new desc"
+						region = "us-east-1"
 						sqs_queue_url = "https://hello.com/sqs2"
 						auth = {
-							access_key_id = "123"
-							secret_access_key = "secret123"
+							access_key_id = "4321"
+							secret_access_key = "4321secret"
 						}
 					}`,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("mezmo_s3_source.my_source", "sqs_queue_url", "https://hello.com/sqs2"),
-					resource.TestCheckResourceAttr("mezmo_s3_source.my_source", "generation_id", "1"),
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_s3_source.my_source", map[string]any{
+						"description":            "new desc",
+						"title":                  "new title",
+						"region":                 "us-east-1",
+						"sqs_queue_url":          "https://hello.com/sqs2",
+						"auth.access_key_id":     "4321",
+						"auth.secret_access_key": "4321secret",
+						"generation_id":          "1",
+					}),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

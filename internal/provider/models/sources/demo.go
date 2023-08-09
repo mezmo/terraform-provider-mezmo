@@ -19,26 +19,8 @@ type DemoSourceModel struct {
 
 func DemoSourceResourceSchema() schema.Schema {
 	return schema.Schema{
-		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed: true,
-			},
-			"pipeline": schema.StringAttribute{
-				Required:    true,
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-				Description: "The pipeline identifier",
-			},
-			"title": schema.StringAttribute{
-				Optional: true,
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-					stringvalidator.LengthAtMost(256),
-				},
-			},
-			"description": schema.StringAttribute{
-				Optional:   true,
-				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
+		Description: "Represents a demo logs source.",
+		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
 			"format": schema.StringAttribute{
 				Required:    true,
 				Description: "The format of the events",
@@ -48,19 +30,16 @@ func DemoSourceResourceSchema() schema.Schema {
 						"apache_error", "bsd_syslog", "syslog", "http_metrics", "generic_metrics"),
 				},
 			},
-			"generation_id": schema.Int64Attribute{
-				Computed: true,
-			},
-		},
+		}, false),
 	}
 }
 
-func DemoSourceFromModel(model *DemoSourceModel, previousState *DemoSourceModel) *Component {
+func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) *Component {
 	component := Component{
 		Type:        "demo-logs",
-		Title:       model.Title.ValueString(),
-		Description: model.Description.ValueString(),
-		UserConfig:  map[string]any{"format": model.Format.ValueString()},
+		Title:       plan.Title.ValueString(),
+		Description: plan.Description.ValueString(),
+		UserConfig:  map[string]any{"format": plan.Format.ValueString()},
 	}
 
 	if previousState != nil {
@@ -71,17 +50,17 @@ func DemoSourceFromModel(model *DemoSourceModel, previousState *DemoSourceModel)
 	return &component
 }
 
-func DemoSourceToModel(model *DemoSourceModel, component *Component) {
-	model.Id = StringValue(component.Id)
+func DemoSourceToModel(plan *DemoSourceModel, component *Component) {
+	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
-		model.Title = StringValue(component.Title)
+		plan.Title = StringValue(component.Title)
 	}
 	if component.Description != "" {
-		model.Description = StringValue(component.Description)
+		plan.Description = StringValue(component.Description)
 	}
 	if component.UserConfig["format"] != nil {
 		format, _ := component.UserConfig["format"].(string)
-		model.Format = StringValue(format)
+		plan.Format = StringValue(format)
 	}
-	model.GenerationId = Int64Value(component.GenerationId)
+	plan.GenerationId = Int64Value(component.GenerationId)
 }

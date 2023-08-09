@@ -22,6 +22,7 @@ resource "mezmo_demo_source" "source1" {
 }
 
 resource "mezmo_stringify_transform" "transform1" {
-  pipeline = mezmo_pipeline.pipeline1.id
-  title    = "My processor"
+  pipeline    = mezmo_pipeline.pipeline1.id
+  title       = "My processor"
+  description = "This transform removes the data we don't want"
 }

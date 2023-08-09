@@ -25,26 +25,8 @@ type S3SourceModel struct {
 
 func S3SourceResourceSchema() schema.Schema {
 	return schema.Schema{
-		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed: true,
-			},
-			"pipeline": schema.StringAttribute{
-				Required:    true,
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-				Description: "The pipeline identifier",
-			},
-			"title": schema.StringAttribute{
-				Optional: true,
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-					stringvalidator.LengthAtMost(256),
-				},
-			},
-			"description": schema.StringAttribute{
-				Optional:   true,
-				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
+		Description: "Represents an S3 pull source.",
+		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
 			"auth": schema.SingleNestedAttribute{
 				Required: true,
 				Attributes: map[string]schema.Attribute{
@@ -69,24 +51,21 @@ func S3SourceResourceSchema() schema.Schema {
 				Description: "The URL of a AWS SQS queue configured to receive S3 bucket notifications",
 				Validators:  []validator.String{stringvalidator.LengthAtLeast(7)},
 			},
-			"generation_id": schema.Int64Attribute{
-				Computed: true,
-			},
-		},
+		}, false),
 	}
 }
 
-func S3SourceFromModel(model *S3SourceModel, previousState *S3SourceModel) *Component {
-	auth := model.Auth.Attributes()
+func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) *Component {
+	auth := plan.Auth.Attributes()
 	auth_access_key_id, _ := auth["access_key_id"].(basetypes.StringValue)
 	auth_secret_access_key, _ := auth["secret_access_key"].(basetypes.StringValue)
 	component := Component{
 		Type:        "s3",
-		Title:       model.Title.ValueString(),
-		Description: model.Description.ValueString(),
+		Title:       plan.Title.ValueString(),
+		Description: plan.Description.ValueString(),
 		UserConfig: map[string]any{
-			"region":        model.Region.ValueString(),
-			"sqs_queue_url": model.SqsQueueUrl.ValueString(),
+			"region":        plan.Region.ValueString(),
+			"sqs_queue_url": plan.SqsQueueUrl.ValueString(),
 			"auth": map[string]string{
 				"access_key_id":     auth_access_key_id.ValueString(),
 				"secret_access_key": auth_secret_access_key.ValueString(),
@@ -102,31 +81,31 @@ func S3SourceFromModel(model *S3SourceModel, previousState *S3SourceModel) *Comp
 	return &component
 }
 
-func S3SourceToModel(model *S3SourceModel, component *Component) {
-	model.Id = StringValue(component.Id)
+func S3SourceToModel(plan *S3SourceModel, component *Component) {
+	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
-		model.Title = StringValue(component.Title)
+		plan.Title = StringValue(component.Title)
 	}
 	if component.Description != "" {
-		model.Description = StringValue(component.Description)
+		plan.Description = StringValue(component.Description)
 	}
 	if component.UserConfig["region"] != nil {
 		value, _ := component.UserConfig["region"].(string)
-		model.Region = StringValue(value)
+		plan.Region = StringValue(value)
 	}
 	if component.UserConfig["sqs_queue_url"] != nil {
 		value, _ := component.UserConfig["sqs_queue_url"].(string)
-		model.SqsQueueUrl = StringValue(value)
+		plan.SqsQueueUrl = StringValue(value)
 	}
 	if component.UserConfig["auth"] != nil {
 		values, _ := component.UserConfig["auth"].(map[string]string)
 		if len(values) > 0 {
-			types := model.Auth.AttributeTypes(context.Background())
-			model.Auth = basetypes.NewObjectValueMust(types, toAttributes(values))
+			types := plan.Auth.AttributeTypes(context.Background())
+			plan.Auth = basetypes.NewObjectValueMust(types, toAttributes(values))
 		}
 	}
 
-	model.GenerationId = Int64Value(component.GenerationId)
+	plan.GenerationId = Int64Value(component.GenerationId)
 }
 
 func toAttributes(values map[string]string) map[string]attr.Value {

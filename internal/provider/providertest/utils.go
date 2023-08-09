@@ -5,10 +5,14 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 const authAccountId = "tf_test_01"
@@ -67,5 +71,60 @@ func TestPreCheck(t *testing.T) {
 		isAccountCreated = true
 	} else {
 		t.Fatalf("Unexpected response when creating the test account: %s %s", resp.Status, string(body))
+	}
+}
+
+var lookupRegex = regexp.MustCompile("^#(.+)\\.(.+)$")
+
+// Given a resource name, look up its properties in state and return the requested value.
+// Lookup syntax is supported for keys and must match #resource.property format.
+func lookupValue(key string, s *terraform.State) (string, error) {
+	matches := lookupRegex.FindStringSubmatch(key)
+	length := len(matches)
+
+	if length == 0 {
+		return key, nil
+	} else if length != 3 {
+		err := fmt.Errorf("lookup pattern is not the correct structure: %v", matches[1:])
+		return "", err
+	}
+
+	resourceName := matches[1]
+	propertyName := matches[2]
+	attributes := s.RootModule().Resources[resourceName].Primary.Attributes
+	value := attributes[propertyName]
+
+	if value == "" {
+		err := fmt.Errorf("lookup for key \"%s\" found a blank value in attributes: %v", key, attributes)
+		return "", err
+	}
+	return value, nil
+}
+
+// Given a string map, compare the expected values for those in the state.
+// Lookup syntax is supported for map values, e.g "#mezmo_stringify_transform.my_transform.id"
+func StateHasExpectedValues(resourceName string, expected map[string]any) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		resource := s.RootModule().Resources[resourceName]
+		if resource == nil {
+			return fmt.Errorf("resource \"%s\" not found", resourceName)
+		}
+		attributes := resource.Primary.Attributes
+
+		for expectedKey, expectedVal := range expected {
+			foundVal, state_has_key := attributes[expectedKey]
+			if state_has_key {
+				lookupVal, err := lookupValue(expectedVal.(string), s)
+				if err != nil {
+					return err
+				}
+				if foundVal != lookupVal {
+					return fmt.Errorf("Expected values do not match for key \"%s\". Found value: %s, Expected value: %s", expectedKey, foundVal, lookupVal)
+				}
+			} else {
+				return fmt.Errorf("Expected key \"%s\" was not found in %s", expectedKey, resourceName)
+			}
+		}
+		return nil
 	}
 }

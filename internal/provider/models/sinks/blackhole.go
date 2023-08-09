@@ -1,10 +1,8 @@
 package sinks
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
@@ -17,50 +15,29 @@ type BlackholeSinkModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
+	AckEnabled   Bool   `tfsdk:"ack_enabled"`
 }
 
 func BlackholeSinkResourceSchema() schema.Schema {
 	return schema.Schema{
 		Description: "Represents a blackhole sink.",
-		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				Computed: true,
-			},
-			"pipeline": schema.StringAttribute{
-				Required:    true,
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-				Description: "The pipeline identifier",
-			},
-			"title": schema.StringAttribute{
-				Optional: true,
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-					stringvalidator.LengthAtMost(256),
-				},
-			},
-			"inputs": schema.ListAttribute{
-				ElementType: StringType,
-				Optional:    true,
-				Description: "The ids of the input components",
-			},
-			"generation_id": schema.Int64Attribute{
-				Computed: true,
-			},
-		},
+		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, false),
 	}
 }
 
-func BlackholeSinkFromModel(model *BlackholeSinkModel, previousState *BlackholeSinkModel) *Component {
+func BlackholeSinkFromModel(plan *BlackholeSinkModel, previousState *BlackholeSinkModel) *Component {
 	component := Component{
-		Type:        "demo-logs",
-		Title:       model.Title.ValueString(),
-		Description: model.Description.ValueString(),
-		UserConfig:  make(map[string]any),
+		Type:        "blackhole",
+		Title:       plan.Title.ValueString(),
+		Description: plan.Description.ValueString(),
+		UserConfig: map[string]any{
+			"ack_enabled": plan.AckEnabled.ValueBool(),
+		},
 	}
 
-	if !model.Inputs.IsUnknown() {
+	if !plan.Inputs.IsUnknown() {
 		inputs := make([]string, 0)
-		for _, v := range model.Inputs.Elements() {
+		for _, v := range plan.Inputs.Elements() {
 			value, _ := v.(basetypes.StringValue)
 			inputs = append(inputs, value.ValueString())
 		}
@@ -75,20 +52,24 @@ func BlackholeSinkFromModel(model *BlackholeSinkModel, previousState *BlackholeS
 	return &component
 }
 
-func BlackholeSinkToModel(model *BlackholeSinkModel, component *Component) {
-	model.Id = StringValue(component.Id)
+func BlackholeSinkToModel(plan *BlackholeSinkModel, component *Component) {
+	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
-		model.Title = StringValue(component.Title)
+		plan.Title = StringValue(component.Title)
 	}
 	if component.Description != "" {
-		model.Description = StringValue(component.Description)
+		plan.Description = StringValue(component.Description)
 	}
-	model.GenerationId = Int64Value(component.GenerationId)
+	plan.GenerationId = Int64Value(component.GenerationId)
 	if component.Inputs != nil {
 		inputs := make([]attr.Value, 0)
 		for _, v := range component.Inputs {
 			inputs = append(inputs, StringValue(v))
 		}
-		model.Inputs = ListValueMust(StringType, inputs)
+		plan.Inputs = ListValueMust(StringType, inputs)
+	}
+	if component.UserConfig["ack_enabled"] != nil {
+		value, _ := component.UserConfig["ack_enabled"].(bool)
+		plan.AckEnabled = BoolValue(value)
 	}
 }

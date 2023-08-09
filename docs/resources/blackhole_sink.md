@@ -17,16 +17,18 @@ Represents a blackhole sink.
 
 ### Required
 
-- `pipeline` (String) The pipeline identifier
+- `pipeline` (String) The uuid of the pipeline
 
 ### Optional
 
+- `ack_enabled` (Boolean) Acknowledge data from the source when it reaches the sink
+- `description` (String) A user-defined value describing the sink component
 - `inputs` (List of String) The ids of the input components
-- `title` (String)
+- `title` (String) A user-defined title for the sink component
 
 ### Read-Only
 
-- `generation_id` (Number)
-- `id` (String) The ID of this resource.
+- `generation_id` (Number) An internal field used for component versioning
+- `id` (String) The uuid of the sink component
 
 
