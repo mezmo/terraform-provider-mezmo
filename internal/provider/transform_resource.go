@@ -32,7 +32,7 @@ func (r *TransformResource[T]) Configure(_ context.Context, req resource.Configu
 	client, ok := req.ProviderData.(Client)
 	if !ok {
 		resp.Diagnostics.AddError(
-			"Unexpected Data Source Configure Type",
+			"Unexpected Data Transform Configure Type",
 			fmt.Sprintf("Expected client.Client, got: %T. Please report this issue to Mezmo.", req.ProviderData),
 		)
 		return
@@ -52,11 +52,11 @@ func (r *TransformResource[T]) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	component := r.fromModelFunc(&plan, nil)
-	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component)
+	stored, err := r.client.CreateTransform(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error creating pipeline",
-			"Could not create pipeline, unexpected error: "+err.Error(),
+			"Error creating transform",
+			"Could not create transform, unexpected error: "+err.Error(),
 		)
 		return
 	}
@@ -76,11 +76,11 @@ func (r *TransformResource[T]) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete existing order
-	err := r.client.DeleteSource(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	err := r.client.DeleteTransform(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error Deleting Source",
-			"Could not source, unexpected error: "+err.Error(),
+			"Error deleting transform",
+			"Could not delete transform, unexpected error: "+err.Error(),
 		)
 		return
 	}
@@ -99,11 +99,11 @@ func (r *TransformResource[T]) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	component, err := r.client.Source(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	component, err := r.client.Transform(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error Reading Source",
-			fmt.Sprintf("Could not read source with id %s and pipeline_id %s: %s",
+			"Error reading transform",
+			fmt.Sprintf("Could not read transform with id %s and pipeline_id %s: %s",
 				r.getIdFunc(&state), r.getPipelineIdFunc(&state), err.Error()),
 		)
 		return
@@ -128,11 +128,11 @@ func (r *TransformResource[T]) Update(ctx context.Context, req resource.UpdateRe
 
 	component := r.fromModelFunc(&plan, &state)
 	// Set id from the current state (not in plan)
-	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component)
+	stored, err := r.client.UpdateTransform(r.getPipelineIdFunc(&state).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error Updating Source",
-			"Could not updated source, unexpected error: "+err.Error(),
+			"Error updating transform",
+			"Could not update transform, unexpected error: "+err.Error(),
 		)
 		return
 	}

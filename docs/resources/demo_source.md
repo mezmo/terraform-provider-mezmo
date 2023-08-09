@@ -3,12 +3,12 @@
 page_title: "mezmo_demo_source Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  
+  Represents a demo logs source.
 ---
 
 # mezmo_demo_source (Resource)
 
-
+Represents a demo logs source.
 
 
 
@@ -18,16 +18,16 @@ description: |-
 ### Required
 
 - `format` (String) The format of the events
-- `pipeline` (String) The pipeline identifier
+- `pipeline` (String) The uuid of the pipeline
 
 ### Optional
 
-- `description` (String)
-- `title` (String)
+- `description` (String) A user-defined value describing the source component
+- `title` (String) A user-defined title for the source component
 
 ### Read-Only
 
-- `generation_id` (Number)
-- `id` (String) The ID of this resource.
+- `generation_id` (Number) An internal field used for component versioning
+- `id` (String) The uuid of the source component
 
 

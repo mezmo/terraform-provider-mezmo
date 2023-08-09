@@ -16,7 +16,8 @@ resource "mezmo_pipeline" "pipeline1" {
 }
 
 resource "mezmo_demo_source" "source1" {
-  pipeline = mezmo_pipeline.pipeline1.id
-  title    = "My source"
-  format   = "nginx"
+  pipeline    = mezmo_pipeline.pipeline1.id
+  title       = "My source"
+  description = "This is a demo source to give us some test data"
+  format      = "nginx"
 }

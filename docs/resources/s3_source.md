@@ -3,12 +3,12 @@
 page_title: "mezmo_s3_source Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  
+  Represents an S3 pull source.
 ---
 
 # mezmo_s3_source (Resource)
 
-
+Represents an S3 pull source.
 
 
 
@@ -18,19 +18,19 @@ description: |-
 ### Required
 
 - `auth` (Attributes) (see [below for nested schema](#nestedatt--auth))
-- `pipeline` (String) The pipeline identifier
+- `pipeline` (String) The uuid of the pipeline
 - `region` (String) The name of the AWS region
 - `sqs_queue_url` (String) The URL of a AWS SQS queue configured to receive S3 bucket notifications
 
 ### Optional
 
-- `description` (String)
-- `title` (String)
+- `description` (String) A user-defined value describing the source component
+- `title` (String) A user-defined title for the source component
 
 ### Read-Only
 
-- `generation_id` (Number)
-- `id` (String) The ID of this resource.
+- `generation_id` (Number) An internal field used for component versioning
+- `id` (String) The uuid of the source component
 
 <a id="nestedatt--auth"></a>
 ### Nested Schema for `auth`

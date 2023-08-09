@@ -3,12 +3,12 @@
 page_title: "mezmo_stringify_transform Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  
+  Represents a processor to stringify JSON data.
 ---
 
 # mezmo_stringify_transform (Resource)
 
-
+Represents a processor to stringify JSON data.
 
 
 
@@ -17,16 +17,17 @@ description: |-
 
 ### Required
 
-- `pipeline` (String) The pipeline identifier
+- `pipeline` (String) The uuid of the pipeline
 
 ### Optional
 
+- `description` (String) A user-defined value describing the transform component
 - `inputs` (List of String) The ids of the input components
-- `title` (String)
+- `title` (String) A user-defined title for the transform component
 
 ### Read-Only
 
-- `generation_id` (Number)
-- `id` (String) The ID of this resource.
+- `generation_id` (Number) An internal field used for component versioning
+- `id` (String) The uuid of the transform component
 
 

@@ -32,7 +32,7 @@ func (r *SinkResource[T]) Configure(_ context.Context, req resource.ConfigureReq
 	client, ok := req.ProviderData.(Client)
 	if !ok {
 		resp.Diagnostics.AddError(
-			"Unexpected Data Source Configure Type",
+			"Unexpected Data Sink Configure Type",
 			fmt.Sprintf("Expected client.Client, got: %T. Please report this issue to Mezmo.", req.ProviderData),
 		)
 		return
@@ -52,15 +52,14 @@ func (r *SinkResource[T]) Create(ctx context.Context, req resource.CreateRequest
 	}
 
 	component := r.fromModelFunc(&plan, nil)
-	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component)
+	stored, err := r.client.CreateSink(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error creating pipeline",
-			"Could not create pipeline, unexpected error: "+err.Error(),
+			"Error creating sink",
+			"Could not create sink, unexpected error: "+err.Error(),
 		)
 		return
 	}
-
 	r.toModelFunc(&plan, stored)
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -76,11 +75,11 @@ func (r *SinkResource[T]) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	// Delete existing order
-	err := r.client.DeleteSource(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	err := r.client.DeleteSink(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error Deleting Source",
-			"Could not source, unexpected error: "+err.Error(),
+			"Error deleting sink",
+			"Could not delete sink, unexpected error: "+err.Error(),
 		)
 		return
 	}
@@ -99,11 +98,11 @@ func (r *SinkResource[T]) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	component, err := r.client.Source(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	component, err := r.client.Sink(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error Reading Source",
-			fmt.Sprintf("Could not read source with id %s and pipeline_id %s: %s",
+			"Error reading sink",
+			fmt.Sprintf("Could not read sink with id %s and pipeline_id %s: %s",
 				r.getIdFunc(&state), r.getPipelineIdFunc(&state), err.Error()),
 		)
 		return
@@ -128,11 +127,11 @@ func (r *SinkResource[T]) Update(ctx context.Context, req resource.UpdateRequest
 
 	component := r.fromModelFunc(&plan, &state)
 	// Set id from the current state (not in plan)
-	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component)
+	stored, err := r.client.UpdateSink(r.getPipelineIdFunc(&state).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error Updating Source",
-			"Could not updated source, unexpected error: "+err.Error(),
+			"Error updating sink",
+			"Could not updated sink, unexpected error: "+err.Error(),
 		)
 		return
 	}

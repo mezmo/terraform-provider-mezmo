@@ -30,21 +30,21 @@ func PipelineResourceSchema() schema.Schema {
 	}
 }
 
-func PipelineFromModel(model *PipelineResourceModel) *Pipeline {
+func PipelineFromModel(plan *PipelineResourceModel) *Pipeline {
 	pipeline := Pipeline{
-		Title: model.Title.ValueString(),
+		Title: plan.Title.ValueString(),
 	}
-	if !model.Id.IsUnknown() {
-		pipeline.Id = model.Id.ValueString()
+	if !plan.Id.IsUnknown() {
+		pipeline.Id = plan.Id.ValueString()
 	}
 
 	return &pipeline
 }
 
-func PipelineToModel(model *PipelineResourceModel, pipeline *Pipeline) {
-	model.Id = StringValue(pipeline.Id)
-	model.Title = StringValue(pipeline.Title)
+func PipelineToModel(plan *PipelineResourceModel, pipeline *Pipeline) {
+	plan.Id = StringValue(pipeline.Id)
+	plan.Title = StringValue(pipeline.Title)
 	if pipeline.CreatedAt != nil {
-		model.CreatedAt = StringValue(pipeline.CreatedAt.Format(time.RFC3339))
+		plan.CreatedAt = StringValue(pipeline.CreatedAt.Format(time.RFC3339))
 	}
 }

@@ -1,24 +1,12 @@
 package sources
 
 import (
-	"os"
 	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/providertest"
 )
-
-func init() {
-	os.Setenv("TF_ACC", "1")
-}
-
-var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){
-	"mezmo": providerserver.NewProtocol6WithError(provider.New("test")()),
-}
 
 func TestDemoSourceResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
@@ -61,14 +49,20 @@ func TestDemoSourceResource(t *testing.T) {
 					}
 					resource "mezmo_demo_source" "my_source" {
 						pipeline = mezmo_pipeline.test_parent.id
+						title = "my source title"
+						description = "my source description"
 						format = "json"
 					}`,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					// Verify user-defined properties
-					resource.TestCheckResourceAttr("mezmo_demo_source.my_source", "format", "json"),
-					// Verify computed properties
+				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_demo_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
+					StateHasExpectedValues("mezmo_demo_source.my_source", map[string]any{
+						"description":   "my source description",
+						"generation_id": "0",
+						"title":         "my source title",
+						"format":        "json",
+						"pipeline":      "#mezmo_pipeline.test_parent.id",
+					}),
 					resource.TestCheckResourceAttrSet("mezmo_demo_source.my_source", "generation_id"),
 				),
 			},
@@ -80,11 +74,17 @@ func TestDemoSourceResource(t *testing.T) {
 					}
 					resource "mezmo_demo_source" "my_source" {
 						pipeline = mezmo_pipeline.test_parent.id
+						title = "new title"
+						description = "new description"
 						format = "apache_common"
 					}`,
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("mezmo_demo_source.my_source", "format", "apache_common"),
-					resource.TestCheckResourceAttr("mezmo_demo_source.my_source", "generation_id", "1"),
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_demo_source.my_source", map[string]any{
+						"description":   "new description",
+						"generation_id": "1",
+						"title":         "new title",
+						"format":        "apache_common",
+					}),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

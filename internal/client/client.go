@@ -214,42 +214,110 @@ func (c *client) UpdateSource(pipelineId string, component *Component) (*Compone
 
 // Sink implements Client.
 // Gets a sink.
-func (*client) Sink(pipelineId string, id string) (*Component, error) {
-	panic("unimplemented")
+func (c *client) Sink(pipelineId string, id string) (*Component, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, pipelineId)
+	req := c.newRequest(http.MethodGet, url, nil)
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[pipelineResponse]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	pipeline := &envelope.Data
+	return pipeline.findSink(id)
 }
 
 // CreateSink implements Client.
-func (*client) CreateSink(pipelineId string, component *Component) (*Component, error) {
-	panic("unimplemented")
+func (c *client) CreateSink(pipelineId string, component *Component) (*Component, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/sink", c.endpoint, pipelineId)
+	reqBody, err := json.Marshal(component)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[Component]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	sink := &envelope.Data
+	return sink, nil
 }
 
 // DeleteSink implements Client.
-func (*client) DeleteSink(pipelineId string, id string) error {
-	panic("unimplemented")
+func (c *client) DeleteSink(pipelineId string, id string) error {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
+	req := c.newRequest(http.MethodDelete, url, nil)
+	return readBody(c.httpClient.Do(req))
 }
 
 // UpdateSink implements Client.
-func (*client) UpdateSink(pipelineId string, component *Component) (*Component, error) {
-	panic("unimplemented")
+func (c *client) UpdateSink(pipelineId string, component *Component) (*Component, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, component.Id)
+	reqBody, err := json.Marshal(component)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[Component]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	sink := &envelope.Data
+	return sink, nil
 }
 
 // Transform implements Client.
 // Gets a Transform.
-func (*client) Transform(pipelineId string, id string) (*Component, error) {
-	panic("unimplemented")
+func (c *client) Transform(pipelineId string, id string) (*Component, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, pipelineId)
+	req := c.newRequest(http.MethodGet, url, nil)
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[pipelineResponse]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	pipeline := &envelope.Data
+	return pipeline.findTransform(id)
 }
 
 // CreateTransform implements Client.
-func (*client) CreateTransform(pipelineId string, component *Component) (*Component, error) {
-	panic("unimplemented")
+func (c *client) CreateTransform(pipelineId string, component *Component) (*Component, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/transform", c.endpoint, pipelineId)
+	reqBody, err := json.Marshal(component)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[Component]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	transform := &envelope.Data
+	return transform, nil
 }
 
 // DeleteTransform implements Client.
-func (*client) DeleteTransform(pipelineId string, id string) error {
-	panic("unimplemented")
+func (c *client) DeleteTransform(pipelineId string, id string) error {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
+	req := c.newRequest(http.MethodDelete, url, nil)
+	return readBody(c.httpClient.Do(req))
 }
 
 // UpdateTransform implements Client.
-func (*client) UpdateTransform(pipelineId string, component *Component) (*Component, error) {
-	panic("unimplemented")
+func (c *client) UpdateTransform(pipelineId string, component *Component) (*Component, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, component.Id)
+	reqBody, err := json.Marshal(component)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[Component]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	transform := &envelope.Data
+	return transform, nil
 }
