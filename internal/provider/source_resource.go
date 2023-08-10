@@ -10,7 +10,7 @@ import (
 )
 
 type SourceModel interface {
-	DemoSourceModel | S3SourceModel
+	DemoSourceModel | S3SourceModel | HttpSourceModel
 }
 
 type SourceResource[T SourceModel] struct {

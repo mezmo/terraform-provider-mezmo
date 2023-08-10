@@ -16,7 +16,7 @@ type HttpSourceModel struct {
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
 	Decoding        String `tfsdk:"decoding"`
-	CaptureMetadata String `tfsdk:"capture_metadata"`
+	CaptureMetadata Bool   `tfsdk:"capture_metadata"`
 }
 
 func HttpSourceResourceSchema() schema.Schema {
@@ -26,6 +26,7 @@ func HttpSourceResourceSchema() schema.Schema {
 			"decoding": schema.StringAttribute{
 				Required:    false,
 				Optional:    true,
+				Computed:    true,
 				Default:     stringdefault.StaticString("json"),
 				Description: "The decoding method for converting frames into data events.",
 				Validators: []validator.String{
@@ -44,7 +45,7 @@ func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) 
 		Description: plan.Description.ValueString(),
 		UserConfig: map[string]any{
 			"decoding":         plan.Decoding.ValueString(),
-			"capture_metadata": plan.CaptureMetadata.ValueString(),
+			"capture_metadata": plan.CaptureMetadata.ValueBool(),
 		},
 	}
 
@@ -67,8 +68,8 @@ func HttpSourceToModel(plan *HttpSourceModel, component *Component) {
 	if component.UserConfig["format"] != nil {
 		decoding, _ := component.UserConfig["decoding"].(string)
 		plan.Decoding = StringValue(decoding)
-		captureMetadata, _ := component.UserConfig["capture_metadata"].(string)
-		plan.CaptureMetadata = StringValue(captureMetadata)
+		captureMetadata, _ := component.UserConfig["capture_metadata"].(bool)
+		plan.CaptureMetadata = BoolValue(captureMetadata)
 	}
 	plan.GenerationId = Int64Value(component.GenerationId)
 }
