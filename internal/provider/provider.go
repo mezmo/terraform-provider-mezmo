@@ -89,6 +89,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		// Sources
 		NewDemoSourceResource,
 		NewS3SourceResource,
+		NewHttpSourceResource,
 
 		// Transforms
 		NewStringifyTransformResource,

@@ -28,3 +28,14 @@ func NewS3SourceResource() resource.Resource {
 		getSchemaFunc:     S3SourceResourceSchema,
 	}
 }
+
+func NewHttpSourceResource() resource.Resource {
+	return &SourceResource[HttpSourceModel]{
+		typeName:          "http",
+		fromModelFunc:     HttpSourceFromModel,
+		toModelFunc:       HttpSourceToModel,
+		getIdFunc:         func(m *HttpSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *HttpSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     HttpSourceResourceSchema,
+	}
+}
