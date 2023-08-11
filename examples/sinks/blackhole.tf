@@ -16,14 +16,14 @@ resource "mezmo_pipeline" "pipeline1" {
 }
 
 resource "mezmo_demo_source" "source1" {
-  pipeline    = mezmo_pipeline.pipeline1.id
+  pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My source"
   description = "This is the point of entry for our data"
   format      = "nginx"
 }
 
 resource "mezmo_blackhole_sink" "sink1" {
-  pipeline     = mezmo_pipeline.pipeline1.id
+  pipeline_id  = mezmo_pipeline.pipeline1.id
   title        = "My sink"
   description  = "Trash the data without acking"
   acks_enabled = false

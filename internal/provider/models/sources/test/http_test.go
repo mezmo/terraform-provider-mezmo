@@ -26,7 +26,7 @@ func TestHttpSourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_http_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						decoding = "nope"
 					}`,
 				ExpectError: regexp.MustCompile("Attribute decoding value must be one of:"),
@@ -38,7 +38,7 @@ func TestHttpSourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_http_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my http title"
 						description = "my http description"
 					}`,
@@ -51,7 +51,7 @@ func TestHttpSourceResource(t *testing.T) {
 						"title":            "my http title",
 						"decoding":         "json",
 						"capture_metadata": "false",
-						"pipeline":         "#mezmo_pipeline.test_parent.id",
+						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 					}),
 				),
 			},
@@ -62,7 +62,7 @@ func TestHttpSourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_http_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
 						description = "new description"
 						decoding = "ndjson"

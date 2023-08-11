@@ -11,7 +11,7 @@ import (
 
 type HttpSourceModel struct {
 	Id              String `tfsdk:"id"`
-	PipelineId      String `tfsdk:"pipeline"`
+	PipelineId      String `tfsdk:"pipeline_id"`
 	Title           String `tfsdk:"title"`
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`

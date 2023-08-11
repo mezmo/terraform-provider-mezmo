@@ -17,7 +17,7 @@ Represents a blackhole sink.
 
 ### Required
 
-- `pipeline` (String) The uuid of the pipeline
+- `pipeline_id` (String) The uuid of the pipeline
 
 ### Optional
 

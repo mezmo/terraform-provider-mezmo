@@ -16,13 +16,13 @@ resource "mezmo_pipeline" "pipeline1" {
 }
 
 resource "mezmo_demo_source" "source1" {
-  pipeline = mezmo_pipeline.pipeline1.id
-  title    = "My source"
-  format   = "apache_common"
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My source"
+  format      = "apache_common"
 }
 
 resource "mezmo_stringify_transform" "transform1" {
-  pipeline    = mezmo_pipeline.pipeline1.id
+  pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My processor"
   description = "This transform removes the data we don't want"
   inputs      = [mezmo_demo_source.source1.id]

@@ -17,7 +17,7 @@ func TestS3SourceResource(t *testing.T) {
 			{
 				Config: GetProviderConfig() + `
 					resource "mezmo_s3_source" "my_source" {
-						pipeline = "c5ce0dae-0c40-11ee-be56-0242ac120002"
+						pipeline_id = "c5ce0dae-0c40-11ee-be56-0242ac120002"
 						region = "us-east-2"
 						auth = {
 							access_key_id = "123"
@@ -30,7 +30,7 @@ func TestS3SourceResource(t *testing.T) {
 			{
 				Config: GetProviderConfig() + `
 					resource "mezmo_s3_source" "my_source" {
-						pipeline = "c5ce0dae-0c40-11ee-be56-0242ac120002"
+						pipeline_id = "c5ce0dae-0c40-11ee-be56-0242ac120002"
 						region = "us-east-1"
 						sqs_queue_url = "https://hello.com/sqs"
 					}`,
@@ -43,7 +43,7 @@ func TestS3SourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_s3_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my title"
 						description = "my description"
 						region = "us-east-2"
@@ -73,7 +73,7 @@ func TestS3SourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_s3_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
 						description = "new desc"
 						region = "us-east-1"

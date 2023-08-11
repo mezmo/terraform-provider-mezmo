@@ -18,7 +18,7 @@ Represents a demo logs source.
 ### Required
 
 - `format` (String) The format of the events
-- `pipeline` (String) The uuid of the pipeline
+- `pipeline_id` (String) The uuid of the pipeline
 
 ### Optional
 
