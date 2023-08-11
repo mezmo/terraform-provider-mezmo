@@ -16,7 +16,7 @@ resource "mezmo_pipeline" "pipeline1" {
 }
 
 resource "mezmo_s3_source" "source1" {
-  pipeline      = mezmo_pipeline.pipeline1.id
+  pipeline_id   = mezmo_pipeline.pipeline1.id
   title         = "My S3 source"
   description   = "This pulls data from S3 using their SQS service"
   region        = "us-east-2"

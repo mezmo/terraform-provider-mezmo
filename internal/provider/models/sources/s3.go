@@ -14,7 +14,7 @@ import (
 
 type S3SourceModel struct {
 	Id           String `tfsdk:"id"`
-	PipelineId   String `tfsdk:"pipeline"`
+	PipelineId   String `tfsdk:"pipeline_id"`
 	Title        String `tfsdk:"title"`
 	Description  String `tfsdk:"description"`
 	Auth         Object `tfsdk:"auth"`

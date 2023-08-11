@@ -20,7 +20,7 @@ func TestDemoSourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_demo_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 					}`,
 				ExpectError: regexp.MustCompile("Missing required argument"),
 			},
@@ -36,7 +36,7 @@ func TestDemoSourceResource(t *testing.T) {
 			{
 				Config: GetProviderConfig() + `
 					resource "mezmo_demo_source" "my_source" {
-						pipeline = "798e1028-0b60-11ee-be56-0242ac120002"
+						pipeline_id = "798e1028-0b60-11ee-be56-0242ac120002"
 						format = "NOT_VALID"
 					}`,
 				ExpectError: regexp.MustCompile("Attribute format value must be one of"),
@@ -48,7 +48,7 @@ func TestDemoSourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_demo_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my source title"
 						description = "my source description"
 						format = "json"
@@ -61,7 +61,7 @@ func TestDemoSourceResource(t *testing.T) {
 						"generation_id": "0",
 						"title":         "my source title",
 						"format":        "json",
-						"pipeline":      "#mezmo_pipeline.test_parent.id",
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
 					}),
 					resource.TestCheckResourceAttrSet("mezmo_demo_source.my_source", "generation_id"),
 				),
@@ -73,7 +73,7 @@ func TestDemoSourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_demo_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
 						description = "new description"
 						format = "apache_common"

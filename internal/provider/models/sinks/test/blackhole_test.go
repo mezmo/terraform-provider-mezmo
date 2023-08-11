@@ -17,7 +17,7 @@ func TestBlackholeSinkResource(t *testing.T) {
 			{
 				Config: GetProviderConfig() + `
 					resource "mezmo_blackhole_sink" "my_sink" {}`,
-				ExpectError: regexp.MustCompile("The argument \"pipeline\" is required, but no definition was found"),
+				ExpectError: regexp.MustCompile("The argument \"pipeline_id\" is required, but no definition was found"),
 			},
 			// Create and Read testing
 			{
@@ -26,7 +26,7 @@ func TestBlackholeSinkResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_blackhole_sink" "my_sink" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my sink title"
 						description = "my sink description"
 					}`,
@@ -49,11 +49,11 @@ func TestBlackholeSinkResource(t *testing.T) {
 						title = "parent pipeline"
 					}
 					resource "mezmo_demo_source" "my_source" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						format = "json"
 					}
 					resource "mezmo_blackhole_sink" "my_sink" {
-						pipeline = mezmo_pipeline.test_parent.id
+						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
 						description = "new description"
 						ack_enabled = false

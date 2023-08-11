@@ -14,7 +14,7 @@ var baseSourceSchemaAttributes = SchemaAttributes{
 		Computed:    true,
 		Description: "The uuid of the source component",
 	},
-	"pipeline": schema.StringAttribute{
+	"pipeline_id": schema.StringAttribute{
 		Required:    true,
 		Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 		Description: "The uuid of the pipeline",
