@@ -25,5 +25,6 @@ resource "mezmo_s3_source" "source1" {
     access_key_id     = "123"
     secret_access_key = "secret123"
   }
+  compression = "gzip"
 }
 

@@ -36,6 +36,21 @@ func TestS3SourceResource(t *testing.T) {
 					}`,
 				ExpectError: regexp.MustCompile("Missing required argument"),
 			},
+			// Violation of compression enum
+			{
+				Config: GetProviderConfig() + `
+					resource "mezmo_s3_source" "my_source" {
+						pipeline_id = "c5ce0dae-0c40-11ee-be56-0242ac120002"
+						region = "us-east-1"
+						sqs_queue_url = "https://hello.com/sqs"
+						auth = {
+							access_key_id = "123"
+							secret_access_key = "secret123"
+						}
+						compression = "NOPE"
+					}`,
+				ExpectError: regexp.MustCompile("Attribute compression value must be one of:"),
+			},
 			// Create and Read testing
 			{
 				Config: GetProviderConfig() + `
@@ -63,6 +78,7 @@ func TestS3SourceResource(t *testing.T) {
 						"auth.access_key_id":     "123",
 						"auth.secret_access_key": "secret123",
 						"generation_id":          "0",
+						"compression":            "auto",
 					}),
 				),
 			},
@@ -82,6 +98,7 @@ func TestS3SourceResource(t *testing.T) {
 							access_key_id = "4321"
 							secret_access_key = "4321secret"
 						}
+						compression = "gzip"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_s3_source.my_source", map[string]any{
@@ -92,6 +109,7 @@ func TestS3SourceResource(t *testing.T) {
 						"auth.access_key_id":     "4321",
 						"auth.secret_access_key": "4321secret",
 						"generation_id":          "1",
+						"compression":            "gzip",
 					}),
 				),
 			},
