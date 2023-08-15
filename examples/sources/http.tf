@@ -21,3 +21,11 @@ resource "mezmo_http_source" "source1" {
   description = "This receives data from my webhook"
   decoding    = "json"
 }
+
+resource "mezmo_http_source" "shared_source" {
+  pipeline_id      = mezmo_pipeline.pipeline1.id
+  title            = "A shared HTTP source"
+  description      = "This source uses the same data as source1"
+  decoding         = "json"
+  gateway_route_id = mezmo_http_source.source1.gateway_route_id
+}

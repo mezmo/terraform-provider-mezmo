@@ -20,6 +20,7 @@ type HttpSourceModel struct {
 	GenerationId    Int64  `tfsdk:"generation_id"`
 	Decoding        String `tfsdk:"decoding"`
 	CaptureMetadata Bool   `tfsdk:"capture_metadata"`
+	GatewayRouteId  String `tfsdk:"gateway_route_id"`
 }
 
 func HttpSourceResourceSchema() schema.Schema {
@@ -54,9 +55,25 @@ func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) 
 		},
 	}
 
-	if previousState != nil {
+	if previousState == nil {
+		if !plan.GatewayRouteId.IsUnknown() {
+			// Let them specify gateway route id on POST only
+			component.GatewayRouteId = plan.GatewayRouteId.ValueString()
+		}
+	} else {
+		// Set generated fields
 		component.Id = previousState.Id.ValueString()
 		component.GenerationId = previousState.GenerationId.ValueInt64()
+
+		// If they have specified gateway_route_id, then it *cannot* be a different value that what's in state
+		if !plan.GatewayRouteId.IsUnknown() && plan.GatewayRouteId.ValueString() != previousState.GatewayRouteId.ValueString() {
+			details := fmt.Sprintf(
+				"Cannot update \"gateway_route_id\" to %s. This field is immutable after resource creation.",
+				plan.GatewayRouteId,
+			)
+			dd.AddError("Error in plan", details)
+			return nil, dd
+		}
 	}
 
 	return &component, dd
@@ -77,4 +94,5 @@ func HttpSourceToModel(plan *HttpSourceModel, component *Component) {
 		plan.CaptureMetadata = BoolValue(captureMetadata)
 	}
 	plan.GenerationId = Int64Value(component.GenerationId)
+	plan.GatewayRouteId = StringValue(component.GatewayRouteId)
 }

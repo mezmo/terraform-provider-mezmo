@@ -121,7 +121,7 @@ func StateHasExpectedValues(resourceName string, expected map[string]any) resour
 				if foundVal != lookupVal {
 					return fmt.Errorf("Expected values do not match for key \"%s\". Found value: %s, Expected value: %s", expectedKey, foundVal, lookupVal)
 				}
-			} else {
+			} else if expectedVal != nil { // Using a nil value means the key should not be present at all
 				return fmt.Errorf("Expected key \"%s\" was not found in %s", expectedKey, resourceName)
 			}
 		}
