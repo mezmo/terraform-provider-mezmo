@@ -2,6 +2,7 @@ package sources
 
 import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
@@ -34,7 +35,8 @@ func DemoSourceResourceSchema() schema.Schema {
 	}
 }
 
-func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) *Component {
+func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) (*Component, diag.Diagnostics) {
+	dd := diag.Diagnostics{}
 	component := Component{
 		Type:        "demo-logs",
 		Title:       plan.Title.ValueString(),
@@ -47,7 +49,7 @@ func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) 
 		component.GenerationId = previousState.GenerationId.ValueInt64()
 	}
 
-	return &component
+	return &component, dd
 }
 
 func DemoSourceToModel(plan *DemoSourceModel, component *Component) {

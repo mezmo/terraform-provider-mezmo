@@ -2,6 +2,7 @@ package transforms
 
 import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -24,7 +25,8 @@ func StringifyTransformResourceSchema() schema.Schema {
 	}
 }
 
-func StringifyTransformFromModel(plan *StringifyTransformModel, previousState *StringifyTransformModel) *Component {
+func StringifyTransformFromModel(plan *StringifyTransformModel, previousState *StringifyTransformModel) (*Component, diag.Diagnostics) {
+	dd := diag.Diagnostics{}
 	component := Component{
 		Type:        "stringify",
 		Title:       plan.Title.ValueString(),
@@ -46,7 +48,7 @@ func StringifyTransformFromModel(plan *StringifyTransformModel, previousState *S
 		component.GenerationId = previousState.GenerationId.ValueInt64()
 	}
 
-	return &component
+	return &component, dd
 }
 
 func StringifyTransformToModel(plan *StringifyTransformModel, component *Component) {

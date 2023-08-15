@@ -1,7 +1,10 @@
 package sources
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -38,7 +41,9 @@ func HttpSourceResourceSchema() schema.Schema {
 	}
 }
 
-func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) *Component {
+func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) (*Component, diag.Diagnostics) {
+	dd := diag.Diagnostics{}
+
 	component := Component{
 		Type:        "http",
 		Title:       plan.Title.ValueString(),
@@ -54,7 +59,7 @@ func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) 
 		component.GenerationId = previousState.GenerationId.ValueInt64()
 	}
 
-	return &component
+	return &component, dd
 }
 
 func HttpSourceToModel(plan *HttpSourceModel, component *Component) {

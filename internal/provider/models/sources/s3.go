@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
@@ -55,7 +56,8 @@ func S3SourceResourceSchema() schema.Schema {
 	}
 }
 
-func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) *Component {
+func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Component, diag.Diagnostics) {
+	dd := diag.Diagnostics{}
 	auth := plan.Auth.Attributes()
 	auth_access_key_id, _ := auth["access_key_id"].(basetypes.StringValue)
 	auth_secret_access_key, _ := auth["secret_access_key"].(basetypes.StringValue)
@@ -78,7 +80,7 @@ func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) *Compo
 		component.GenerationId = previousState.GenerationId.ValueInt64()
 	}
 
-	return &component
+	return &component, dd
 }
 
 func S3SourceToModel(plan *S3SourceModel, component *Component) {
