@@ -2,6 +2,7 @@ package sinks
 
 import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -25,7 +26,8 @@ func BlackholeSinkResourceSchema() schema.Schema {
 	}
 }
 
-func BlackholeSinkFromModel(plan *BlackholeSinkModel, previousState *BlackholeSinkModel) *Component {
+func BlackholeSinkFromModel(plan *BlackholeSinkModel, previousState *BlackholeSinkModel) (*Component, diag.Diagnostics) {
+	dd := diag.Diagnostics{}
 	component := Component{
 		Type:        "blackhole",
 		Title:       plan.Title.ValueString(),
@@ -49,7 +51,7 @@ func BlackholeSinkFromModel(plan *BlackholeSinkModel, previousState *BlackholeSi
 		component.GenerationId = previousState.GenerationId.ValueInt64()
 	}
 
-	return &component
+	return &component, dd
 }
 
 func BlackholeSinkToModel(plan *BlackholeSinkModel, component *Component) {

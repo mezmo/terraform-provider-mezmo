@@ -51,7 +51,10 @@ func (r *SinkResource[T]) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	component := r.fromModelFunc(&plan, nil)
+	component, dd := r.fromModelFunc(&plan, nil)
+	if setDiagnosticsHasError(dd, &resp.Diagnostics) {
+		return
+	}
 	stored, err := r.client.CreateSink(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -125,7 +128,10 @@ func (r *SinkResource[T]) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	component := r.fromModelFunc(&plan, &state)
+	component, dd := r.fromModelFunc(&plan, &state)
+	if setDiagnosticsHasError(dd, &resp.Diagnostics) {
+		return
+	}
 	// Set id from the current state (not in plan)
 	stored, err := r.client.UpdateSink(r.getPipelineIdFunc(&state).ValueString(), component)
 	if err != nil {

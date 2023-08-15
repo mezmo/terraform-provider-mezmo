@@ -51,7 +51,10 @@ func (r *TransformResource[T]) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	component := r.fromModelFunc(&plan, nil)
+	component, dd := r.fromModelFunc(&plan, nil)
+	if setDiagnosticsHasError(dd, &resp.Diagnostics) {
+		return
+	}
 	stored, err := r.client.CreateTransform(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -126,8 +129,10 @@ func (r *TransformResource[T]) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	component := r.fromModelFunc(&plan, &state)
-	// Set id from the current state (not in plan)
+	component, dd := r.fromModelFunc(&plan, &state)
+	if setDiagnosticsHasError(dd, &resp.Diagnostics) {
+		return
+	}
 	stored, err := r.client.UpdateTransform(r.getPipelineIdFunc(&state).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
