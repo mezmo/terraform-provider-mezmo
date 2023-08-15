@@ -57,11 +57,12 @@ func TestDemoSourceResource(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_demo_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_demo_source.my_source", map[string]any{
-						"description":   "my source description",
-						"generation_id": "0",
-						"title":         "my source title",
-						"format":        "json",
-						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+						"description":      "my source description",
+						"generation_id":    "0",
+						"title":            "my source title",
+						"format":           "json",
+						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
+						"gateway_route_id": nil,
 					}),
 					resource.TestCheckResourceAttrSet("mezmo_demo_source.my_source", "generation_id"),
 				),
