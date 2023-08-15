@@ -24,6 +24,7 @@ Represents an S3 pull source.
 
 ### Optional
 
+- `compression` (String) The compression format of the S3 objects
 - `description` (String) A user-defined value describing the source component
 - `title` (String) A user-defined title for the source component
 

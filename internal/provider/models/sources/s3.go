@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -22,6 +23,7 @@ type S3SourceModel struct {
 	Region       String `tfsdk:"region"`
 	SqsQueueUrl  String `tfsdk:"sqs_queue_url"`
 	GenerationId Int64  `tfsdk:"generation_id"`
+	Compression  String `tfsdk:"compression"`
 }
 
 func S3SourceResourceSchema() schema.Schema {
@@ -52,6 +54,13 @@ func S3SourceResourceSchema() schema.Schema {
 				Description: "The URL of a AWS SQS queue configured to receive S3 bucket notifications",
 				Validators:  []validator.String{stringvalidator.LengthAtLeast(7)},
 			},
+			"compression": schema.StringAttribute{
+				Optional:    true,
+				Computed:    true,
+				Default:     stringdefault.StaticString("auto"),
+				Description: "The compression format of the S3 objects",
+				Validators:  []validator.String{stringvalidator.OneOf([]string{"auto", "gzip", "none", "zstd"}...)},
+			},
 		}, false),
 	}
 }
@@ -72,6 +81,7 @@ func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Comp
 				"access_key_id":     auth_access_key_id.ValueString(),
 				"secret_access_key": auth_secret_access_key.ValueString(),
 			},
+			"compression": plan.Compression.ValueString(),
 		},
 	}
 
@@ -98,6 +108,10 @@ func S3SourceToModel(plan *S3SourceModel, component *Component) {
 	if component.UserConfig["sqs_queue_url"] != nil {
 		value, _ := component.UserConfig["sqs_queue_url"].(string)
 		plan.SqsQueueUrl = StringValue(value)
+	}
+	if component.UserConfig["compression"] != nil {
+		value, _ := component.UserConfig["compression"].(string)
+		plan.Compression = StringValue(value)
 	}
 	if component.UserConfig["auth"] != nil {
 		values, _ := component.UserConfig["auth"].(map[string]string)
