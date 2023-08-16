@@ -82,21 +82,21 @@ func TestHttpSourceResource(t *testing.T) {
 			},
 			// Supply gateway_route_id
 			{
-				Config: GetProviderConfig() + `
-								resource "mezmo_pipeline" "test_parent" {
-									title = "parent pipeline"
-								}
-								resource "mezmo_http_source" "my_source" {
-									pipeline_id = mezmo_pipeline.test_parent.id
-									title = "my http title"
-									description = "my http description"
-								}
-								resource "mezmo_http_source" "shared_source" {
-									pipeline_id = mezmo_pipeline.test_parent.id
-									title = "A shared http source"
-									description = "This source provides gateway_route_id"
-									gateway_route_id = mezmo_http_source.my_source.gateway_route_id
-								}`,
+				Config: SetCachedConfig("Supply gateway_route_id", `
+					resource "mezmo_pipeline" "test_parent" {
+						title = "parent pipeline"
+					}
+					resource "mezmo_http_source" "my_source" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my http title"
+						description = "my http description"
+					}`) + `
+					resource "mezmo_http_source" "shared_source" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "A shared http source"
+						description = "This source provides gateway_route_id"
+						gateway_route_id = mezmo_http_source.my_source.gateway_route_id
+					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_http_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
@@ -113,38 +113,22 @@ func TestHttpSourceResource(t *testing.T) {
 			},
 			// Updating gateway_route_id is not allowed
 			{
-				Config: GetProviderConfig() + `
-								resource "mezmo_pipeline" "test_parent" {
-									title = "parent pipeline"
-								}
-								resource "mezmo_http_source" "my_source" {
-									pipeline_id = mezmo_pipeline.test_parent.id
-									title = "my http title"
-									description = "my http description"
-								}
-								resource "mezmo_http_source" "shared_source" {
-									pipeline_id = mezmo_pipeline.test_parent.id
-									title = "A new title"
-									gateway_route_id = mezmo_pipeline.test_parent.id
-								}`,
+				Config: GetCachedConfig("Supply gateway_route_id") + `
+					resource "mezmo_http_source" "shared_source" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "A new title"
+						gateway_route_id = mezmo_pipeline.test_parent.id
+					}`,
 				ExpectError: regexp.MustCompile("This field is immutable after resource creation."),
 			},
 			// gateway_route_id can be specified if it's the same value
 			{
-				Config: GetProviderConfig() + `
-								resource "mezmo_pipeline" "test_parent" {
-									title = "parent pipeline"
-								}
-								resource "mezmo_http_source" "my_source" {
-									pipeline_id = mezmo_pipeline.test_parent.id
-									title = "my http title"
-									description = "my http description"
-								}
-								resource "mezmo_http_source" "shared_source" {
-									pipeline_id = mezmo_pipeline.test_parent.id
-									title = "Updated title again"
-									gateway_route_id = mezmo_http_source.my_source.gateway_route_id
-								}`,
+				Config: GetCachedConfig("Supply gateway_route_id") + `
+					resource "mezmo_http_source" "shared_source" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "Updated title again"
+						gateway_route_id = mezmo_http_source.my_source.gateway_route_id
+					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_http_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
