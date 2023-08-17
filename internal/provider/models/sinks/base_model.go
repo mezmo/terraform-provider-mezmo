@@ -1,6 +1,8 @@
 package sinks
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -52,7 +54,7 @@ var baseSinkSchemaAttributes = SchemaAttributes{
 	},
 }
 
-var configurableSinkBatchTimeoutBase = SchemaAttributes{
+var addSchemas = map[string]schema.Attribute{
 	"batch_timeout_secs": schema.Int64Attribute{
 		Computed: true,
 		Optional: true,
@@ -60,16 +62,24 @@ var configurableSinkBatchTimeoutBase = SchemaAttributes{
 		Description: "The maximum amount of time, in seconds, events will be buffered " +
 			"before being flushed to the destination",
 	},
+	"ack_enabled": schema.BoolAttribute{
+		Computed:    true,
+		Optional:    true,
+		Default:     booldefault.StaticBool(true),
+		Description: "Sets end-to-end acknowledgement on the destination",
+	},
 }
 
-func ExtendBaseAttributes(target SchemaAttributes, use_batch_timeout bool) SchemaAttributes {
+func ExtendBaseAttributes(target SchemaAttributes, addons []string) SchemaAttributes {
 	for k, v := range baseSinkSchemaAttributes {
 		target[k] = v
 	}
-	if use_batch_timeout {
-		for k, v := range configurableSinkBatchTimeoutBase {
-			target[k] = v
+	for _, name := range addons {
+		schema, ok := addSchemas[name]
+		if !ok {
+			panic(fmt.Errorf("Addon attribute %s not found. Developer error.", name))
 		}
+		target[name] = schema
 	}
 	return target
 }

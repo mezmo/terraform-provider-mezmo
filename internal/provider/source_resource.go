@@ -58,8 +58,8 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Error creating pipeline",
-			"Could not create pipeline, unexpected error: "+err.Error(),
+			"Error creating source",
+			"Could not create source, unexpected error: "+err.Error(),
 		)
 		return
 	}

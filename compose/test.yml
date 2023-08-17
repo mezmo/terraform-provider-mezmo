@@ -1,6 +1,25 @@
 version: '2.4'
 
 services:
+  pipeline-service:
+    logging:
+      driver: none
+
+  timescaledb-service:
+    logging:
+      driver: none
+
+  timescaledb-metrics:
+    logging:
+      driver: none
+
+  localstack:
+    logging:
+      driver: none
+
+  account-service:
+    logging:
+      driver: none
 
   terraform-provider-mezmo:
     build:
