@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -12,6 +11,7 @@ import (
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
+	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type S3SourceModel struct {
@@ -117,17 +117,9 @@ func S3SourceToModel(plan *S3SourceModel, component *Component) {
 		values, _ := component.UserConfig["auth"].(map[string]string)
 		if len(values) > 0 {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, toAttributes(values))
+			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.ToAttributes(values))
 		}
 	}
 
 	plan.GenerationId = Int64Value(component.GenerationId)
-}
-
-func toAttributes(values map[string]string) map[string]attr.Value {
-	result := make(map[string]attr.Value, len(values))
-	for k, v := range values {
-		result[k] = StringValue(v)
-	}
-	return result
 }

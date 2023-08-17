@@ -19,7 +19,7 @@ const authAccountId = "tf_test_01"
 
 var setupMutex sync.Mutex
 var isAccountCreated bool
-var testConfigCache map[string]string = make(map[string]string, 0)
+var testConfigCache = make(map[string]string, 0)
 
 func SetCachedConfig(key string, body string) string {
 	toCache := GetProviderConfig() + body

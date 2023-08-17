@@ -10,7 +10,7 @@ import (
 )
 
 type SinkModel interface {
-	BlackholeSinkModel
+	BlackholeSinkModel | HttpSinkModel
 }
 
 type SinkResource[T SinkModel] struct {

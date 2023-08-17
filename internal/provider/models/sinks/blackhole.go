@@ -22,7 +22,7 @@ type BlackholeSinkModel struct {
 func BlackholeSinkResourceSchema() schema.Schema {
 	return schema.Schema{
 		Description: "Represents a blackhole sink.",
-		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, false),
+		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, nil),
 	}
 }
 

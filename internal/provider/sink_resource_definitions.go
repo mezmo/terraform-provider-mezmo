@@ -17,3 +17,14 @@ func NewBlackholeSinkResource() resource.Resource {
 		getSchemaFunc:     BlackholeSinkResourceSchema,
 	}
 }
+
+func NewHttpSinkResource() resource.Resource {
+	return &SinkResource[HttpSinkModel]{
+		typeName:          "http",
+		fromModelFunc:     HttpSinkFromModel,
+		toModelFunc:       HttpSinkToModel,
+		getIdFunc:         func(m *HttpSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *HttpSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     HttpSinkResourceSchema,
+	}
+}
