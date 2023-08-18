@@ -31,7 +31,7 @@ func DemoSourceResourceSchema() schema.Schema {
 						"apache_error", "bsd_syslog", "syslog", "http_metrics", "generic_metrics"),
 				},
 			},
-		}, false),
+		}, nil),
 	}
 }
 

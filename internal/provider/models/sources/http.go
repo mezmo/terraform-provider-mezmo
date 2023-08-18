@@ -38,7 +38,7 @@ func HttpSourceResourceSchema() schema.Schema {
 						"bytes", "json", "ndjson"),
 				},
 			},
-		}, true),
+		}, []string{"capture_metadata", "gateway_route_id"}),
 	}
 }
 
