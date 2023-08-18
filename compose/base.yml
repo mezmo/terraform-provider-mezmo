@@ -69,6 +69,7 @@ services:
     environment:
       LOGLEVEL: debug
       DATABASE_URL: postgresql://postgres:password@timescaledb-service/postgres
+      MEZMO_API_EXTERNAL_HOSTNAME: api.use.dev.mezmo.it
       METRICS_DATABASE_URL: postgresql://postgres:password@timescaledb-metrics/postgres
       AWS_ENDPOINT: http://localstack:4566
       AWS_ACCESS_KEY: abcd

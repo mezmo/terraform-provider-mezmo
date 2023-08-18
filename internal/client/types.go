@@ -1,7 +1,6 @@
 package client
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -44,34 +43,4 @@ type pipelineResponse struct {
 	Sources    []Source    `json:"sources"`
 	Transforms []Transform `json:"transforms"`
 	Sinks      []Sink      `json:"sinks"`
-}
-
-func (p *pipelineResponse) findSource(id string) (*Source, error) {
-	for _, s := range p.Sources {
-		if s.Id == id {
-			return &s, nil
-		}
-	}
-
-	return nil, fmt.Errorf("Source %s not found in pipeline %s", id, p.Id)
-}
-
-func (p *pipelineResponse) findSink(id string) (*Sink, error) {
-	for _, s := range p.Sinks {
-		if s.Id == id {
-			return &s, nil
-		}
-	}
-
-	return nil, fmt.Errorf("Sink %s not found in pipeline %s", id, p.Id)
-}
-
-func (p *pipelineResponse) findTransform(id string) (*Transform, error) {
-	for _, s := range p.Transforms {
-		if s.Id == id {
-			return &s, nil
-		}
-	}
-
-	return nil, fmt.Errorf("Transform %s not found in pipeline %s", id, p.Id)
 }
