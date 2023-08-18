@@ -12,7 +12,7 @@ generate-doc:
 
 .PHONY: test
 test:
-	docker-compose -p terraform-provider-mezmo-$(BUILD_TAG) -f compose/base.yml -f compose/test.yml up --remove-orphans --exit-code-from terraform-provider-mezmo --build
+	docker-compose -f compose/base.yml pull && docker-compose -p terraform-provider-mezmo-$(BUILD_TAG) -f compose/base.yml -f compose/test.yml up --remove-orphans --exit-code-from terraform-provider-mezmo --build
 
 .PHONY: local-test
 ENV := $(PWD)/env/local.env
