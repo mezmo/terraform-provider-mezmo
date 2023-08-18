@@ -61,7 +61,7 @@ func S3SourceResourceSchema() schema.Schema {
 				Description: "The compression format of the S3 objects",
 				Validators:  []validator.String{stringvalidator.OneOf([]string{"auto", "gzip", "none", "zstd"}...)},
 			},
-		}, false),
+		}, nil),
 	}
 }
 

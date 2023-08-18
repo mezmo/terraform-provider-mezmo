@@ -1,6 +1,8 @@
 package sources
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -38,7 +40,7 @@ var baseSourceSchemaAttributes = SchemaAttributes{
 	},
 }
 
-var pushSourceCaptureMetadataBase = SchemaAttributes{
+var addSchemas = map[string]schema.Attribute{
 	"capture_metadata": schema.BoolAttribute{
 		Computed: true,
 		Optional: true,
@@ -54,14 +56,16 @@ var pushSourceCaptureMetadataBase = SchemaAttributes{
 	},
 }
 
-func ExtendBaseAttributes(target SchemaAttributes, is_push_source bool) SchemaAttributes {
+func ExtendBaseAttributes(target SchemaAttributes, addons []string) SchemaAttributes {
 	for k, v := range baseSourceSchemaAttributes {
 		target[k] = v
 	}
-	if is_push_source {
-		for k, v := range pushSourceCaptureMetadataBase {
-			target[k] = v
+	for _, name := range addons {
+		schema, ok := addSchemas[name]
+		if !ok {
+			panic(fmt.Errorf("Addon attribute %s not found. Developer error.", name))
 		}
+		target[name] = schema
 	}
 	return target
 }
