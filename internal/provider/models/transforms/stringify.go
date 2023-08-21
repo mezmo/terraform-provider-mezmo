@@ -25,13 +25,15 @@ func StringifyTransformResourceSchema() schema.Schema {
 	}
 }
 
-func StringifyTransformFromModel(plan *StringifyTransformModel, previousState *StringifyTransformModel) (*Component, diag.Diagnostics) {
+func StringifyTransformFromModel(plan *StringifyTransformModel, previousState *StringifyTransformModel) (*Transform, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
-	component := Component{
-		Type:        "stringify",
-		Title:       plan.Title.ValueString(),
-		Description: plan.Description.ValueString(),
-		UserConfig:  make(map[string]any),
+	component := Transform{
+		BaseNode: BaseNode{
+			Type:        "stringify",
+			Title:       plan.Title.ValueString(),
+			Description: plan.Description.ValueString(),
+			UserConfig:  make(map[string]any),
+		},
 	}
 
 	if !plan.Inputs.IsUnknown() {
@@ -51,7 +53,7 @@ func StringifyTransformFromModel(plan *StringifyTransformModel, previousState *S
 	return &component, dd
 }
 
-func StringifyTransformToModel(plan *StringifyTransformModel, component *Component) {
+func StringifyTransformToModel(plan *StringifyTransformModel, component *Transform) {
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = StringValue(component.Title)

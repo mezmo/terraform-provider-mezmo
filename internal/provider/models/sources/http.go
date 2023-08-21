@@ -42,16 +42,18 @@ func HttpSourceResourceSchema() schema.Schema {
 	}
 }
 
-func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) (*Component, diag.Diagnostics) {
+func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) (*Source, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
 
-	component := Component{
-		Type:        "http",
-		Title:       plan.Title.ValueString(),
-		Description: plan.Description.ValueString(),
-		UserConfig: map[string]any{
-			"decoding":         plan.Decoding.ValueString(),
-			"capture_metadata": plan.CaptureMetadata.ValueBool(),
+	component := Source{
+		BaseNode: BaseNode{
+			Type:        "http",
+			Title:       plan.Title.ValueString(),
+			Description: plan.Description.ValueString(),
+			UserConfig: map[string]any{
+				"decoding":         plan.Decoding.ValueString(),
+				"capture_metadata": plan.CaptureMetadata.ValueBool(),
+			},
 		},
 	}
 
@@ -79,7 +81,7 @@ func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) 
 	return &component, dd
 }
 
-func HttpSourceToModel(plan *HttpSourceModel, component *Component) {
+func HttpSourceToModel(plan *HttpSourceModel, component *Source) {
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = StringValue(component.Title)

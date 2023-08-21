@@ -16,8 +16,8 @@ type SinkModel interface {
 type SinkResource[T SinkModel] struct {
 	client            Client
 	typeName          string
-	fromModelFunc     componentFromModelFunc[T]
-	toModelFunc       componentToModelFunc[T]
+	fromModelFunc     sinkFromModelFunc[T]
+	toModelFunc       sinkToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
 	getPipelineIdFunc idGetterFunc[T]
 	getSchemaFunc     getSchemaFunc
