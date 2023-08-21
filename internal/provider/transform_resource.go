@@ -10,7 +10,7 @@ import (
 )
 
 type TransformModel interface {
-	StringifyTransformModel
+	StringifyTransformModel | CompactFieldsTransformModel
 }
 
 type TransformResource[T TransformModel] struct {

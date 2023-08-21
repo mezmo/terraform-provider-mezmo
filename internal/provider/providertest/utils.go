@@ -124,6 +124,9 @@ func StateHasExpectedValues(resourceName string, expected map[string]any) resour
 		}
 		attributes := resource.Primary.Attributes
 
+		// For debugging:
+		// fmt.Printf("---------- attributes ------- %+v\n", attributes)
+
 		for expectedKey, expectedVal := range expected {
 			foundVal, state_has_key := attributes[expectedKey]
 			if state_has_key {
