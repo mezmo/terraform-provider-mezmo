@@ -65,23 +65,25 @@ func S3SourceResourceSchema() schema.Schema {
 	}
 }
 
-func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Component, diag.Diagnostics) {
+func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Source, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
 	auth := plan.Auth.Attributes()
 	auth_access_key_id, _ := auth["access_key_id"].(basetypes.StringValue)
 	auth_secret_access_key, _ := auth["secret_access_key"].(basetypes.StringValue)
-	component := Component{
-		Type:        "s3",
-		Title:       plan.Title.ValueString(),
-		Description: plan.Description.ValueString(),
-		UserConfig: map[string]any{
-			"region":        plan.Region.ValueString(),
-			"sqs_queue_url": plan.SqsQueueUrl.ValueString(),
-			"auth": map[string]string{
-				"access_key_id":     auth_access_key_id.ValueString(),
-				"secret_access_key": auth_secret_access_key.ValueString(),
+	component := Source{
+		BaseNode: BaseNode{
+			Type:        "s3",
+			Title:       plan.Title.ValueString(),
+			Description: plan.Description.ValueString(),
+			UserConfig: map[string]any{
+				"region":        plan.Region.ValueString(),
+				"sqs_queue_url": plan.SqsQueueUrl.ValueString(),
+				"auth": map[string]string{
+					"access_key_id":     auth_access_key_id.ValueString(),
+					"secret_access_key": auth_secret_access_key.ValueString(),
+				},
+				"compression": plan.Compression.ValueString(),
 			},
-			"compression": plan.Compression.ValueString(),
 		},
 	}
 
@@ -93,7 +95,7 @@ func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Comp
 	return &component, dd
 }
 
-func S3SourceToModel(plan *S3SourceModel, component *Component) {
+func S3SourceToModel(plan *S3SourceModel, component *Source) {
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = StringValue(component.Title)

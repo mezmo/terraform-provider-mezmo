@@ -16,8 +16,8 @@ type SourceModel interface {
 type SourceResource[T SourceModel] struct {
 	client            Client
 	typeName          string
-	fromModelFunc     componentFromModelFunc[T]
-	toModelFunc       componentToModelFunc[T]
+	fromModelFunc     sourceFromModelFunc[T]
+	toModelFunc       sourceToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
 	getPipelineIdFunc idGetterFunc[T]
 	getSchemaFunc     getSchemaFunc

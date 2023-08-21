@@ -26,14 +26,16 @@ func BlackholeSinkResourceSchema() schema.Schema {
 	}
 }
 
-func BlackholeSinkFromModel(plan *BlackholeSinkModel, previousState *BlackholeSinkModel) (*Component, diag.Diagnostics) {
+func BlackholeSinkFromModel(plan *BlackholeSinkModel, previousState *BlackholeSinkModel) (*Sink, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
-	component := Component{
-		Type:        "blackhole",
-		Title:       plan.Title.ValueString(),
-		Description: plan.Description.ValueString(),
-		UserConfig: map[string]any{
-			"ack_enabled": plan.AckEnabled.ValueBool(),
+	component := Sink{
+		BaseNode: BaseNode{
+			Type:        "blackhole",
+			Title:       plan.Title.ValueString(),
+			Description: plan.Description.ValueString(),
+			UserConfig: map[string]any{
+				"ack_enabled": plan.AckEnabled.ValueBool(),
+			},
 		},
 	}
 
@@ -54,7 +56,7 @@ func BlackholeSinkFromModel(plan *BlackholeSinkModel, previousState *BlackholeSi
 	return &component, dd
 }
 
-func BlackholeSinkToModel(plan *BlackholeSinkModel, component *Component) {
+func BlackholeSinkToModel(plan *BlackholeSinkModel, component *Sink) {
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = StringValue(component.Title)

@@ -16,8 +16,8 @@ type TransformModel interface {
 type TransformResource[T TransformModel] struct {
 	client            Client
 	typeName          string
-	fromModelFunc     componentFromModelFunc[T]
-	toModelFunc       componentToModelFunc[T]
+	fromModelFunc     transformFromModelFunc[T]
+	toModelFunc       transformToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
 	getPipelineIdFunc idGetterFunc[T]
 	getSchemaFunc     getSchemaFunc

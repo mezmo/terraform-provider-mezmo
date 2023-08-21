@@ -35,13 +35,15 @@ func DemoSourceResourceSchema() schema.Schema {
 	}
 }
 
-func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) (*Component, diag.Diagnostics) {
+func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) (*Source, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
-	component := Component{
-		Type:        "demo-logs",
-		Title:       plan.Title.ValueString(),
-		Description: plan.Description.ValueString(),
-		UserConfig:  map[string]any{"format": plan.Format.ValueString()},
+	component := Source{
+		BaseNode: BaseNode{
+			Type:        "demo-logs",
+			Title:       plan.Title.ValueString(),
+			Description: plan.Description.ValueString(),
+			UserConfig:  map[string]any{"format": plan.Format.ValueString()},
+		},
 	}
 
 	if previousState != nil {
@@ -52,7 +54,7 @@ func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) 
 	return &component, dd
 }
 
-func DemoSourceToModel(plan *DemoSourceModel, component *Component) {
+func DemoSourceToModel(plan *DemoSourceModel, component *Source) {
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = StringValue(component.Title)

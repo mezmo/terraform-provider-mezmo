@@ -13,6 +13,13 @@ type ComponentModel interface {
 }
 
 type idGetterFunc[T ComponentModel] func(*T) basetypes.StringValue
-type componentToModelFunc[T ComponentModel] func(model *T, component *Component)
-type componentFromModelFunc[T ComponentModel] func(model *T, previousState *T) (*Component, diag.Diagnostics)
 type getSchemaFunc func() schema.Schema
+
+type sourceToModelFunc[T ComponentModel] func(model *T, component *Source)
+type sourceFromModelFunc[T ComponentModel] func(model *T, previousState *T) (*Source, diag.Diagnostics)
+
+type transformToModelFunc[T ComponentModel] func(model *T, component *Transform)
+type transformFromModelFunc[T ComponentModel] func(model *T, previousState *T) (*Transform, diag.Diagnostics)
+
+type sinkToModelFunc[T ComponentModel] func(model *T, component *Sink)
+type sinkFromModelFunc[T ComponentModel] func(model *T, previousState *T) (*Sink, diag.Diagnostics)

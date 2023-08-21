@@ -95,18 +95,20 @@ func HttpSinkResourceSchema() schema.Schema {
 	}
 }
 
-func HttpSinkFromModel(plan *HttpSinkModel, previousState *HttpSinkModel) (*Component, diag.Diagnostics) {
+func HttpSinkFromModel(plan *HttpSinkModel, previousState *HttpSinkModel) (*Sink, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
 
-	component := Component{
-		Type:        "http",
-		Title:       plan.Title.ValueString(),
-		Description: plan.Description.ValueString(),
-		UserConfig: map[string]any{
-			"uri":         plan.Uri.ValueString(),
-			"encoding":    plan.Encoding.ValueString(),
-			"compression": plan.Compression.ValueString(),
-			"ack_enabled": plan.AckEnabled.ValueBool(),
+	component := Sink{
+		BaseNode: BaseNode{
+			Type:        "http",
+			Title:       plan.Title.ValueString(),
+			Description: plan.Description.ValueString(),
+			UserConfig: map[string]any{
+				"uri":         plan.Uri.ValueString(),
+				"encoding":    plan.Encoding.ValueString(),
+				"compression": plan.Compression.ValueString(),
+				"ack_enabled": plan.AckEnabled.ValueBool(),
+			},
 		},
 	}
 
@@ -140,7 +142,7 @@ func HttpSinkFromModel(plan *HttpSinkModel, previousState *HttpSinkModel) (*Comp
 	return &component, dd
 }
 
-func HttpSinkToModel(plan *HttpSinkModel, component *Component) {
+func HttpSinkToModel(plan *HttpSinkModel, component *Sink) {
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = StringValue(component.Title)
