@@ -181,15 +181,15 @@ func (c *client) DeleteSource(pipelineId string, id string) error {
 // Source implements Client.
 // Gets a source from a pipeline.
 func (c *client) Source(pipelineId string, id string) (*Source, error) {
-	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, pipelineId)
+	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[pipelineResponse]
+	var envelope apiResponseEnvelope[Source]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	pipeline := &envelope.Data
-	return pipeline.findSource(id)
+	source := &envelope.Data
+	return source, nil
 }
 
 // UpdateSource implements Client.
@@ -215,15 +215,15 @@ func (c *client) UpdateSource(pipelineId string, component *Source) (*Source, er
 // Sink implements Client.
 // Gets a sink.
 func (c *client) Sink(pipelineId string, id string) (*Sink, error) {
-	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, pipelineId)
+	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[pipelineResponse]
+	var envelope apiResponseEnvelope[Sink]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	pipeline := &envelope.Data
-	return pipeline.findSink(id)
+	sink := &envelope.Data
+	return sink, nil
 }
 
 // CreateSink implements Client.
@@ -270,15 +270,15 @@ func (c *client) UpdateSink(pipelineId string, component *Sink) (*Sink, error) {
 // Transform implements Client.
 // Gets a Transform.
 func (c *client) Transform(pipelineId string, id string) (*Transform, error) {
-	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, pipelineId)
+	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[pipelineResponse]
+	var envelope apiResponseEnvelope[Transform]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	pipeline := &envelope.Data
-	return pipeline.findTransform(id)
+	transform := &envelope.Data
+	return transform, nil
 }
 
 // CreateTransform implements Client.
