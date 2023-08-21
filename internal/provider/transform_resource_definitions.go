@@ -17,3 +17,13 @@ func NewStringifyTransformResource() resource.Resource {
 		getSchemaFunc:     StringifyTransformResourceSchema,
 	}
 }
+func NewCompactFieldsTransformResource() resource.Resource {
+	return &TransformResource[CompactFieldsTransformModel]{
+		typeName:          "compact_fields",
+		fromModelFunc:     CompactFieldsTransformFromModel,
+		toModelFunc:       CompactFieldsTransformToModel,
+		getIdFunc:         func(m *CompactFieldsTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *CompactFieldsTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     CompactFieldsTransformResourceSchema,
+	}
+}

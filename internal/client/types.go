@@ -28,10 +28,10 @@ type Source struct {
 }
 type Transform struct {
 	BaseNode
-	OutputNames []struct {
+	Outputs []struct {
 		Id    string `json:"id"`
 		Label string `json:"label"`
-	} `json:"output_names,omitempty"`
+	} `json:"outputs,omitempty"`
 }
 type Sink struct {
 	BaseNode
