@@ -18,6 +18,17 @@ func NewDemoSourceResource() resource.Resource {
 	}
 }
 
+func NewAgentSourceResource() resource.Resource {
+    return &SourceResource[AgentSourceModel]{
+        typeName:          "agent",
+        fromModelFunc:     AgentSourceFromModel,
+        toModelFunc:       AgentSourceToModel,
+        getIdFunc:         func(m *AgentSourceModel) basetypes.StringValue { return m.Id },
+        getPipelineIdFunc: func(m *AgentSourceModel) basetypes.StringValue { return m.PipelineId },
+        getSchemaFunc:     AgentSourceResourceSchema,
+    }
+}
+
 func NewS3SourceResource() resource.Resource {
 	return &SourceResource[S3SourceModel]{
 		typeName:          "s3",
