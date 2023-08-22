@@ -11,6 +11,7 @@ import (
 
 type TransformModel interface {
 	CompactFieldsTransformModel |
+		DecryptFieldsTransformModel |
 		DedupeTransformModel |
 		DropFieldsTransformModel |
 		FlattenFieldsTransformModel |

@@ -96,6 +96,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 
 		// Transforms
 		NewCompactFieldsTransformResource,
+		NewDecryptFieldsTransformResource,
 		NewDedupeTransformResource,
 		NewDropFieldsTransformResource,
 		NewFlattenFieldsTransformResource,
