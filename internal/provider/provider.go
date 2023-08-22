@@ -92,8 +92,9 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewHttpSourceResource,
 
 		// Transforms
-		NewStringifyTransformResource,
 		NewCompactFieldsTransformResource,
+		NewDedupeTransformResource,
+		NewStringifyTransformResource,
 
 		// Sinks
 		NewBlackholeSinkResource,
