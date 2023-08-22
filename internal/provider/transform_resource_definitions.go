@@ -7,6 +7,17 @@ import (
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/transforms"
 )
 
+func NewDedupeTransformResource() resource.Resource {
+	return &TransformResource[DedupeTransformModel]{
+		typeName:          "dedupe",
+		fromModelFunc:     DedupeTransformFromModel,
+		toModelFunc:       DedupeTransformToModel,
+		getIdFunc:         func(m *DedupeTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *DedupeTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     DedupeTransformResourceSchema,
+	}
+}
+
 func NewStringifyTransformResource() resource.Resource {
 	return &TransformResource[StringifyTransformModel]{
 		typeName:          "stringify",
@@ -17,6 +28,7 @@ func NewStringifyTransformResource() resource.Resource {
 		getSchemaFunc:     StringifyTransformResourceSchema,
 	}
 }
+
 func NewCompactFieldsTransformResource() resource.Resource {
 	return &TransformResource[CompactFieldsTransformModel]{
 		typeName:          "compact_fields",
