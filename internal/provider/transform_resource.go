@@ -12,7 +12,8 @@ import (
 type TransformModel interface {
 	CompactFieldsTransformModel |
 		DedupeTransformModel |
-		StringifyTransformModel
+		StringifyTransformModel |
+		FlattenFieldsTransformModel
 }
 
 type TransformResource[T TransformModel] struct {

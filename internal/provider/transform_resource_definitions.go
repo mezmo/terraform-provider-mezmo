@@ -18,6 +18,17 @@ func NewDedupeTransformResource() resource.Resource {
 	}
 }
 
+func NewFlattenFieldsTransformResource() resource.Resource {
+	return &TransformResource[FlattenFieldsTransformModel]{
+		typeName:          "flatten_fields",
+		fromModelFunc:     FlattenFieldsTransformFromModel,
+		toModelFunc:       FlattenFieldsTransformToModel,
+		getIdFunc:         func(m *FlattenFieldsTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *FlattenFieldsTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     FlattenFieldsTransformResourceSchema,
+	}
+}
+
 func NewStringifyTransformResource() resource.Resource {
 	return &TransformResource[StringifyTransformModel]{
 		typeName:          "stringify",
