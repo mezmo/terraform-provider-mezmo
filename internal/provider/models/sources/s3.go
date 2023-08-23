@@ -11,6 +11,7 @@ import (
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
+	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
@@ -117,7 +118,7 @@ func S3SourceToModel(plan *S3SourceModel, component *Source) {
 		values, _ := component.UserConfig["auth"].(map[string]string)
 		if len(values) > 0 {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, ToAttributes(values))
+			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapStringsToMapValues(values))
 		}
 	}
 
