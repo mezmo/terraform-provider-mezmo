@@ -4,16 +4,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type DedupeTransformModel struct {
@@ -82,16 +80,8 @@ func DedupeTransformFromModel(plan *DedupeTransformModel, previousState *DedupeT
 		component.GenerationId = previousState.GenerationId.ValueInt64()
 	}
 
-	if !plan.Inputs.IsUnknown() {
-		inputs := make([]string, 0)
-		for _, v := range plan.Inputs.Elements() {
-			value, _ := v.(basetypes.StringValue)
-			inputs = append(inputs, value.ValueString())
-		}
-		component.Inputs = inputs
-	}
-
-	component.UserConfig["fields"] = modelutils.StringListValueToStringSlice(plan.Fields)
+	component.Inputs = StringListValueToStringSlice(plan.Inputs)
+	component.UserConfig["fields"] = StringListValueToStringSlice(plan.Fields)
 	// Default values make the plan always to have this values defined
 	component.UserConfig["number_of_events"] = plan.NumberOfEvents.ValueInt64()
 	component.UserConfig["comparison_type"] = plan.ComparisonType.ValueString()
@@ -108,15 +98,8 @@ func DedupeTransformToModel(plan *DedupeTransformModel, component *Transform) {
 		plan.Description = StringValue(component.Description)
 	}
 	plan.GenerationId = Int64Value(component.GenerationId)
-	if component.Inputs != nil {
-		inputs := make([]attr.Value, 0)
-		for _, v := range component.Inputs {
-			inputs = append(inputs, StringValue(v))
-		}
-		plan.Inputs = ListValueMust(StringType, inputs)
-	}
-
-	plan.Fields = modelutils.SliceToStringListValue(component.UserConfig["fields"].([]any))
+	plan.Inputs = SliceToStringListValue(component.Inputs)
+	plan.Fields = SliceToStringListValue(component.UserConfig["fields"].([]any))
 	if component.UserConfig["number_of_events"] != nil {
 		plan.NumberOfEvents = Int64Value(int64(component.UserConfig["number_of_events"].(float64)))
 	}

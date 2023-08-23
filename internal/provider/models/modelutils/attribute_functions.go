@@ -55,6 +55,10 @@ func FromAttributes(obj interface{}, dd diag.Diagnostics) (map[string]string, bo
 }
 
 func StringListValueToStringSlice(list List) []string {
+	if list.IsUnknown() {
+		return nil
+	}
+
 	result := make([]string, 0)
 	for _, v := range list.Elements() {
 		value, _ := v.(basetypes.StringValue)
@@ -64,10 +68,10 @@ func StringListValueToStringSlice(list List) []string {
 	return result
 }
 
-func SliceToStringListValue(s []any) List {
+func SliceToStringListValue[T any](s []T) List {
 	list := make([]attr.Value, 0)
 	for _, v := range s {
-		value, _ := v.(string)
+		value, _ := any(v).(string)
 		list = append(list, StringValue(value))
 	}
 	return ListValueMust(StringType, list)
