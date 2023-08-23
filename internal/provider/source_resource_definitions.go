@@ -50,3 +50,14 @@ func NewHttpSourceResource() resource.Resource {
 		getSchemaFunc:     HttpSourceResourceSchema,
 	}
 }
+
+func NewSQSSourceResource() resource.Resource {
+	return &SourceResource[SQSSourceModel]{
+		typeName:          "sqs",
+		fromModelFunc:     SQSSourceFromModel,
+		toModelFunc:       SQSSourceToModel,
+		getIdFunc:         func(m *SQSSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *SQSSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     SQSSourceResourceSchema,
+	}
+}
