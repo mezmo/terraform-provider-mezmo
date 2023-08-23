@@ -12,8 +12,9 @@ import (
 type TransformModel interface {
 	CompactFieldsTransformModel |
 		DedupeTransformModel |
-		StringifyTransformModel |
-		FlattenFieldsTransformModel
+		FlattenFieldsTransformModel |
+		SampleTransformModel |
+		StringifyTransformModel
 }
 
 type TransformResource[T TransformModel] struct {

@@ -29,6 +29,17 @@ func NewFlattenFieldsTransformResource() resource.Resource {
 	}
 }
 
+func NewSampleTransformResource() resource.Resource {
+	return &TransformResource[SampleTransformModel]{
+		typeName:          "sample",
+		fromModelFunc:     SampleTransformFromModel,
+		toModelFunc:       SampleTransformToModel,
+		getIdFunc:         func(m *SampleTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *SampleTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     SampleTransformResourceSchema,
+	}
+}
+
 func NewStringifyTransformResource() resource.Resource {
 	return &TransformResource[StringifyTransformModel]{
 		typeName:          "stringify",

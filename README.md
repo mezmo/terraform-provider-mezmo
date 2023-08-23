@@ -30,10 +30,16 @@ Start the services:
 docker-compose -f compose/base.yml up --remove-orphans
 ```
 
-Run the test suite:
+Running the test suite:
 
 ```shell
 make local-test
+```
+
+Running a single test
+
+```shell
+env $(cat ./env/local.env) go test -v -count=1 ./... -run TestDedupeTransform
 ```
 
 ## Generating the Docs
