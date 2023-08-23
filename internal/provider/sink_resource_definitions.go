@@ -28,3 +28,14 @@ func NewHttpSinkResource() resource.Resource {
 		getSchemaFunc:     HttpSinkResourceSchema,
 	}
 }
+
+func NewDatadogMetricsSinkResource() resource.Resource {
+	return &SinkResource[DatadogMetricsSinkModel]{
+		typeName:          "datadog-metrics",
+		fromModelFunc:     DatadogMetricsFromModel,
+		toModelFunc:       DatadogMetricsSinkToModel,
+		getIdFunc:         func(m *DatadogMetricsSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *DatadogMetricsSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     DatadogMetricsSinkResourceSchema,
+	}
+}

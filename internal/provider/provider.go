@@ -100,6 +100,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 
 		// Sinks
 		NewBlackholeSinkResource,
+		NewDatadogMetricsSinkResource,
 		NewHttpSinkResource,
 	}
 }
