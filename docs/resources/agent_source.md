@@ -3,12 +3,12 @@
 page_title: "mezmo_agent_source Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  Represents an agent source.
+  Represents a Mezmo agent source.
 ---
 
 # mezmo_agent_source (Resource)
 
-Represents an Agent source.
+Represents a Mezmo agent source.
 
 
 

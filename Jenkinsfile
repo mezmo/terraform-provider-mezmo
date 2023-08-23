@@ -68,6 +68,21 @@ pipeline {
   }
 
   stages {
+    stage('Format') {
+      tools {
+        nodejs 'NodeJS 16'
+      }
+      agent {
+        node {
+          label 'ec2-fleet'
+          customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}-integration_tests"
+        }
+      }
+      steps {
+        sh 'FILES_TO_FORMAT=$(gofmt -l .) && echo -e "Files with formatting errors: $FILES_TO_FORMAT" && [ -z "$FILES_TO_FORMAT" ]'
+      }
+    }
+
     stage('Test') {
       when {
         not {

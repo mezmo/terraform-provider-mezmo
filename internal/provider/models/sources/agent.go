@@ -22,7 +22,7 @@ type AgentSourceModel struct {
 func AgentSourceResourceSchema() schema.Schema {
 	return schema.Schema{
 		Description: "Represents a Mezmo agent source.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "gateway_route_id"}),
+		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "gateway_route_id"}),
 	}
 }
 

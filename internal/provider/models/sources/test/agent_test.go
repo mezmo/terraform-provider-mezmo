@@ -9,7 +9,7 @@ import (
 )
 
 func TestAgentSourceResource(t *testing.T) {
-        const cacheKey = "agent_resources"
+	const cacheKey = "agent_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
@@ -28,7 +28,7 @@ func TestAgentSourceResource(t *testing.T) {
 			},
 			// Create and Read testing
 			{
-			    Config: GetCachedConfig(cacheKey) + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_agent_source" "my_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my agent title"
@@ -50,7 +50,7 @@ func TestAgentSourceResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-			    Config: GetCachedConfig(cacheKey) + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_agent_source" "my_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
