@@ -121,10 +121,10 @@ func HttpSinkFromModel(plan *HttpSinkModel, previousState *HttpSinkModel) (*Sink
 		component.Inputs = inputs
 	}
 	if !plan.Auth.IsNull() {
-		component.UserConfig["auth"], _ = modelutils.FromAttributes(plan.Auth, dd)
+		component.UserConfig["auth"], _ = modelutils.MapValuesToMapStrings(plan.Auth, dd)
 	}
 	if !plan.Headers.IsNull() {
-		headerMap, ok := modelutils.FromAttributes(plan.Headers, dd)
+		headerMap, ok := modelutils.MapValuesToMapStrings(plan.Headers, dd)
 		if ok {
 			headerArray := make([]map[string]string, 0, len(headerMap))
 			for k, v := range headerMap {
@@ -173,7 +173,7 @@ func HttpSinkToModel(plan *HttpSinkModel, component *Sink) {
 		values, _ := component.UserConfig["auth"].(map[string]string)
 		if len(values) > 0 {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.ToAttributes(values))
+			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapStringsToMapValues(values))
 		}
 	}
 	if component.UserConfig["headers"] != nil {
@@ -183,7 +183,7 @@ func HttpSinkToModel(plan *HttpSinkModel, component *Sink) {
 			for _, obj := range headerArray {
 				headerMap[obj["header_name"]] = obj["header_value"]
 			}
-			plan.Headers = basetypes.NewMapValueMust(MapType{}, modelutils.ToAttributes(headerMap))
+			plan.Headers = basetypes.NewMapValueMust(MapType{}, modelutils.MapStringsToMapValues(headerMap))
 		}
 	}
 	if component.UserConfig["ack_enabled"] != nil {

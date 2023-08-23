@@ -13,7 +13,7 @@ import (
 
 // This function can help with taking an object from an API response and translating
 // it into a basetype object from the terraform-plugin-framework
-func ToAttributes(values map[string]string) map[string]attr.Value {
+func MapStringsToMapValues(values map[string]string) map[string]attr.Value {
 	result := make(map[string]attr.Value, len(values))
 	for k, v := range values {
 		result[k] = StringValue(v)
@@ -26,7 +26,7 @@ func ToAttributes(values map[string]string) map[string]attr.Value {
 // it can be used in an API call.
 // TODO: This currently only supports string values, not numbers or any other type.
 // TODO: perhaps this should accept a mutable interface that can be inspected for casting
-func FromAttributes(obj interface{}, dd diag.Diagnostics) (map[string]string, bool) {
+func MapValuesToMapStrings(obj interface{}, dd diag.Diagnostics) (map[string]string, bool) {
 	var attrs map[string]attr.Value
 	switch obj.(type) {
 	case Object:
