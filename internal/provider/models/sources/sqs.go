@@ -6,31 +6,36 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
 	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
-type S3SourceModel struct {
+type SQSSourceModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
 	Title        String `tfsdk:"title"`
 	Description  String `tfsdk:"description"`
+	GenerationId Int64  `tfsdk:"generation_id"`
+	QueueUrl     String `tfsdk:"queue_url"`
 	Auth         Object `tfsdk:"auth"`
 	Region       String `tfsdk:"region"`
-	SqsQueueUrl  String `tfsdk:"sqs_queue_url"`
-	GenerationId Int64  `tfsdk:"generation_id"`
-	Compression  String `tfsdk:"compression"`
 }
 
-func S3SourceResourceSchema() schema.Schema {
+func SQSSourceResourceSchema() schema.Schema {
 	return schema.Schema{
-		Description: "Represents an S3 pull source.",
+		Description: "Collect messages from AWS SQS",
 		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+			"queue_url": schema.StringAttribute{
+				Required:    true,
+				Description: "The URL of an AWS SQS queue",
+				Validators: []validator.String{
+					stringvalidator.LengthAtLeast(7), // http://
+					stringvalidator.LengthAtMost(128),
+				},
+			},
 			"auth": schema.SingleNestedAttribute{
 				Required:    true,
 				Description: "Configures AWS authentication",
@@ -50,41 +55,30 @@ func S3SourceResourceSchema() schema.Schema {
 			},
 			"region": schema.StringAttribute{
 				Required:    true,
-				Description: "The name of the AWS region",
+				Description: "The name of the source's AWS region",
 				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"sqs_queue_url": schema.StringAttribute{
-				Required:    true,
-				Description: "The URL of a AWS SQS queue configured to receive S3 bucket notifications",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(7)},
-			},
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("auto"),
-				Description: "The compression format of the S3 objects",
-				Validators:  []validator.String{stringvalidator.OneOf([]string{"auto", "gzip", "none", "zstd"}...)},
 			},
 		}, nil),
 	}
 }
 
-func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Source, diag.Diagnostics) {
+func SQSSourceFromModel(plan *SQSSourceModel, previousState *SQSSourceModel) (*Source, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
 	auth := plan.Auth.Attributes()
+	auth_access_key_id, _ := auth["access_key_id"].(basetypes.StringValue)
+	auth_secret_access_key, _ := auth["secret_access_key"].(basetypes.StringValue)
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "s3",
+			Type:        "sqs",
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{
-				"region":        plan.Region.ValueString(),
-				"sqs_queue_url": plan.SqsQueueUrl.ValueString(),
+				"region":    plan.Region.ValueString(),
+				"queue_url": plan.QueueUrl.ValueString(),
 				"auth": map[string]string{
-					"access_key_id":     GetAttributeValue[String](auth, "access_key_id").ValueString(),
-					"secret_access_key": GetAttributeValue[String](auth, "secret_access_key").ValueString(),
+					"access_key_id":     auth_access_key_id.ValueString(),
+					"secret_access_key": auth_secret_access_key.ValueString(),
 				},
-				"compression": plan.Compression.ValueString(),
 			},
 		},
 	}
@@ -97,7 +91,7 @@ func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Sour
 	return &component, dd
 }
 
-func S3SourceToModel(plan *S3SourceModel, component *Source) {
+func SQSSourceToModel(plan *SQSSourceModel, component *Source) {
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = StringValue(component.Title)
@@ -105,18 +99,14 @@ func S3SourceToModel(plan *S3SourceModel, component *Source) {
 	if component.Description != "" {
 		plan.Description = StringValue(component.Description)
 	}
-	if component.UserConfig["region"] != nil {
-		value, _ := component.UserConfig["region"].(string)
-		plan.Region = StringValue(value)
-	}
-	if component.UserConfig["sqs_queue_url"] != nil {
-		value, _ := component.UserConfig["sqs_queue_url"].(string)
-		plan.SqsQueueUrl = StringValue(value)
-	}
-	if component.UserConfig["compression"] != nil {
-		value, _ := component.UserConfig["compression"].(string)
-		plan.Compression = StringValue(value)
-	}
+
+	// Required properties will always be present in the API response
+	region, _ := component.UserConfig["region"].(string)
+	plan.Region = StringValue(region)
+
+	queueUrl, _ := component.UserConfig["queue_url"].(string)
+	plan.QueueUrl = StringValue(queueUrl)
+
 	if component.UserConfig["auth"] != nil {
 		values, _ := component.UserConfig["auth"].(map[string]string)
 		if len(values) > 0 {

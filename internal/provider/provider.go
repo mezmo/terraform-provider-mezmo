@@ -87,10 +87,11 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewPipelineResource,
 
 		// Sources
-		NewDemoSourceResource,
 		NewAgentSourceResource,
-		NewS3SourceResource,
+		NewDemoSourceResource,
 		NewHttpSourceResource,
+		NewS3SourceResource,
+		NewSQSSourceResource,
 
 		// Transforms
 		NewCompactFieldsTransformResource,

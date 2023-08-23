@@ -10,7 +10,11 @@ import (
 )
 
 type SourceModel interface {
-	DemoSourceModel | AgentSourceModel | S3SourceModel | HttpSourceModel
+	AgentSourceModel |
+		DemoSourceModel |
+		HttpSourceModel |
+		S3SourceModel |
+		SQSSourceModel
 }
 
 type SourceResource[T SourceModel] struct {
