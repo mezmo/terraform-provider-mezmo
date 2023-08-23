@@ -54,6 +54,12 @@ func FromAttributes(obj interface{}, dd diag.Diagnostics) (map[string]string, bo
 	return target, dd.HasError()
 }
 
+// Gets a known attribute value from an attribute map and casts it to the provided type.
+func GetAttributeValue[T any](m map[string]attr.Value, name string) T {
+	r, _ := m[name].(T)
+	return r
+}
+
 func StringListValueToStringSlice(list List) []string {
 	if list.IsUnknown() {
 		return nil
