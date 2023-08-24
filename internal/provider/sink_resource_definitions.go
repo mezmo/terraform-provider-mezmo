@@ -18,17 +18,6 @@ func NewBlackholeSinkResource() resource.Resource {
 	}
 }
 
-func NewHttpSinkResource() resource.Resource {
-	return &SinkResource[HttpSinkModel]{
-		typeName:          "http",
-		fromModelFunc:     HttpSinkFromModel,
-		toModelFunc:       HttpSinkToModel,
-		getIdFunc:         func(m *HttpSinkModel) basetypes.StringValue { return m.Id },
-		getPipelineIdFunc: func(m *HttpSinkModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     HttpSinkResourceSchema,
-	}
-}
-
 func NewDatadogLogsSinkResource() resource.Resource {
 	return &SinkResource[DatadogLogsSinkModel]{
 		typeName:          "datadog-logs",
@@ -48,5 +37,27 @@ func NewDatadogMetricsSinkResource() resource.Resource {
 		getIdFunc:         func(m *DatadogMetricsSinkModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *DatadogMetricsSinkModel) basetypes.StringValue { return m.PipelineId },
 		getSchemaFunc:     DatadogMetricsSinkResourceSchema,
+	}
+}
+
+func NewHttpSinkResource() resource.Resource {
+	return &SinkResource[HttpSinkModel]{
+		typeName:          "http",
+		fromModelFunc:     HttpSinkFromModel,
+		toModelFunc:       HttpSinkToModel,
+		getIdFunc:         func(m *HttpSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *HttpSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     HttpSinkResourceSchema,
+	}
+}
+
+func NewMezmoSinkResource() resource.Resource {
+	return &SinkResource[MezmoSinkModel]{
+		typeName:          "logs",
+		fromModelFunc:     MezmoSinkFromModel,
+		toModelFunc:       MezmoSinkToModel,
+		getIdFunc:         func(m *MezmoSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *MezmoSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     MezmoSinkResourceSchema,
 	}
 }

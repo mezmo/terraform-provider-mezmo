@@ -60,6 +60,43 @@ func GetAttributeValue[T any](m map[string]attr.Value, name string) T {
 	return r
 }
 
+// Returns the keys of the provided map
+func MapKeys[K comparable, V any](m map[K]V) []K {
+	result := make([]K, 0, len(m))
+	for k := range m {
+		result = append(result, k)
+	}
+	return result
+}
+
+// Returns the key for a given map, panicking when not found
+func FindKey[K comparable, V comparable](m map[K]V, value V) K {
+	for k, v := range m {
+		if v == value {
+			return k
+		}
+	}
+	panic(fmt.Sprintf("Key for '%v' not found", value))
+}
+
+// Sets one or more optional string values from a attribute map into a target map
+func SetOptionalStringFromAttributeMap(target map[string]any, attr_source_map map[string]attr.Value, names ...string) {
+	for _, name := range names {
+		if attr_source_map[name] != nil && !attr_source_map[name].IsNull() {
+			target[name] = GetAttributeValue[String](attr_source_map, name).ValueString()
+		}
+	}
+}
+
+// Sets one or more optional string attributes from a source map
+func SetOptionalAttributeStringFromMap(target map[string]attr.Value, source map[string]any, names ...string) {
+	for _, name := range names {
+		if source[name] != nil {
+			target[name] = StringValue(source[name].(string))
+		}
+	}
+}
+
 func StringListValueToStringSlice(list List) []string {
 	if list.IsUnknown() {
 		return nil
