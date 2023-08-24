@@ -10,7 +10,7 @@ import (
 )
 
 type SinkModel interface {
-	BlackholeSinkModel | HttpSinkModel | DatadogMetricsSinkModel
+	BlackholeSinkModel | HttpSinkModel | DatadogLogsSinkModel | DatadogMetricsSinkModel
 }
 
 type SinkResource[T SinkModel] struct {
