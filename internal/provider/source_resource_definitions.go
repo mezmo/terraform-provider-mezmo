@@ -61,3 +61,14 @@ func NewSQSSourceResource() resource.Resource {
 		getSchemaFunc:     SQSSourceResourceSchema,
 	}
 }
+
+func NewSplunkHecSourceResource() resource.Resource {
+	return &SourceResource[SplunkHecSourceModel]{
+		typeName:          "splunk_hec",
+		fromModelFunc:     SplunkHecSourceFromModel,
+		toModelFunc:       SplunkHecSourceToModel,
+		getIdFunc:         func(m *SplunkHecSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *SplunkHecSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     SplunkHecSourceResourceSchema,
+	}
+}
