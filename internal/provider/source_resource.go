@@ -14,6 +14,7 @@ type SourceModel interface {
 		DemoSourceModel |
 		HttpSourceModel |
 		S3SourceModel |
+		SplunkHecSourceModel |
 		SQSSourceModel
 }
 
