@@ -18,6 +18,17 @@ func NewDedupeTransformResource() resource.Resource {
 	}
 }
 
+func NewDropFieldsTransformResource() resource.Resource {
+	return &TransformResource[DropFieldsTransformModel]{
+		typeName:          "drop_fields",
+		fromModelFunc:     DropFieldsTransformFromModel,
+		toModelFunc:       DropFieldsTransformToModel,
+		getIdFunc:         func(m *DropFieldsTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *DropFieldsTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     DropFieldsTransformResourceSchema,
+	}
+}
+
 func NewFlattenFieldsTransformResource() resource.Resource {
 	return &TransformResource[FlattenFieldsTransformModel]{
 		typeName:          "flatten_fields",
@@ -48,6 +59,17 @@ func NewStringifyTransformResource() resource.Resource {
 		getIdFunc:         func(m *StringifyTransformModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *StringifyTransformModel) basetypes.StringValue { return m.PipelineId },
 		getSchemaFunc:     StringifyTransformResourceSchema,
+	}
+}
+
+func NewUnrollTransformResource() resource.Resource {
+	return &TransformResource[UnrollTransformModel]{
+		typeName:          "unroll",
+		fromModelFunc:     UnrollTransformFromModel,
+		toModelFunc:       UnrollTransformToModel,
+		getIdFunc:         func(m *UnrollTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *UnrollTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     UnrollTransformResourceSchema,
 	}
 }
 
