@@ -72,3 +72,14 @@ func NewSplunkHecSourceResource() resource.Resource {
 		getSchemaFunc:     SplunkHecSourceResourceSchema,
 	}
 }
+
+func NewLogStashSourceResource() resource.Resource {
+	return &SourceResource[LogStashSourceModel]{
+		typeName:          "logstash",
+		fromModelFunc:     LogStashSourceFromModel,
+		toModelFunc:       LogStashSourceToModel,
+		getIdFunc:         func(m *LogStashSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *LogStashSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     LogStashSourceResourceSchema,
+	}
+}
