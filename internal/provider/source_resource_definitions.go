@@ -83,3 +83,14 @@ func NewLogStashSourceResource() resource.Resource {
 		getSchemaFunc:     LogStashSourceResourceSchema,
 	}
 }
+
+func NewFluentSourceResource() resource.Resource {
+	return &SourceResource[FluentSourceModel]{
+		typeName:          "fluent",
+		fromModelFunc:     FluentSourceFromModel,
+		toModelFunc:       FluentSourceToModel,
+		getIdFunc:         func(m *FluentSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *FluentSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     FluentSourceResourceSchema,
+	}
+}
