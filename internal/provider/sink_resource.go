@@ -13,8 +13,10 @@ type SinkModel interface {
 	BlackholeSinkModel |
 		DatadogLogsSinkModel |
 		DatadogMetricsSinkModel |
+		ElasticSearchSinkModel |
 		HttpSinkModel |
-		MezmoSinkModel
+		MezmoSinkModel |
+		NewRelicSinkModel
 }
 
 type SinkResource[T SinkModel] struct {
