@@ -40,6 +40,17 @@ func NewDatadogMetricsSinkResource() resource.Resource {
 	}
 }
 
+func NewElasticSearchSinkResource() resource.Resource {
+	return &SinkResource[ElasticSearchSinkModel]{
+		typeName:          "elasticsearch",
+		fromModelFunc:     ElasticSearchSinkFromModel,
+		toModelFunc:       ElasticSearchSinkToModel,
+		getIdFunc:         func(m *ElasticSearchSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *ElasticSearchSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     ElasticSearchSinkResourceSchema,
+	}
+}
+
 func NewHttpSinkResource() resource.Resource {
 	return &SinkResource[HttpSinkModel]{
 		typeName:          "http",
@@ -59,5 +70,16 @@ func NewMezmoSinkResource() resource.Resource {
 		getIdFunc:         func(m *MezmoSinkModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *MezmoSinkModel) basetypes.StringValue { return m.PipelineId },
 		getSchemaFunc:     MezmoSinkResourceSchema,
+	}
+}
+
+func NewNewRelicSinkResource() resource.Resource {
+	return &SinkResource[NewRelicSinkModel]{
+		typeName:          "new_relic",
+		fromModelFunc:     NewRelicSinkFromModel,
+		toModelFunc:       NewRelicSinkToModel,
+		getIdFunc:         func(m *NewRelicSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *NewRelicSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     NewRelicSinkResourceSchema,
 	}
 }
