@@ -114,6 +114,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewHttpSinkResource,
 		NewMezmoSinkResource,
 		NewNewRelicSinkResource,
+		NewPrometheusRemoteWriteSinkResource,
 	}
 }
 
