@@ -16,7 +16,8 @@ type SinkModel interface {
 		ElasticSearchSinkModel |
 		HttpSinkModel |
 		MezmoSinkModel |
-		NewRelicSinkModel
+		NewRelicSinkModel |
+		PrometheusRemoteWriteSinkModel
 }
 
 type SinkResource[T SinkModel] struct {

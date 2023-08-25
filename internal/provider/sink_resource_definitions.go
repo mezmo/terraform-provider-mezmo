@@ -83,3 +83,14 @@ func NewNewRelicSinkResource() resource.Resource {
 		getSchemaFunc:     NewRelicSinkResourceSchema,
 	}
 }
+
+func NewPrometheusRemoteWriteSinkResource() resource.Resource {
+	return &SinkResource[PrometheusRemoteWriteSinkModel]{
+		typeName:          "prometheus_remote_write",
+		fromModelFunc:     PrometheusRemoteWriteSinkFromModel,
+		toModelFunc:       PrometheusRemoteWriteSinkToModel,
+		getIdFunc:         func(m *PrometheusRemoteWriteSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *PrometheusRemoteWriteSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     PrometheusRemoteWriteSinkResourceSchema,
+	}
+}
