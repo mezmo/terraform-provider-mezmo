@@ -13,6 +13,7 @@ type SourceModel interface {
 	AgentSourceModel |
 		DemoSourceModel |
 		HttpSourceModel |
+		LogStashSourceModel |
 		S3SourceModel |
 		SplunkHecSourceModel |
 		SQSSourceModel

@@ -3,12 +3,12 @@
 page_title: "mezmo_datadog-logs_sink Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  Represents a datadog-logs sink.
+  Publish log events to Datadog.
 ---
 
 # mezmo_datadog-logs_sink (Resource)
 
-Represents a datadog-logs sink.
+Publish log events to Datadog.
 
 
 
@@ -18,7 +18,7 @@ Represents a datadog-logs sink.
 ### Required
 
 - `api_key` (String, Sensitive) Datadog logs application API key.
-- `compression` (String) What compression algorithm to use while sending log data.
+- `compression` (String) The compression strategy used on the encoded data prior to sending..
 - `pipeline_id` (String) The uuid of the pipeline
 - `site` (String) The Datadog site (region) to send logs to.
 
