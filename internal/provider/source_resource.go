@@ -12,6 +12,7 @@ import (
 type SourceModel interface {
 	AgentSourceModel |
 		DemoSourceModel |
+		FluentSourceModel |
 		HttpSourceModel |
 		LogStashSourceModel |
 		S3SourceModel |
