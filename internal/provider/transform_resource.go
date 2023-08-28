@@ -14,6 +14,7 @@ type TransformModel interface {
 		DecryptFieldsTransformModel |
 		DedupeTransformModel |
 		DropFieldsTransformModel |
+		EncryptFieldsTransformModel |
 		FlattenFieldsTransformModel |
 		SampleTransformModel |
 		StringifyTransformModel |

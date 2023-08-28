@@ -23,10 +23,10 @@ resource "mezmo_demo_source" "source1" {
 }
 
 resource "mezmo_new_relic_sink" "sink1" {
-  pipeline_id   = mezmo_pipeline.pipeline1.id
-  title         = "My sink"
-  description   = "Send logs to New Relic"
-  inputs        = [mezmo_demo_source.source1.id]
-  account_id    = var.my_new_relic_account_id
-  license_key   = var.my_license_key
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My sink"
+  description = "Send logs to New Relic"
+  inputs      = [mezmo_demo_source.source1.id]
+  account_id  = var.my_new_relic_account_id
+  license_key = var.my_license_key
 }

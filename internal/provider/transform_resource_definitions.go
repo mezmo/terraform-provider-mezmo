@@ -94,3 +94,14 @@ func NewDecryptFieldsTransformResource() resource.Resource {
 		getSchemaFunc:     DecryptFieldsTransformResourceSchema,
 	}
 }
+
+func NewEncryptFieldsTransformResource() resource.Resource {
+	return &TransformResource[EncryptFieldsTransformModel]{
+		typeName:          "encrypt_fields",
+		fromModelFunc:     EncryptFieldsTransformFromModel,
+		toModelFunc:       EncryptFieldsTransformToModel,
+		getIdFunc:         func(m *EncryptFieldsTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *EncryptFieldsTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     EncryptFieldsTransformResourceSchema,
+	}
+}
