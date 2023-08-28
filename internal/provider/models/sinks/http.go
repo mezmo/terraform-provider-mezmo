@@ -5,7 +5,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -61,8 +60,8 @@ func HttpSinkResourceSchema() schema.Schema {
 				Description: "Configures HTTP authentication",
 				Attributes: map[string]schema.Attribute{
 					"strategy": schema.StringAttribute{
-						Optional:   true,
-						Validators: []validator.String{stringvalidator.OneOf("basic", "bearer", "none")},
+						Required:   true,
+						Validators: []validator.String{stringvalidator.OneOf("basic", "bearer")},
 					},
 					"user": schema.StringAttribute{
 						Optional:   true,
@@ -137,7 +136,10 @@ func HttpSinkFromModel(plan *HttpSinkModel, previousState *HttpSinkModel) (*Sink
 					"Bearer auth requires token field to be defined")
 			}
 		}
+	} else {
+		component.UserConfig["auth"] = map[string]string{"strategy": "none"}
 	}
+
 	if !plan.Headers.IsNull() {
 		headerMap, ok := modelutils.MapValuesToMapStrings(plan.Headers, dd)
 		if ok {
@@ -165,32 +167,22 @@ func HttpSinkToModel(plan *HttpSinkModel, component *Sink) {
 	if component.Description != "" {
 		plan.Description = StringValue(component.Description)
 	}
-	if component.Inputs != nil {
-		inputs := make([]attr.Value, 0)
-		for _, v := range component.Inputs {
-			inputs = append(inputs, StringValue(v))
-		}
-		plan.Inputs = ListValueMust(StringType, inputs)
-	}
-	if component.UserConfig["uri"] != nil {
-		value, _ := component.UserConfig["uri"].(string)
-		plan.Uri = StringValue(value)
-	}
-	if component.UserConfig["encoding"] != nil {
-		value, _ := component.UserConfig["encoding"].(string)
-		plan.Encoding = StringValue(value)
-	}
-	if component.UserConfig["compression"] != nil {
-		value, _ := component.UserConfig["compression"].(string)
-		plan.Compression = StringValue(value)
-	}
-	if component.UserConfig["auth"] != nil {
-		values, _ := component.UserConfig["auth"].(map[string]string)
-		if len(values) > 0 {
+
+	plan.Inputs = modelutils.SliceToStringListValue(component.Inputs)
+	plan.Uri = StringValue(component.UserConfig["uri"].(string))
+	plan.Encoding = StringValue(component.UserConfig["encoding"].(string))
+	plan.Compression = StringValue(component.UserConfig["compression"].(string))
+	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
+	plan.GenerationId = Int64Value(component.GenerationId)
+
+	auth, _ := component.UserConfig["auth"].(map[string]string)
+	if len(auth) > 0 {
+		if auth["strategy"] != "none" && auth["strategy"] != "" {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapStringsToMapValues(values))
+			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapStringsToMapValues(auth))
 		}
 	}
+
 	if component.UserConfig["headers"] != nil {
 		headerArray, _ := component.UserConfig["headers"].([]map[string]string)
 		if len(headerArray) > 0 {
@@ -201,9 +193,4 @@ func HttpSinkToModel(plan *HttpSinkModel, component *Sink) {
 			plan.Headers = basetypes.NewMapValueMust(MapType{}, modelutils.MapStringsToMapValues(headerMap))
 		}
 	}
-	if component.UserConfig["ack_enabled"] != nil {
-		value, _ := component.UserConfig["ack_enabled"].(bool)
-		plan.AckEnabled = BoolValue(value)
-	}
-	plan.GenerationId = Int64Value(component.GenerationId)
 }
