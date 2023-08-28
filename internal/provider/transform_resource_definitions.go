@@ -94,3 +94,14 @@ func NewDecryptFieldsTransformResource() resource.Resource {
 		getSchemaFunc:     DecryptFieldsTransformResourceSchema,
 	}
 }
+
+func NewParseSequentiallyTransformResource() resource.Resource {
+	return &TransformResource[ParseSequentiallyTransformModel]{
+		typeName:          "parse_sequentially",
+		fromModelFunc:     ParseSequentiallyTransformFromModel,
+		toModelFunc:       ParseSequentiallyTransformToModel,
+		getIdFunc:         func(m *ParseSequentiallyTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *ParseSequentiallyTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     ParseSequentiallyTransformResourceSchema,
+	}
+}

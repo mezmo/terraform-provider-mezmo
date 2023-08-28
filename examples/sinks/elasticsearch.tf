@@ -23,12 +23,12 @@ resource "mezmo_demo_source" "source1" {
 }
 
 resource "mezmo_elasticsearch_sink" "sink1" {
-  pipeline_id   = mezmo_pipeline.pipeline1.id
-  title         = "My sink"
-  description   = "Send logs to an ElasticSearch cluster"
-  inputs        = [mezmo_demo_source.source1.id]
-  endpoints     = ["https://my.example.com/"]
-  auth          = {
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My sink"
+  description = "Send logs to an ElasticSearch cluster"
+  inputs      = [mezmo_demo_source.source1.id]
+  endpoints   = ["https://my.example.com/"]
+  auth = {
     strategy = "basic"
     user     = "usr1"
     password = var.my_password

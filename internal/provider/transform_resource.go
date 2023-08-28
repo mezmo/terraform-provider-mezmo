@@ -15,6 +15,7 @@ type TransformModel interface {
 		DedupeTransformModel |
 		DropFieldsTransformModel |
 		FlattenFieldsTransformModel |
+		ParseSequentiallyTransformModel |
 		SampleTransformModel |
 		StringifyTransformModel |
 		UnrollTransformModel

@@ -1,0 +1,26 @@
+package modelutils
+
+var VrlParsers = []string{
+	"parse_aws_cloudwatch_log_subscription_message",
+	"parse_aws_alb_log",
+	"parse_apache_log",
+	"parse_csv",
+	"parse_cef",
+	"parse_common_log",
+	"parse_glog",
+	"parse_grok",
+	"parse_int",
+	"parse_json",
+	"parse_key_value",
+	"parse_klog",
+	"parse_linux_authorization",
+	"parse_nginx_log",
+	"parse_query_string",
+	"parse_regex",
+	"parse_syslog",
+	"parse_timestamp",
+	"parse_tokens",
+	"parse_url",
+	"parse_user_agent",
+	"parse_aws_vpc_flow_log",
+}
