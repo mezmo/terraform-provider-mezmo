@@ -39,10 +39,13 @@ Represents an HTTP sink.
 <a id="nestedatt--auth"></a>
 ### Nested Schema for `auth`
 
+Required:
+
+- `strategy` (String)
+
 Optional:
 
 - `password` (String, Sensitive)
-- `strategy` (String)
 - `token` (String, Sensitive)
 - `user` (String)
 
