@@ -121,7 +121,22 @@ func HttpSinkFromModel(plan *HttpSinkModel, previousState *HttpSinkModel) (*Sink
 		component.Inputs = inputs
 	}
 	if !plan.Auth.IsNull() {
-		component.UserConfig["auth"], _ = modelutils.MapValuesToMapStrings(plan.Auth, dd)
+		auth, _ := modelutils.MapValuesToMapStrings(plan.Auth, dd)
+		component.UserConfig["auth"] = auth
+
+		if auth["strategy"] == "basic" {
+			if auth["user"] == "" || auth["password"] == "" {
+				dd.AddError(
+					"Error in plan",
+					"Basic auth requires user and password fields to be defined")
+			}
+		} else {
+			if auth["token"] == "" {
+				dd.AddError(
+					"Error in plan",
+					"Bearer auth requires token field to be defined")
+			}
+		}
 	}
 	if !plan.Headers.IsNull() {
 		headerMap, ok := modelutils.MapValuesToMapStrings(plan.Headers, dd)

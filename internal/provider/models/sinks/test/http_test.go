@@ -8,7 +8,8 @@ import (
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestHttpSinkResource(t *testing.T) {
+func TestHttpSink(t *testing.T) {
+	cacheKey := "http_sink_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
@@ -24,19 +25,45 @@ func TestHttpSinkResource(t *testing.T) {
 
 			// Error: uri is required
 			{
-				Config: GetProviderConfig() + `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "pipeline"
-					}
+					}`) + `
 					resource "mezmo_http_sink" "my_sink" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"uri\" is required"),
 			},
 
+			// Error: basic auth fields required
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_http_sink" "my_sink" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						uri = "http://example.com"
+						auth = {
+							strategy = "basic"
+						}
+					}`,
+				ExpectError: regexp.MustCompile("Basic auth requires user and password fields to be defined"),
+			},
+
+			// Error: basic auth fields required
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_http_sink" "my_sink" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						uri = "https://example.com"
+						auth = {
+							strategy = "bearer"
+						}
+					}`,
+				ExpectError: regexp.MustCompile("Bearer auth requires token field to be defined"),
+			},
+
 			// Create test defaults
 			{
-				Config: SetCachedConfig("http_sink_resources", `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "pipeline"
 					}
@@ -69,7 +96,7 @@ func TestHttpSinkResource(t *testing.T) {
 
 			// Update all fields
 			{
-				Config: GetCachedConfig("http_sink_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_http_sink" "my_sink" {
 						title = "new title"
 						description = "new description"
@@ -113,7 +140,7 @@ func TestHttpSinkResource(t *testing.T) {
 
 			// Nullify fields
 			{
-				Config: GetCachedConfig("http_sink_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_http_sink" "my_sink" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						uri = "http://example.com"
@@ -131,24 +158,6 @@ func TestHttpSinkResource(t *testing.T) {
 						"headers.%":     nil,
 					}),
 				),
-			},
-
-			// API-level validation
-			{
-				Config: GetCachedConfig("http_sink_resources") + `
-					resource "mezmo_http_sink" "my_sink" {
-						pipeline_id = mezmo_pipeline.test_parent.id
-						uri = "http://example.com"
-						inputs = [mezmo_http_source.my_source.id]
-
-						auth = {
-							strategy = "bearer"
-							user = "nope"
-							password = "nope"
-						}
-					}
-					`,
-				ExpectError: regexp.MustCompile("properties/token/minLength"),
 			},
 
 			// Delete testing automatically occurs in TestCase
