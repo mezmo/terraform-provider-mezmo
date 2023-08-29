@@ -116,3 +116,14 @@ func NewEncryptFieldsTransformResource() resource.Resource {
 		getSchemaFunc:     EncryptFieldsTransformResourceSchema,
 	}
 }
+
+func NewReduceTransformResource() resource.Resource {
+	return &TransformResource[ReduceTransformModel]{
+		typeName:          "reduce",
+		fromModelFunc:     ReduceTransformFromModel,
+		toModelFunc:       ReduceTransformToModel,
+		getIdFunc:         func(m *ReduceTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *ReduceTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     ReduceTransformResourceSchema,
+	}
+}
