@@ -15,6 +15,7 @@ type SinkModel interface {
 		DatadogLogsSinkModel |
 		DatadogMetricsSinkModel |
 		ElasticSearchSinkModel |
+		HoneycombLogsSinkModel |
 		HttpSinkModel |
 		MezmoSinkModel |
 		NewRelicSinkModel |

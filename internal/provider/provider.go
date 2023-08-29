@@ -113,6 +113,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewDatadogLogsSinkResource,
 		NewDatadogMetricsSinkResource,
 		NewElasticSearchSinkResource,
+		NewHoneycombLogsSinkResource,
 		NewHttpSinkResource,
 		NewMezmoSinkResource,
 		NewNewRelicSinkResource,
