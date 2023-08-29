@@ -17,6 +17,7 @@ type ProcessorModel interface {
 		EncryptFieldsProcessorModel |
 		FlattenFieldsProcessorModel |
 		ParseProcessorModel |
+		ReduceProcessorModel |
 		SampleProcessorModel |
 		ScriptExecutionProcessorModel |
 		StringifyProcessorModel |
