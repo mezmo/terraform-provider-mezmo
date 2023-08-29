@@ -51,7 +51,7 @@ resource "mezmo_kafka_source" "source2" {
     mechanism = "PLAIN"
   }
 
-  decoding    = "json"
+  decoding = "json"
 }
 
 

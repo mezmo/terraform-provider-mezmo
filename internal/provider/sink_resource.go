@@ -17,6 +17,7 @@ type SinkModel interface {
 		ElasticSearchSinkModel |
 		HoneycombLogsSinkModel |
 		HttpSinkModel |
+		KafkaSinkModel |
 		MezmoSinkModel |
 		NewRelicSinkModel |
 		PrometheusRemoteWriteSinkModel

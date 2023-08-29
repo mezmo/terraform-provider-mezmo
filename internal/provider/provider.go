@@ -116,6 +116,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewElasticSearchSinkResource,
 		NewHoneycombLogsSinkResource,
 		NewHttpSinkResource,
+		NewKafkaSinkResource,
 		NewMezmoSinkResource,
 		NewNewRelicSinkResource,
 		NewPrometheusRemoteWriteSinkResource,
