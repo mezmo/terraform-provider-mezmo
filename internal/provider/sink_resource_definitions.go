@@ -116,3 +116,14 @@ func NewPrometheusRemoteWriteSinkResource() resource.Resource {
 		getSchemaFunc:     PrometheusRemoteWriteSinkResourceSchema,
 	}
 }
+
+func NewSplunkHecLogsSinkResource() resource.Resource {
+	return &SinkResource[SplunkHecLogsSinkModel]{
+		typeName:          "splunk_hec_logs",
+		fromModelFunc:     SplunkHecLogsSinkFromModel,
+		toModelFunc:       SplunkHecLogsSinkToModel,
+		getIdFunc:         func(m *SplunkHecLogsSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *SplunkHecLogsSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     SplunkHecLogsSinkResourceSchema,
+	}
+}

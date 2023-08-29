@@ -19,7 +19,8 @@ type SinkModel interface {
 		HttpSinkModel |
 		MezmoSinkModel |
 		NewRelicSinkModel |
-		PrometheusRemoteWriteSinkModel
+		PrometheusRemoteWriteSinkModel |
+		SplunkHecLogsSinkModel
 }
 
 type SinkResource[T SinkModel] struct {
