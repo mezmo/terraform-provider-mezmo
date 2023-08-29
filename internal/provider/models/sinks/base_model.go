@@ -3,6 +3,7 @@ package sinks
 import (
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -61,6 +62,7 @@ var addSchemas = map[string]schema.Attribute{
 		Default:  int64default.StaticInt64(300),
 		Description: "The maximum amount of time, in seconds, events will be buffered " +
 			"before being flushed to the destination",
+		Validators: []validator.Int64{int64validator.OneOf(30, 60, 90, 120, 300)},
 	},
 	"ack_enabled": schema.BoolAttribute{
 		Computed:    true,

@@ -108,6 +108,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewUnrollTransformResource,
 
 		// Sinks
+		NewAzureBlobStorageSinkResource,
 		NewBlackholeSinkResource,
 		NewDatadogLogsSinkResource,
 		NewDatadogMetricsSinkResource,

@@ -10,7 +10,8 @@ import (
 )
 
 type SinkModel interface {
-	BlackholeSinkModel |
+	AzureBlobStorageSinkModel |
+		BlackholeSinkModel |
 		DatadogLogsSinkModel |
 		DatadogMetricsSinkModel |
 		ElasticSearchSinkModel |
