@@ -16,6 +16,7 @@ type SourceModel interface {
 		FluentSourceModel |
 		HttpSourceModel |
 		KafkaSourceModel |
+		KinesisFirehoseSourceModel |
 		LogStashSourceModel |
 		S3SourceModel |
 		SplunkHecSourceModel |
