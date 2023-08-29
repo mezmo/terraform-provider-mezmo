@@ -7,6 +7,17 @@ import (
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/sinks"
 )
 
+func NewAzureBlobStorageSinkResource() resource.Resource {
+	return &SinkResource[AzureBlobStorageSinkModel]{
+		typeName:          "azure_blob_storage",
+		fromModelFunc:     AzureBlobStorageFromModel,
+		toModelFunc:       AzureBlobStorageToModel,
+		getIdFunc:         func(m *AzureBlobStorageSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *AzureBlobStorageSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     AzureBlobStorageResourceSchema,
+	}
+}
+
 func NewBlackholeSinkResource() resource.Resource {
 	return &SinkResource[BlackholeSinkModel]{
 		typeName:          "blackhole",
