@@ -29,6 +29,17 @@ func NewAgentSourceResource() resource.Resource {
 	}
 }
 
+func NewKafkaSourceResource() resource.Resource {
+	return &SourceResource[KafkaSourceModel]{
+		typeName:          "kafka",
+		fromModelFunc:     KafkaSourceFromModel,
+		toModelFunc:       KafkaSourceToModel,
+		getIdFunc:         func(m *KafkaSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *KafkaSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     KafkaSourceResourceSchema,
+	}
+}
+
 func NewS3SourceResource() resource.Resource {
 	return &SourceResource[S3SourceModel]{
 		typeName:          "s3",

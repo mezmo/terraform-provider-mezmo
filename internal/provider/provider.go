@@ -91,6 +91,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewDemoSourceResource,
 		NewFluentSourceResource,
 		NewHttpSourceResource,
+		NewKafkaSourceResource,
 		NewLogStashSourceResource,
 		NewS3SourceResource,
 		NewSplunkHecSourceResource,

@@ -14,6 +14,7 @@ type SourceModel interface {
 		DemoSourceModel |
 		FluentSourceModel |
 		HttpSourceModel |
+		KafkaSourceModel |
 		LogStashSourceModel |
 		S3SourceModel |
 		SplunkHecSourceModel |
