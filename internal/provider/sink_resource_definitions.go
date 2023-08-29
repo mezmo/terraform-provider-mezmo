@@ -51,6 +51,17 @@ func NewElasticSearchSinkResource() resource.Resource {
 	}
 }
 
+func NewHoneycombLogsSinkResource() resource.Resource {
+	return &SinkResource[HoneycombLogsSinkModel]{
+		typeName:          "honeycomb_logs",
+		fromModelFunc:     HoneycombLogsFromModel,
+		toModelFunc:       HoneycombLogsToModel,
+		getIdFunc:         func(m *HoneycombLogsSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *HoneycombLogsSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     HoneycombLogsResourceSchema,
+	}
+}
+
 func NewHttpSinkResource() resource.Resource {
 	return &SinkResource[HttpSinkModel]{
 		typeName:          "http",
