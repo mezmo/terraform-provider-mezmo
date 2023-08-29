@@ -127,3 +127,14 @@ func NewParseProcessorResource() resource.Resource {
 		getSchemaFunc:     ParseProcessorResourceSchema,
 	}
 }
+
+func NewReduceProcessorResource() resource.Resource {
+	return &ProcessorResource[ReduceProcessorModel]{
+		typeName:          "reduce",
+		fromModelFunc:     ReduceProcessorFromModel,
+		toModelFunc:       ReduceProcessorToModel,
+		getIdFunc:         func(m *ReduceProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *ReduceProcessorModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     ReduceProcessorResourceSchema,
+	}
+}
