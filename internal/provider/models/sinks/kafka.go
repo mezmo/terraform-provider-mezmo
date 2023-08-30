@@ -132,7 +132,7 @@ func KafkaSinkResourceSchema() schema.Schema {
 					},
 				},
 			},
-		}, []string{"ack_enabled"}),
+		}, nil),
 	}
 }
 

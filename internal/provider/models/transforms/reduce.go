@@ -244,7 +244,62 @@ func ReduceTransformFromModel(plan *ReduceTransformModel, previousState *ReduceT
 		component.Inputs = inputs
 	}
 
+	if !plan.FlushCondition.IsNull() {
+		flushCondition := plan.FlushCondition.Attributes()
+		component.UserConfig["flush_condition"] = map[string]any{
+			"when":        GetAttributeValue[String](flushCondition, "when").ValueString(),
+			"conditional": unwindConditionalFromModel(flushCondition["conditional"]),
+		}
+	}
+
 	return &component, dd
+}
+
+func unwindConditionalFromModel(v attr.Value) map[string]any {
+	conditional := map[string]any{
+		"expressions":       nil,
+		"logical_operation": "AND",
+	}
+	value, ok := v.(basetypes.ObjectValue)
+	if !ok {
+		panic(fmt.Errorf("Expected an object but did not receive one: %+v", v))
+	}
+	attrs := value.Attributes()
+
+	if !attrs["logical_operation"].IsNull() {
+		conditional["logical_operation"] = attrs["logical_operation"].(String).ValueString()
+	}
+
+	if expressions, ok := attrs["expressions"]; ok && !expressions.IsNull() {
+		// Loop and extract expressions into an array of map[strings]
+		elements := expressions.(List).Elements()
+		result := make([]map[string]any, 0, len(elements))
+		for _, obj := range elements {
+			propVals := obj.(basetypes.ObjectValue).Attributes()
+			elem := map[string]any{
+				"field":        propVals["field"].(String).ValueString(),
+				"str_operator": propVals["operator"].(String).ValueString(),
+			}
+			if propVals["value_number"].IsNull() {
+				elem["value"] = propVals["value_string"].(String).ValueString()
+			} else {
+				elem["value"] = propVals["value_number"].(Float64).ValueFloat64()
+			}
+			result = append(result, elem)
+		}
+		conditional["expressions"] = result
+
+	} else if group, ok := attrs["expressions_group"]; ok && !group.IsNull() {
+		// This is a nested list of conditionals. Recursively unwind them.
+		conditionals := group.(basetypes.ListValue).Elements()
+		result := make([]map[string]any, 0, len(conditionals))
+		for _, conditional := range conditionals {
+			result = append(result, unwindConditionalFromModel(conditional))
+		}
+		conditional["expressions"] = result
+	}
+
+	return conditional
 }
 
 func ReduceTransformToModel(plan *ReduceTransformModel, component *Transform) {
