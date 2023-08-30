@@ -31,7 +31,7 @@ func NewBlackholeSinkResource() resource.Resource {
 
 func NewDatadogLogsSinkResource() resource.Resource {
 	return &SinkResource[DatadogLogsSinkModel]{
-		typeName:          "datadog-logs",
+		typeName:          "datadog_logs",
 		fromModelFunc:     DatadogLogsFromModel,
 		toModelFunc:       DatadogLogsSinkToModel,
 		getIdFunc:         func(m *DatadogLogsSinkModel) basetypes.StringValue { return m.Id },
@@ -42,7 +42,7 @@ func NewDatadogLogsSinkResource() resource.Resource {
 
 func NewDatadogMetricsSinkResource() resource.Resource {
 	return &SinkResource[DatadogMetricsSinkModel]{
-		typeName:          "datadog-metrics",
+		typeName:          "datadog_metrics",
 		fromModelFunc:     DatadogMetricsFromModel,
 		toModelFunc:       DatadogMetricsSinkToModel,
 		getIdFunc:         func(m *DatadogMetricsSinkModel) basetypes.StringValue { return m.Id },

@@ -64,12 +64,6 @@ var addSchemas = map[string]schema.Attribute{
 			"before being flushed to the destination",
 		Validators: []validator.Int64{int64validator.OneOf(30, 60, 90, 120, 300)},
 	},
-	"ack_enabled": schema.BoolAttribute{
-		Computed:    true,
-		Optional:    true,
-		Default:     booldefault.StaticBool(true),
-		Description: "Sets end-to-end acknowledgement on the destination",
-	},
 }
 
 func ExtendBaseAttributes(target SchemaAttributes, addons []string) SchemaAttributes {
