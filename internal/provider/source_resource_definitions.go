@@ -40,6 +40,17 @@ func NewKafkaSourceResource() resource.Resource {
 	}
 }
 
+func NewPrometheusRemoteWriteSourceResource() resource.Resource {
+	return &SourceResource[PrometheusRemoteWriteSourceModel]{
+		typeName:          "prometheus_remote_write",
+		fromModelFunc:     PrometheusRemoteWriteSourceFromModel,
+		toModelFunc:       PrometheusRemoteWriteSourceToModel,
+		getIdFunc:         func(m *PrometheusRemoteWriteSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *PrometheusRemoteWriteSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     PrometheusRemoteWriteSourceResourceSchema,
+	}
+}
+
 func NewS3SourceResource() resource.Resource {
 	return &SourceResource[S3SourceModel]{
 		typeName:          "s3",
