@@ -62,6 +62,17 @@ func NewStringifyTransformResource() resource.Resource {
 	}
 }
 
+func NewScriptExecutionTransformResource() resource.Resource {
+	return &TransformResource[ScriptExecutionTransformModel]{
+		typeName:          "script_execution",
+		fromModelFunc:     ScriptExecutionTransformFromModel,
+		toModelFunc:       ScriptExecutionTransformToModel,
+		getIdFunc:         func(m *ScriptExecutionTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *ScriptExecutionTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     ScriptExecutionTransformResourceSchema,
+	}
+}
+
 func NewUnrollTransformResource() resource.Resource {
 	return &TransformResource[UnrollTransformModel]{
 		typeName:          "unroll",

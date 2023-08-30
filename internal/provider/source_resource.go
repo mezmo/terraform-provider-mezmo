@@ -23,7 +23,7 @@ type SourceModel interface {
 
 type SourceResource[T SourceModel] struct {
 	client            Client
-	typeName          string
+	typeName          string // The name to use as part of the terraform resource name: mezmo_{typeName}_source
 	fromModelFunc     sourceFromModelFunc[T]
 	toModelFunc       sourceToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
