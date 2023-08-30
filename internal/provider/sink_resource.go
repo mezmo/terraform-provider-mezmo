@@ -24,7 +24,7 @@ type SinkModel interface {
 
 type SinkResource[T SinkModel] struct {
 	client            Client
-	typeName          string
+	typeName          string // The name to use as part of the terraform resource name: mezmo_{typeName}_sink
 	fromModelFunc     sinkFromModelFunc[T]
 	toModelFunc       sinkToModelFunc[T]
 	getIdFunc         idGetterFunc[T]

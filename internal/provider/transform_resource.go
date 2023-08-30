@@ -17,13 +17,14 @@ type TransformModel interface {
 		EncryptFieldsTransformModel |
 		FlattenFieldsTransformModel |
 		SampleTransformModel |
+		ScriptExecutionTransformModel |
 		StringifyTransformModel |
 		UnrollTransformModel
 }
 
 type TransformResource[T TransformModel] struct {
 	client            Client
-	typeName          string
+	typeName          string // The name to use as part of the terraform resource name: mezmo_{typeName}_transform
 	fromModelFunc     transformFromModelFunc[T]
 	toModelFunc       transformToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
