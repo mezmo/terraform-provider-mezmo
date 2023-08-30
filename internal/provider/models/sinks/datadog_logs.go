@@ -25,7 +25,7 @@ type DatadogLogsSinkModel struct {
 
 func DatadogLogsSinkResourceSchema() schema.Schema {
 	return schema.Schema{
-		Description: "Publish log events to Datadog.",
+		Description: "Publishes log events to Datadog",
 		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
 			"api_key": schema.StringAttribute{
 				Sensitive:   true,
@@ -43,7 +43,7 @@ func DatadogLogsSinkResourceSchema() schema.Schema {
 				Description: "The compression strategy used on the encoded data prior to sending..",
 				Validators:  []validator.String{stringvalidator.OneOf("none", "gzip")},
 			},
-		}, []string{"ack_enabled"}),
+		}, nil),
 	}
 }
 

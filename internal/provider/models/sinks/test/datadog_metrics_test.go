@@ -16,7 +16,7 @@ func TestDatadogMetricsSinkResource(t *testing.T) {
 			// Required field site
 			{
 				Config: GetProviderConfig() + `
-					resource "mezmo_datadog-metrics_sink" "my_sink" {
+					resource "mezmo_datadog_metrics_sink" "my_sink" {
 						site    = "us3"
 						api_key = "<secret-api-key>"
 					}`,
@@ -26,7 +26,7 @@ func TestDatadogMetricsSinkResource(t *testing.T) {
 			// Required field api_key
 			{
 				Config: GetProviderConfig() + `
-					resource "mezmo_datadog-metrics_sink" "my_sink" {
+					resource "mezmo_datadog_metrics_sink" "my_sink" {
 						site = "us3"
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"api_key\" is required, but no definition was found"),
@@ -38,7 +38,7 @@ func TestDatadogMetricsSinkResource(t *testing.T) {
 					resource "mezmo_pipeline" "test_parent" {
 						title = "pipeline"
 					}
-					resource "mezmo_datadog-metrics_sink" "my_sink" {
+					resource "mezmo_datadog_metrics_sink" "my_sink" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						api_key     = "<secret-api-key>"
 					}`,
@@ -51,7 +51,7 @@ func TestDatadogMetricsSinkResource(t *testing.T) {
 					resource "mezmo_pipeline" "test_parent" {
 						title = "pipeline"
 					}
-					resource "mezmo_datadog-metrics_sink" "my_sink" {
+					resource "mezmo_datadog_metrics_sink" "my_sink" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						site        = "blah"
 						api_key     = "<secret-api-key>"
@@ -68,7 +68,7 @@ func TestDatadogMetricsSinkResource(t *testing.T) {
 					resource "mezmo_http_source" "my_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 					}`) + `
-					resource "mezmo_datadog-metrics_sink" "my_sink" {
+					resource "mezmo_datadog_metrics_sink" "my_sink" {
 						title       = "my metrics sink"
 						description = "metrics description"
 						pipeline_id = mezmo_pipeline.test_parent.id
@@ -78,9 +78,9 @@ func TestDatadogMetricsSinkResource(t *testing.T) {
 					`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
-						"mezmo_datadog-metrics_sink.my_sink", "id", regexp.MustCompile(`[\w-]{36}`)),
+						"mezmo_datadog_metrics_sink.my_sink", "id", regexp.MustCompile(`[\w-]{36}`)),
 
-					StateHasExpectedValues("mezmo_datadog-metrics_sink.my_sink", map[string]any{
+					StateHasExpectedValues("mezmo_datadog_metrics_sink.my_sink", map[string]any{
 						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
 						"title":         "my metrics sink",
 						"description":   "metrics description",
@@ -94,7 +94,7 @@ func TestDatadogMetricsSinkResource(t *testing.T) {
 			// Update all fields
 			{
 				Config: GetCachedConfig("http_sink_resources") + `
-					resource "mezmo_datadog-metrics_sink" "my_sink" {
+					resource "mezmo_datadog_metrics_sink" "my_sink" {
 						title = "new title"
 						description = "new metrics description"
 						pipeline_id = mezmo_pipeline.test_parent.id
@@ -105,7 +105,7 @@ func TestDatadogMetricsSinkResource(t *testing.T) {
 					}
 					`,
 				Check: resource.ComposeTestCheckFunc(
-					StateHasExpectedValues("mezmo_datadog-metrics_sink.my_sink", map[string]any{
+					StateHasExpectedValues("mezmo_datadog_metrics_sink.my_sink", map[string]any{
 						"pipeline_id": "#mezmo_pipeline.test_parent.id",
 						"title":       "new title",
 						"description": "new metrics description",

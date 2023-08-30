@@ -90,7 +90,7 @@ func HttpSinkResourceSchema() schema.Schema {
 					),
 				},
 			},
-		}, []string{"ack_enabled"}),
+		}, nil),
 	}
 }
 

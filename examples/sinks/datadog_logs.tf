@@ -22,12 +22,12 @@ resource "mezmo_demo_source" "source1" {
   format      = "json"
 }
 
-resource "mezmo_datadog-logs_sink" "sink1" {
+resource "mezmo_datadog_logs_sink" "sink1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My sink"
   description = "Datadog logs sink"
   site        = "us1"
-  compression = "none"
+  compression = "gzip"
   api_key     = "<secret-api-key>"
   inputs      = [mezmo_demo_source.source1.id]
 }

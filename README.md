@@ -27,7 +27,7 @@ make test
 Start the services:
 
 ```shell
-docker-compose -f compose/base.yml up --remove-orphans
+docker-compose -f compose/base.yml pull && docker-compose -f compose/base.yml up --remove-orphans
 ```
 
 Running the test suite:

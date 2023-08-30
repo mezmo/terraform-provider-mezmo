@@ -17,39 +17,43 @@ Represents a Kafka source.
 
 ### Required
 
+- `brokers` (Attributes List) The Kafka brokers to connect to. (see [below for nested schema](#nestedatt--brokers))
+- `group_id` (String) The Kafka consumer group ID to use.
 - `pipeline_id` (String) The uuid of the pipeline
-- `brokers` (List of Attributes) A list of Kafka brokers (see [below for nested schema](#nestedatt--brokers))
-- `topics` (List of Strings) A list of Kafka topics
-- `group_id` (String) The Kafka consumer group id
+- `topics` (List of String) The Kafka topics to consume from.
 
 ### Optional
 
-- `tls_enabled` (Boolean) Whether TLS is enabled (default: true)
-- `decoding` (String) The decoding method for converting frames into data events (default: json).
+- `decoding` (String) The decoding method for converting frames into data events.
 - `description` (String) A user-defined value describing the source component
+- `sasl` (Attributes) The SASL configuration to use when connecting to Kafka. (see [below for nested schema](#nestedatt--sasl))
 - `title` (String) A user-defined title for the source component
-- `sasl` (Attributes) Configures SASL authentication (see [below for nested schema](#nestedatt--sasl))
+- `tls_enabled` (Boolean) Whether to use TLS when connecting to Kafka.
 
 ### Read-Only
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the source component
 
-<a id="nestedatt--sasl"></a>
-### Nested Schema for `sasl`
-
-Required:
-
-- `username` (String) The SASL username to authenticate as
-- `password` (String, Sensitive) The password for the user
-- `mechanism` (String) The SASL mechanism to use
-
 <a id="nestedatt--brokers"></a>
 ### Nested Schema for `brokers`
 
 Required:
 
-- `host` (String) The hostname of the broker. Must be a valid external DNS hostname
-- `port` (Number) The port to connect to.
+- `host` (String) The host of the Kafka broker.
+- `port` (Number) The port of the Kafka broker.
+
+
+<a id="nestedatt--sasl"></a>
+### Nested Schema for `sasl`
+
+Required:
+
+- `password` (String, Sensitive) The SASL password to use when connecting to Kafka.
+- `username` (String) The SASL username to use when connecting to Kafka.
+
+Optional:
+
+- `mechanism` (String) The SASL mechanism to use when connecting to Kafka.
 
 

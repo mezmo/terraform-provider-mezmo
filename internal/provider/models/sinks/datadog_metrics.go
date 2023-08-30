@@ -24,7 +24,7 @@ type DatadogMetricsSinkModel struct {
 
 func DatadogMetricsSinkResourceSchema() schema.Schema {
 	return schema.Schema{
-		Description: "Represents a datadog-metrics sink.",
+		Description: "Publishes metric events to Datadog",
 		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
 			"api_key": schema.StringAttribute{
 				Sensitive:   true,
@@ -37,7 +37,7 @@ func DatadogMetricsSinkResourceSchema() schema.Schema {
 				Description: "The Datadog site (region) to send metrics to.",
 				Validators:  []validator.String{stringvalidator.OneOf("us1", "us3", "us5", "eu1")},
 			},
-		}, []string{"ack_enabled"}),
+		}, nil),
 	}
 }
 
