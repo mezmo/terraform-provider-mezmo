@@ -84,6 +84,17 @@ func NewHttpSinkResource() resource.Resource {
 	}
 }
 
+func NewKafkaSinkResource() resource.Resource {
+	return &SinkResource[KafkaSinkModel]{
+		typeName:          "kafka",
+		fromModelFunc:     KafkaSinkFromModel,
+		toModelFunc:       KafkaSinkToModel,
+		getIdFunc:         func(m *KafkaSinkModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *KafkaSinkModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     KafkaSinkResourceSchema,
+	}
+}
+
 func NewMezmoSinkResource() resource.Resource {
 	return &SinkResource[MezmoSinkModel]{
 		typeName:          "logs",

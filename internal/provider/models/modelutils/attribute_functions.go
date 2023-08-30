@@ -119,3 +119,70 @@ func SliceToStringListValue[T any](s []T) List {
 	}
 	return ListValueMust(StringType, list)
 }
+
+// Kafka-specific functions, shared between multiple types
+func BrokersFromModelList(Brokers List, dd diag.Diagnostics) ([]map[string]any, diag.Diagnostics) {
+	output := make([]map[string]any, 0)
+	elements := Brokers.Elements()
+	for _, b := range elements {
+		broker := map[string]any{}
+		attrs := b.(basetypes.ObjectValue).Attributes()
+		for k, v := range attrs {
+			switch v.(type) {
+			case String:
+				value, ok := attrs[k].(basetypes.StringValue)
+				if !ok {
+					dd.AddError(
+						"Could not look up attribute value",
+						fmt.Sprintf("Cannot cast key %s to a string value. Please report this to Mezmo.", k),
+					)
+					continue
+				}
+				broker[k] = value.ValueString()
+			case Int64:
+				value, ok := attrs[k].(basetypes.Int64Value)
+				if !ok {
+					dd.AddError(
+						"Could not look up attribute value",
+						fmt.Sprintf("Cannot cast key %s to an int value. Please report this to Mezmo.", k),
+					)
+					continue
+				}
+				broker[k] = value.ValueInt64()
+			}
+		}
+		output = append(output, broker)
+	}
+	return output, dd
+}
+
+func BrokersToModelList(elementType attr.Type, brokers []interface{}) List {
+	output := make([]attr.Value, 0)
+	for _, v := range brokers {
+		broker_raw := v.(map[string]interface{})
+		broker_map := map[string]attr.Value{
+			"host": StringValue(broker_raw["host"].(string)),
+			"port": Int64Value(int64(broker_raw["port"].(float64))),
+		}
+		broker := basetypes.NewObjectValueMust(
+			map[string]attr.Type{"host": StringType, "port": Int64Type},
+			broker_map)
+		output = append(output, broker)
+	}
+	brokersList, _ := ListValue(elementType, output)
+	return brokersList
+}
+
+func KafkaSinkSASLToModel(types map[string]attr.Type, user_config map[string]interface{}) basetypes.ObjectValue {
+	sasl := map[string]attr.Value{}
+	if user_config["sasl_username"] != nil {
+		sasl["username"] = StringValue(user_config["sasl_username"].(string))
+	}
+	if user_config["sasl_password"] != nil {
+		sasl["password"] = StringValue(user_config["sasl_password"].(string))
+	}
+	if user_config["sasl_mechanism"] != nil {
+		sasl["mechanism"] = StringValue(user_config["sasl_mechanism"].(string))
+	}
+	return basetypes.NewObjectValueMust(types, sasl)
+}
