@@ -11,6 +11,7 @@ import (
 
 type SourceModel interface {
 	AgentSourceModel |
+		AzureEventHubSourceModel |
 		DemoSourceModel |
 		FluentSourceModel |
 		HttpSourceModel |

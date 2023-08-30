@@ -88,6 +88,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 
 		// Sources
 		NewAgentSourceResource,
+		NewAzureEventHubSourceResource,
 		NewDemoSourceResource,
 		NewFluentSourceResource,
 		NewHttpSourceResource,

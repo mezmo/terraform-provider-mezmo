@@ -105,3 +105,14 @@ func NewFluentSourceResource() resource.Resource {
 		getSchemaFunc:     FluentSourceResourceSchema,
 	}
 }
+
+func NewAzureEventHubSourceResource() resource.Resource {
+	return &SourceResource[AzureEventHubSourceModel]{
+		typeName:          "azure_event_hub",
+		fromModelFunc:     AzureEventHubSourceFromModel,
+		toModelFunc:       AzureEventHubSourceToModel,
+		getIdFunc:         func(m *AzureEventHubSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *AzureEventHubSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     AzureEventHubSourceResourceSchema,
+	}
+}
