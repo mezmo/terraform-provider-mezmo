@@ -1,17 +1,20 @@
 package transforms
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type ReduceTransformModel struct {
@@ -40,13 +43,18 @@ var expressionAttributes = map[string]schema.Attribute{
 		Required:    true,
 		Description: "The comparison operator",
 		Validators: []validator.String{
-			stringvalidator.OneOf(modelutils.Operators...),
+			stringvalidator.OneOf(Operators...),
 		},
 	},
 	"value_string": schema.StringAttribute{
 		Optional:    true,
 		Description: "The operand to compare the field value with, when the value is a string",
-		Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		Validators: []validator.String{
+			stringvalidator.LengthAtLeast(1),
+			stringvalidator.ConflictsWith(
+				path.MatchRelative().AtParent().AtName("value_number"),
+			),
+		},
 	},
 	"value_number": schema.Float64Attribute{
 		Optional:    true,
@@ -56,6 +64,7 @@ var expressionAttributes = map[string]schema.Attribute{
 
 var logicalOperation = schema.StringAttribute{
 	Optional:    true,
+	Computed:    true,
 	Description: "The logical operation (AND/OR) to be applied to the list of conditionals",
 	Validators: []validator.String{
 		stringvalidator.OneOf("AND", "OR"),
@@ -63,34 +72,52 @@ var logicalOperation = schema.StringAttribute{
 }
 
 var expressionList = schema.ListNestedAttribute{
-	Required:    true,
-	Description: "Defines an expression for field comparison",
+	Optional:    true,
+	Description: "Defines a list of expressions for field comparisons",
 	NestedObject: schema.NestedAttributeObject{
 		Attributes: expressionAttributes,
 	},
 	Validators: []validator.List{
 		listvalidator.SizeAtLeast(1),
+		listvalidator.ConflictsWith(
+			path.MatchRelative().AtParent().AtName("expressions_group"),
+		),
 	},
 }
 
-var expressionGroup = schema.ListNestedAttribute{
-	Optional:    true,
-	Description: "A group of expressions joined by a logical operator",
-	NestedObject: schema.NestedAttributeObject{
-		Attributes: map[string]schema.Attribute{
-			"expressions":       expressionList,
-			"logical_operation": logicalOperation, // Needs function for optional
+func nestedExpressionGroup(depth int) schema.ListNestedAttribute {
+	if depth > 1 {
+		return schema.ListNestedAttribute{
+			Optional:    true,
+			Description: "A group of nested expressions joined by a logical operator",
+			NestedObject: schema.NestedAttributeObject{
+				Attributes: map[string]schema.Attribute{
+					"expressions":       expressionList,
+					"expressions_group": nestedExpressionGroup(depth - 1),
+					"logical_operation": logicalOperation,
+				},
+			},
+		}
+	}
+	// The last iteration will omit `expressions_group`
+	return schema.ListNestedAttribute{
+		Optional:    true,
+		Description: "A group of expressions joined by a logical operator",
+		NestedObject: schema.NestedAttributeObject{
+			Attributes: map[string]schema.Attribute{
+				"expressions":       expressionList,
+				"logical_operation": logicalOperation,
+			},
 		},
-	},
-	// function should take validators for conflicts with `expressions`
+	}
 }
 
 var conditionalValueType = schema.SingleNestedAttribute{
 	Optional:    true,
-	Description: "xxx",
+	Description: "A group of expressions (optionally nested) joined by a logical operator",
 	Attributes: map[string]schema.Attribute{
-		"expressions":       expressionList,  // Needs function for required optional
-		"expressions_group": expressionGroup, // *** Needs function to add another expression_group
+		"expressions":       expressionList,
+		"expressions_group": nestedExpressionGroup(3),
 		"logical_operation": logicalOperation,
 	},
 }
@@ -159,7 +186,7 @@ func ReduceTransformResourceSchema() schema.Schema {
 							Required:    true,
 							Description: "The merge strategy to be used for the specified property",
 							Validators: []validator.String{
-								stringvalidator.OneOf(modelutils.ReduceMergeStrategies...),
+								stringvalidator.OneOf(ReduceMergeStrategies...),
 							},
 						},
 					},
@@ -174,12 +201,14 @@ func ReduceTransformResourceSchema() schema.Schema {
 					"conditional expression evaluates to true on an inbound event.",
 				Attributes: map[string]schema.Attribute{
 					"when": schema.StringAttribute{
-						Required:    true,
-						Description: "The merge strategy to be used for the specified property",
+						Required: true,
+						Description: "Specifies whether to start a new reduction of events based on the " +
+							"conditions, or end a current reduction based on them.",
 						Validators: []validator.String{
 							stringvalidator.OneOf("starts_when", "ends_when"),
 						},
 					},
+					"conditional": conditionalValueType,
 				},
 			},
 		}),
@@ -190,15 +219,16 @@ func ReduceTransformFromModel(plan *ReduceTransformModel, previousState *ReduceT
 	dd := diag.Diagnostics{}
 	component := Transform{
 		BaseNode: BaseNode{
-			Type:        "compact-fields",
+			Type:        "reduce",
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
-			UserConfig:  make(map[string]any),
+			UserConfig: map[string]any{
+				"duration_ms": plan.DurationMs.ValueInt64(),
+			},
 		},
 	}
 
-	var options = make(map[string]bool)
-	component.UserConfig["options"] = options
+	fmt.Printf("---------------- %+v\n", plan)
 
 	if previousState != nil {
 		component.Id = previousState.Id.ValueString()
@@ -218,6 +248,8 @@ func ReduceTransformFromModel(plan *ReduceTransformModel, previousState *ReduceT
 }
 
 func ReduceTransformToModel(plan *ReduceTransformModel, component *Transform) {
+	fmt.Printf("------- COMPONENT --------- %+v\n", component)
+	PrintJSON(component)
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = StringValue(component.Title)

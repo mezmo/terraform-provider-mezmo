@@ -48,11 +48,39 @@ func TestReduceTransform(t *testing.T) {
 						flush_condition = {
 							when = "starts_when"
 							conditional = {
-								expressions = [
-									field = ".status"
-									operator = "equal"
-									value = 400
+								expressions_group = [
+									{
+										expressions = [
+											{
+												field = ".level"
+												operator = "equal"
+												value_string = "ERROR"
+											},
+											{
+												field = ".app"
+												operator = "equal"
+												value_string = "worker"
+											}
+										],
+										logical_operation = "AND"
+									},
+									{
+										expressions = [
+											{
+												field = ".status"
+												operator = "equal"
+												value_number = 500
+											},
+											{
+												field = ".app"
+												operator = "equal"
+												value_string = "service"
+											}
+										],
+										logical_operation = "AND"
+									},
 								]
+								logical_operation = "OR"
 							}
 						}
 					}`,
