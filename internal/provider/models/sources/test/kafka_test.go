@@ -21,7 +21,7 @@ func TestKafkaSourceResource(t *testing.T) {
 						title = "parent pipeline"
 					}`) + `
 					resource "mezmo_kafka_source" "my_source" {
-						itle = "my kafka title"
+						title = "my kafka title"
 						description = "my kafka description"
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"pipeline_id\" is required"),

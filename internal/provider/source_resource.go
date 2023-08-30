@@ -18,6 +18,7 @@ type SourceModel interface {
 		KafkaSourceModel |
 		KinesisFirehoseSourceModel |
 		LogStashSourceModel |
+		PrometheusRemoteWriteSourceModel |
 		S3SourceModel |
 		SplunkHecSourceModel |
 		SQSSourceModel
