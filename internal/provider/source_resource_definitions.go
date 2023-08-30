@@ -116,3 +116,14 @@ func NewAzureEventHubSourceResource() resource.Resource {
 		getSchemaFunc:     AzureEventHubSourceResourceSchema,
 	}
 }
+
+func NewKinesisFirehoseSourceResource() resource.Resource {
+	return &SourceResource[KinesisFirehoseSourceModel]{
+		typeName:          "kinesis_firehose",
+		fromModelFunc:     KinesisFirehoseSourceFromModel,
+		toModelFunc:       KinesisFirehoseSourceToModel,
+		getIdFunc:         func(m *KinesisFirehoseSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *KinesisFirehoseSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     KinesisFirehoseSourceResourceSchema,
+	}
+}
