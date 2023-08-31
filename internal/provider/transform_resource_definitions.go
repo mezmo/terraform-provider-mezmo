@@ -116,3 +116,14 @@ func NewEncryptFieldsTransformResource() resource.Resource {
 		getSchemaFunc:     EncryptFieldsTransformResourceSchema,
 	}
 }
+
+func NewParseTransformResource() resource.Resource {
+	return &TransformResource[ParseTransformModel]{
+		typeName:          "parse",
+		fromModelFunc:     ParseTransformFromModel,
+		toModelFunc:       ParseTransformToModel,
+		getIdFunc:         func(m *ParseTransformModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *ParseTransformModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     ParseTransformResourceSchema,
+	}
+}

@@ -45,8 +45,12 @@ var baseTransformSchemaAttributes = SchemaAttributes{
 }
 
 func ExtendBaseAttributes(target SchemaAttributes) SchemaAttributes {
-	for k, v := range baseTransformSchemaAttributes {
-		target[k] = v
+	return ExtendSchemaAttributes(baseTransformSchemaAttributes, target)
+}
+
+func ExtendSchemaAttributes(fromAttributes SchemaAttributes, toAttributes SchemaAttributes) SchemaAttributes {
+	for k, v := range fromAttributes {
+		toAttributes[k] = v
 	}
-	return target
+	return toAttributes
 }

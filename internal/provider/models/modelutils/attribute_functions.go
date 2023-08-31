@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"golang.org/x/exp/slices"
 )
 
 // This function can help with taking an object from an API response and translating
@@ -19,6 +20,59 @@ func MapStringsToMapValues(values map[string]string) map[string]attr.Value {
 		result[k] = StringValue(v)
 	}
 	return result
+}
+
+// Convert from an API response object to a terraform plugin framework
+// basetype object
+func MapAnyToMapValues(attrs map[string]attr.Type, values map[string]any, optional_fields []string) map[string]attr.Value {
+	result := make(map[string]attr.Value, len(values))
+	for k, v := range values {
+		switch reflect.TypeOf(v).Kind() {
+		case reflect.Bool:
+			result[k] = BoolValue(v.(bool))
+		case reflect.Float32, reflect.Float64:
+			result[k] = Float64Value(v.(float64))
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			result[k] = Int64Value(v.(int64))
+		case reflect.String:
+			if slices.Contains(optional_fields, k) && (v == nil || v.(string) == "") {
+				result[k] = StringNull()
+			} else {
+				result[k] = StringValue(v.(string))
+			}
+		case reflect.Slice:
+			if slices.Contains(optional_fields, k) && v == nil {
+				result[k] = ListNull(StringType)
+			} else {
+				result[k] = SliceToStringListValue(v.([]string))
+			}
+		}
+	}
+
+	PopulateMissingMapValues(attrs, result)
+	return result
+}
+
+func PopulateMissingMapValues(attrs map[string]attr.Type, result map[string]attr.Value) {
+	for field, attr_type := range attrs {
+		if _, ok := result[field]; ok {
+			continue
+		}
+		switch attr_type {
+		case basetypes.BoolType{}:
+			result[field] = BoolNull()
+		case basetypes.Int64Type{}:
+			result[field] = Int64Null()
+		case basetypes.Float64Type{}:
+			result[field] = Float64Null()
+		case basetypes.NumberType{}:
+			result[field] = NumberNull()
+		case basetypes.StringType{}:
+			result[field] = StringNull()
+		case basetypes.ListType{ElemType: basetypes.StringType{}}:
+			result[field] = ListNull(basetypes.StringType{})
+		}
+	}
 }
 
 // This function can receive a terraform object (as defined in their basetypes) and
