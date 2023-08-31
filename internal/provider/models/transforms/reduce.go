@@ -1,6 +1,7 @@
 package transforms
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
@@ -29,6 +30,53 @@ type ReduceTransformModel struct {
 	DateFormats     List   `tfsdk:"date_formats"`
 	MergeStrategies List   `tfsdk:"merge_strategies"`
 	FlushCondition  Object `tfsdk:"flush_condition"`
+}
+
+var expressionTypes = map[string]attr.Type{
+	"field":        StringType,
+	"operator":     StringType,
+	"value_number": Float64Type,
+	"value_string": StringType,
+}
+
+func nestedExpressionTypes(depth int) map[string]attr.Type {
+	if depth > 0 {
+		return map[string]attr.Type{
+			"expressions": ListType{
+				ElemType: ObjectType{
+					AttrTypes: expressionTypes,
+				},
+			},
+			"expressions_group": ListType{
+				ElemType: ObjectType{
+					AttrTypes: nestedExpressionTypes(depth - 1),
+				},
+			},
+			"logical_operation": StringType,
+		}
+	}
+	return map[string]attr.Type{
+		"expressions": ListType{
+			ElemType: ObjectType{
+				AttrTypes: expressionTypes,
+			},
+		},
+		"logical_operation": StringType,
+	}
+}
+
+var conditionalTypes = map[string]attr.Type{
+	"expressions": ListType{
+		ElemType: ObjectType{
+			AttrTypes: expressionTypes,
+		},
+	},
+	"expressions_group": ListType{
+		ElemType: ObjectType{
+			// AttrTypes: nestedExpressionTypes(3),
+		},
+	},
+	"logical_operation": StringType,
 }
 
 var expressionAttributes = map[string]schema.Attribute{
@@ -320,4 +368,87 @@ func ReduceTransformToModel(plan *ReduceTransformModel, component *Transform) {
 		}
 		plan.Inputs = ListValueMust(StringType, inputs)
 	}
+	if component.UserConfig["flush_condition"] != nil {
+		flushCondition := component.UserConfig["flush_condition"].(map[string]any)
+		unwindConditionalToModel(flushCondition["conditional"].(map[string]any))
+	}
+}
+
+func unwindConditionalToModel(component map[string]any) basetypes.ObjectValue {
+	conditional := map[string]attr.Value{
+		"expressions":       basetypes.NewListNull(basetypes.ObjectType{}),
+		"expressions_group": basetypes.NewListNull(basetypes.ObjectType{}),
+		"logical_operation": StringValue(component["logical_operation"].(string)),
+	}
+
+	expressionsVal := make([]attr.Value, 0)
+	nestedConditionalsVal := make([]attr.Value, 0)
+
+	fmt.Printf("********* incoming %+v\n", component)
+	for _, e := range component["expressions"].([]any) {
+		compExpression := e.(map[string]any)
+		if _, ok := compExpression["expressions"].([]any); ok {
+			fmt.Printf("+++++++++ nesting detected in compExpression %+v\n", compExpression)
+			// There's a nested expression group.  Recurse.
+			// conditional["expressions"] = basetypes.NewListValueMust(basetypes.ObjectType{}, expressionsVal)
+			nestedConditional := unwindConditionalToModel(compExpression)
+			fmt.Printf("&&&&&&&&&&&&& after recursion: %+v\n", nestedConditional)
+			nestedConditionalsVal = append(
+				nestedConditionalsVal,
+				basetypes.NewObjectValueMust(nestedConditional.AttributeTypes(context.Background()), nestedConditional.Attributes()),
+			)
+
+			fmt.Printf("=========== nestedConditionalsVal %+v\n", nestedConditionalsVal)
+		} else {
+			fmt.Printf("@@@@@@@ compExpression: %+v\n", compExpression)
+			// It's an expression object to covert to a TF type
+			expression := map[string]attr.Value{
+				"field":        StringValue(compExpression["field"].(string)),
+				"operator":     StringValue(compExpression["str_operator"].(string)),
+				"value_number": basetypes.NewFloat64Null(),
+				"value_string": StringNull(),
+			}
+			if valueNumber, ok := compExpression["value"].(float64); ok {
+				expression["value_number"] = basetypes.NewFloat64Value(valueNumber)
+			} else {
+				expression["value_string"] = basetypes.NewStringValue(compExpression["value"].(string))
+			}
+			expressionsVal = append(
+				expressionsVal,
+				basetypes.NewObjectValueMust(expressionTypes, expression),
+			)
+			fmt.Printf("========== added flat conditions: %+v\n", expressionsVal)
+		}
+	}
+
+	conditional["expressions"] = basetypes.NewListValueMust(basetypes.ObjectType{
+		AttrTypes: expressionTypes,
+	}, expressionsVal)
+
+	for _, v := range nestedConditionalsVal {
+		fmt.Printf("_______________ types %+v\n", v.(basetypes.ObjectValue).AttributeTypes(context.Background()))
+	}
+	var expressionsGroupType map[string]attr.Type = nil
+	if len(nestedConditionalsVal) > 0 {
+		fmt.Printf("***************** SIZE OF group: %d\n", len(nestedConditionalsVal))
+		expressionsGroupType = nestedConditionalsVal[0].(basetypes.ObjectValue).AttributeTypes(context.Background())
+	}
+	conditional["expressions_group"] = basetypes.NewListValueMust(ObjectType{
+		AttrTypes: expressionsGroupType,
+	}, nestedConditionalsVal)
+
+	fmt.Printf("--------------- returning %+v\n", conditional)
+
+	conditionalVal := basetypes.NewObjectValueMust(map[string]attr.Type{
+		"expressions": ListType{
+			ElemType: conditional["expressions"].(basetypes.ListValue).ElementType(context.Background()),
+		},
+		"expressions_group": ListType{
+			ElemType: conditional["expressions_group"].(basetypes.ListValue).ElementType(context.Background()),
+		},
+		"logical_operation": StringType,
+	}, conditional)
+	fmt.Printf("\n--------------------------------- FINAL: %+v\n\n", conditionalVal)
+
+	return conditionalVal
 }

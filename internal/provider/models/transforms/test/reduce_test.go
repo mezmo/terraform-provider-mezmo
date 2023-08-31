@@ -79,6 +79,26 @@ func TestReduceTransform(t *testing.T) {
 										],
 										logical_operation = "AND"
 									},
+									{
+										expressions_group = [
+											{
+												expressions = [
+													{
+														field = ".deeper"
+														operator = "equal"
+														value_string = "yep"
+													},
+													{
+														field = ".other.deeper"
+														operator = "equal"
+														value_string = "getting deep now"
+													}
+												],
+												logical_operation = "AND"
+											}
+										],
+										logical_operation = "AND"
+									},
 								]
 								logical_operation = "OR"
 							}
