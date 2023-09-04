@@ -26,21 +26,23 @@ type Source struct {
 	BaseNode
 	GatewayRouteId string `json:"gateway_route_id,omitempty"`
 }
-type Transform struct {
+
+type Processor struct {
 	BaseNode
 	Outputs []struct {
 		Id    string `json:"id"`
 		Label string `json:"label"`
 	} `json:"outputs,omitempty"`
 }
-type Sink struct {
+
+type Destination struct {
 	BaseNode
 }
 
 // Represents a full pipeline response from the service.
 type pipelineResponse struct {
-	Id         string      `json:"id"`
-	Sources    []Source    `json:"sources"`
-	Transforms []Transform `json:"transforms"`
-	Sinks      []Sink      `json:"sinks"`
+	Id           string        `json:"id"`
+	Sources      []Source      `json:"sources"`
+	Processors   []Processor   `json:"transforms"`
+	Destinations []Destination `json:"sinks"`
 }

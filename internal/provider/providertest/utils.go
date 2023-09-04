@@ -115,7 +115,7 @@ func lookupValue(key string, s *terraform.State) (string, error) {
 }
 
 // Given a string map, compare the expected values for those in the state.
-// Lookup syntax is supported for map values, e.g "#mezmo_stringify_transform.my_transform.id"
+// Lookup syntax is supported for map values, e.g "#mezmo_stringify_processor.my_processor.id"
 func StateHasExpectedValues(resourceName string, expected map[string]any) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		resource := s.RootModule().Resources[resourceName]
