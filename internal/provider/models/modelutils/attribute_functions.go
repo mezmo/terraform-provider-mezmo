@@ -227,7 +227,7 @@ func BrokersToModelList(elementType attr.Type, brokers []interface{}) List {
 	return brokersList
 }
 
-func KafkaSinkSASLToModel(types map[string]attr.Type, user_config map[string]interface{}) basetypes.ObjectValue {
+func KafkaDestinationSASLToModel(types map[string]attr.Type, user_config map[string]interface{}) basetypes.ObjectValue {
 	sasl := map[string]attr.Value{}
 	if user_config["sasl_username"] != nil {
 		sasl["username"] = StringValue(user_config["sasl_username"].(string))

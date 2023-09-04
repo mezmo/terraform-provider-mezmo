@@ -19,15 +19,15 @@ type Client interface {
 	UpdateSource(pipelineId string, component *Source) (*Source, error)
 	DeleteSource(pipelineId string, id string) error
 
-	Sink(pipelineId string, id string) (*Sink, error)
-	CreateSink(pipelineId string, component *Sink) (*Sink, error)
-	UpdateSink(pipelineId string, component *Sink) (*Sink, error)
-	DeleteSink(pipelineId string, id string) error
+	Destination(pipelineId string, id string) (*Destination, error)
+	CreateDestination(pipelineId string, component *Destination) (*Destination, error)
+	UpdateDestination(pipelineId string, component *Destination) (*Destination, error)
+	DeleteDestination(pipelineId string, id string) error
 
-	Transform(pipelineId string, id string) (*Transform, error)
-	CreateTransform(pipelineId string, component *Transform) (*Transform, error)
-	UpdateTransform(pipelineId string, component *Transform) (*Transform, error)
-	DeleteTransform(pipelineId string, id string) error
+	Processor(pipelineId string, id string) (*Processor, error)
+	CreateProcessor(pipelineId string, component *Processor) (*Processor, error)
+	UpdateProcessor(pipelineId string, component *Processor) (*Processor, error)
+	DeleteProcessor(pipelineId string, id string) error
 }
 
 func NewClient(endpoint string, authKey string, headers map[string]string) Client {
@@ -211,25 +211,22 @@ func (c *client) UpdateSource(pipelineId string, component *Source) (*Source, er
 	return source, nil
 }
 
-// TODO: The following methods need an implementation
-// using Source(), CreateSource(), UpdateSource(), DeleteSource() as examples.
-
-// Sink implements Client.
-// Gets a sink.
-func (c *client) Sink(pipelineId string, id string) (*Sink, error) {
+// Destination implements Client.
+// Gets a destination.
+func (c *client) Destination(pipelineId string, id string) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[Sink]
+	var envelope apiResponseEnvelope[Destination]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	sink := &envelope.Data
-	return sink, nil
+	destination := &envelope.Data
+	return destination, nil
 }
 
-// CreateSink implements Client.
-func (c *client) CreateSink(pipelineId string, component *Sink) (*Sink, error) {
+// CreateDestination implements Client.
+func (c *client) CreateDestination(pipelineId string, component *Destination) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink", c.endpoint, pipelineId)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
@@ -237,23 +234,23 @@ func (c *client) CreateSink(pipelineId string, component *Sink) (*Sink, error) {
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[Sink]
+	var envelope apiResponseEnvelope[Destination]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	sink := &envelope.Data
-	return sink, nil
+	destination := &envelope.Data
+	return destination, nil
 }
 
-// DeleteSink implements Client.
-func (c *client) DeleteSink(pipelineId string, id string) error {
+// DeleteDestination implements Client.
+func (c *client) DeleteDestination(pipelineId string, id string) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }
 
-// UpdateSink implements Client.
-func (c *client) UpdateSink(pipelineId string, component *Sink) (*Sink, error) {
+// UpdateDestination implements Client.
+func (c *client) UpdateDestination(pipelineId string, component *Destination) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, component.Id)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
@@ -261,30 +258,30 @@ func (c *client) UpdateSink(pipelineId string, component *Sink) (*Sink, error) {
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[Sink]
+	var envelope apiResponseEnvelope[Destination]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	sink := &envelope.Data
-	return sink, nil
+	destination := &envelope.Data
+	return destination, nil
 }
 
-// Transform implements Client.
-// Gets a Transform.
-func (c *client) Transform(pipelineId string, id string) (*Transform, error) {
+// Processor implements Client.
+// Gets a Processor.
+func (c *client) Processor(pipelineId string, id string) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[Transform]
+	var envelope apiResponseEnvelope[Processor]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	transform := &envelope.Data
-	return transform, nil
+	processor := &envelope.Data
+	return processor, nil
 }
 
-// CreateTransform implements Client.
-func (c *client) CreateTransform(pipelineId string, component *Transform) (*Transform, error) {
+// CreateProcessor implements Client.
+func (c *client) CreateProcessor(pipelineId string, component *Processor) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform", c.endpoint, pipelineId)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
@@ -292,23 +289,23 @@ func (c *client) CreateTransform(pipelineId string, component *Transform) (*Tran
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[Transform]
+	var envelope apiResponseEnvelope[Processor]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	transform := &envelope.Data
-	return transform, nil
+	processor := &envelope.Data
+	return processor, nil
 }
 
-// DeleteTransform implements Client.
-func (c *client) DeleteTransform(pipelineId string, id string) error {
+// DeleteProcessor implements Client.
+func (c *client) DeleteProcessor(pipelineId string, id string) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }
 
-// UpdateTransform implements Client.
-func (c *client) UpdateTransform(pipelineId string, component *Transform) (*Transform, error) {
+// UpdateProcessor implements Client.
+func (c *client) UpdateProcessor(pipelineId string, component *Processor) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, component.Id)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
@@ -316,10 +313,10 @@ func (c *client) UpdateTransform(pipelineId string, component *Transform) (*Tran
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
-	var envelope apiResponseEnvelope[Transform]
+	var envelope apiResponseEnvelope[Processor]
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
-	transform := &envelope.Data
-	return transform, nil
+	processor := &envelope.Data
+	return processor, nil
 }

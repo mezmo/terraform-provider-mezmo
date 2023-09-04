@@ -1,4 +1,4 @@
-package sources
+package destinations
 
 import (
 	"context"
@@ -12,28 +12,57 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
 	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
-type KafkaSourceModel struct {
-	Id           String `tfsdk:"id"`
-	PipelineId   String `tfsdk:"pipeline_id"`
-	Title        String `tfsdk:"title"`
-	Description  String `tfsdk:"description"`
-	GenerationId Int64  `tfsdk:"generation_id"`
-	Brokers      List   `tfsdk:"brokers"`
-	Topics       List   `tfsdk:"topics"`
-	GroupId      String `tfsdk:"group_id"`
-	TLSEnabled   Bool   `tfsdk:"tls_enabled"`
-	SASL         Object `tfsdk:"sasl"`
-	Decoding     String `tfsdk:"decoding"`
+type KafkaDestinationModel struct {
+	Id            String `tfsdk:"id"`
+	PipelineId    String `tfsdk:"pipeline_id"`
+	Title         String `tfsdk:"title"`
+	Description   String `tfsdk:"description"`
+	Inputs        List   `tfsdk:"inputs"`
+	GenerationId  Int64  `tfsdk:"generation_id"`
+	Encoding      String `tfsdk:"encoding"`
+	Compression   String `tfsdk:"compression"`
+	EventKeyField String `tfsdk:"event_key_field"`
+	Brokers       List   `tfsdk:"brokers"`
+	Topic         String `tfsdk:"topic"`
+	TLSEnabled    Bool   `tfsdk:"tls_enabled"`
+	SASL          Object `tfsdk:"sasl"`
+	AckEnabled    Bool   `tfsdk:"ack_enabled"`
 }
 
-func KafkaSourceResourceSchema() schema.Schema {
+func KafkaDestinationResourceSchema() schema.Schema {
 	return schema.Schema{
-		Description: "Represents a Kafka source.",
+		Description: "Represents a Kafka destination.",
 		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+			"encoding": schema.StringAttribute{
+				Optional:    true,
+				Computed:    true,
+				Default:     stringdefault.StaticString("text"),
+				Description: "The encoding to apply to the data.",
+				Validators: []validator.String{
+					stringvalidator.OneOf("json", "text"),
+				},
+			},
+			"compression": schema.StringAttribute{
+				Optional:    true,
+				Computed:    true,
+				Default:     stringdefault.StaticString("none"),
+				Description: "The compression strategy used on the encoded data prior to sending.",
+				Validators: []validator.String{
+					stringvalidator.OneOf("gzip", "lz4", "snappy", "zstd", "none"),
+				},
+			},
+			"event_key_field": schema.StringAttribute{
+				Optional:    true,
+				Description: "The field in the log whose value is used as Kafka's event key.",
+				Validators: []validator.String{
+					stringvalidator.LengthAtLeast(1),
+				},
+			},
 			"brokers": schema.ListNestedAttribute{
 				Required:    true,
 				Description: "The Kafka brokers to connect to.",
@@ -61,21 +90,9 @@ func KafkaSourceResourceSchema() schema.Schema {
 					listvalidator.SizeAtLeast(1),
 				},
 			},
-			"topics": schema.ListAttribute{
+			"topic": schema.StringAttribute{
 				Required:    true,
-				Description: "The Kafka topics to consume from.",
-				ElementType: StringType,
-				Validators: []validator.List{
-					listvalidator.UniqueValues(),
-					listvalidator.SizeAtLeast(1),
-					listvalidator.ValueStringsAre(
-						stringvalidator.LengthBetween(1, 256),
-					),
-				},
-			},
-			"group_id": schema.StringAttribute{
-				Required:    true,
-				Description: "The Kafka consumer group ID to use.",
+				Description: "The name of the topic to publish to.",
 				Validators: []validator.String{
 					stringvalidator.LengthAtLeast(1),
 				},
@@ -115,41 +132,43 @@ func KafkaSourceResourceSchema() schema.Schema {
 					},
 				},
 			},
-			"decoding": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("json"),
-				Description: "The decoding method for converting frames into data events.",
-				Validators: []validator.String{
-					stringvalidator.OneOf("bytes", "json"),
-				},
-			},
 		}, nil),
 	}
 }
 
-func KafkaSourceFromModel(plan *KafkaSourceModel, previousState *KafkaSourceModel) (*Source, diag.Diagnostics) {
+func KafkaDestinationFromModel(plan *KafkaDestinationModel, previousState *KafkaDestinationModel) (*Destination, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
 
-	brokers, dd := modelutils.BrokersFromModelList(plan.Brokers, dd)
-
-	topics := make([]string, 0, len(plan.Topics.Elements()))
-	dd = plan.Topics.ElementsAs(context.Background(), &topics, false)
-
-	component := Source{
+	component := Destination{
 		BaseNode: BaseNode{
 			Type:        "kafka",
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{
-				"brokers":        brokers,
-				"topics":         topics,
-				"group_id":       plan.GroupId.ValueString(),
-				"tls_enabled":    plan.TLSEnabled.ValueBool(),
-				"decoding_codec": plan.Decoding.ValueString(),
+				"encoding":    plan.Encoding.ValueString(),
+				"compression": plan.Compression.ValueString(),
+				"topic":       plan.Topic.ValueString(),
+				"tls_enabled": plan.TLSEnabled.ValueBool(),
+				"ack_enabled": plan.AckEnabled.ValueBool(),
 			},
 		},
 	}
+
+	if !plan.Inputs.IsUnknown() {
+		inputs := make([]string, 0)
+		for _, v := range plan.Inputs.Elements() {
+			value, _ := v.(basetypes.StringValue)
+			inputs = append(inputs, value.ValueString())
+		}
+		component.Inputs = inputs
+	}
+
+	if !plan.EventKeyField.IsNull() {
+		component.UserConfig["event_key_field"] = plan.EventKeyField.ValueString()
+	}
+
+	brokers, dd := modelutils.BrokersFromModelList(plan.Brokers, dd)
+	component.UserConfig["brokers"] = brokers
 
 	sasl := plan.SASL.Attributes()
 	if len(sasl) > 0 {
@@ -169,7 +188,7 @@ func KafkaSourceFromModel(plan *KafkaSourceModel, previousState *KafkaSourceMode
 	return &component, dd
 }
 
-func KafkaSourceToModel(plan *KafkaSourceModel, component *Source) {
+func KafkaDestinationToModel(plan *KafkaDestinationModel, component *Destination) {
 	plan.Id = StringValue(component.Id)
 	plan.GenerationId = Int64Value(component.GenerationId)
 
@@ -180,10 +199,17 @@ func KafkaSourceToModel(plan *KafkaSourceModel, component *Source) {
 		plan.Description = StringValue(component.Description)
 	}
 
+	plan.Inputs = modelutils.SliceToStringListValue(component.Inputs)
 	plan.Brokers = modelutils.BrokersToModelList(plan.Brokers.ElementType(context.Background()), component.UserConfig["brokers"].([]interface{}))
-	plan.Topics, _ = ListValueFrom(context.Background(), StringType, component.UserConfig["topics"])
-	plan.GroupId = StringValue(component.UserConfig["group_id"].(string))
+	plan.Encoding = StringValue(component.UserConfig["encoding"].(string))
+	plan.Compression = StringValue(component.UserConfig["compression"].(string))
+	plan.Topic = StringValue(component.UserConfig["topic"].(string))
 	plan.TLSEnabled = BoolValue(component.UserConfig["tls_enabled"].(bool))
+	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
+
+	if component.UserConfig["event_key_field"] != nil {
+		plan.EventKeyField = StringValue(component.UserConfig["event_key_field"].(string))
+	}
 
 	if component.UserConfig["sasl_enabled"] != nil {
 		sasl_enabled, _ := component.UserConfig["sasl_enabled"].(bool)
@@ -191,6 +217,4 @@ func KafkaSourceToModel(plan *KafkaSourceModel, component *Source) {
 			plan.SASL = modelutils.KafkaDestinationSASLToModel(plan.SASL.AttributeTypes(context.Background()), component.UserConfig)
 		}
 	}
-
-	plan.Decoding = StringValue(component.UserConfig["decoding_codec"].(string))
 }

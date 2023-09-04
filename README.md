@@ -39,7 +39,7 @@ make local-test
 Running a single test
 
 ```shell
-env $(cat ./env/local.env) go test -v -count=1 ./... -run TestDedupeTransform
+env $(cat ./env/local.env) go test -v -count=1 ./... -run TestDedupeProcessor
 ```
 
 ## Generating the Docs
