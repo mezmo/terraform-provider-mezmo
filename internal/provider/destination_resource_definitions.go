@@ -128,6 +128,17 @@ func NewPrometheusRemoteWriteDestinationResource() resource.Resource {
 	}
 }
 
+func NewS3DestinationResource() resource.Resource {
+	return &DestinationResource[S3DestinationModel]{
+		typeName:          "s3",
+		fromModelFunc:     S3DestinationFromModel,
+		toModelFunc:       S3DestinationToModel,
+		getIdFunc:         func(m *S3DestinationModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *S3DestinationModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     S3DestinationResourceSchema,
+	}
+}
+
 func NewSplunkHecLogsDestinationResource() resource.Resource {
 	return &DestinationResource[SplunkHecLogsDestinationModel]{
 		typeName:          "splunk_hec_logs",

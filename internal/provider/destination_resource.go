@@ -21,6 +21,7 @@ type DestinationModel interface {
 		MezmoDestinationModel |
 		NewRelicDestinationModel |
 		PrometheusRemoteWriteDestinationModel |
+		S3DestinationModel |
 		SplunkHecLogsDestinationModel
 }
 
