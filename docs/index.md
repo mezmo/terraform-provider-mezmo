@@ -3,12 +3,12 @@
 page_title: "mezmo Provider"
 subcategory: ""
 description: |-
-  
+  The Mezmo Terraform Provider allows organizations to manage Pipelines (sources, processors and destinations) programmatically via Terraform.
 ---
 
 # mezmo Provider
 
-
+The Mezmo Terraform Provider allows organizations to manage Pipelines (sources, processors and destinations) programmatically via Terraform.
 
 
 
@@ -21,6 +21,5 @@ description: |-
 
 ### Optional
 
-- `auth_additional` (String) Used for direct auth schemes in test scenarios
-- `auth_header` (String)
 - `endpoint` (String) Mezmo API endpoint containing the url scheme, host and port
+- `headers` (Map of String) Optional map of headers to send in each request
