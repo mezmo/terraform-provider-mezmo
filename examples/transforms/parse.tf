@@ -30,7 +30,7 @@ resource "mezmo_parse_transform" "error_logs" {
   field       = ".log"
   parser      = "apache_log"
   apache_log_options = {
-    format = "error"
+    format           = "error"
     timestamp_format = "%Y/%m/%d %H:%M:%S"
   }
 }
@@ -43,7 +43,7 @@ resource "mezmo_parse_transform" "retrieve_timestamp" {
   field       = ".log"
   parser      = "timestamp_parser"
   timestamp_parser_options = {
-    format = "Custom"
+    format        = "Custom"
     custom_format = "%Y/%m/%d %H:%M:%S"
   }
 }
@@ -53,8 +53,8 @@ resource "mezmo_parse_transform" "regex" {
   title       = "Regex parser"
   description = "Parse regex log"
   inputs      = [mezmo_http_source.curl.id]
-  field        = ".log"
-  parser = "regex_parser"
+  field       = ".log"
+  parser      = "regex_parser"
   regex_parser_options = {
     pattern = "^(?P<number>[0-9]*)(?P<word>\\w*)(?P<singlequote>\\')(?P<slash>\\\\?)"
   }

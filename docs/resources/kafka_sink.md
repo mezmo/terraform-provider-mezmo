@@ -23,7 +23,7 @@ Represents a Kafka sink.
 
 ### Optional
 
-- `ack_enabled` (Boolean) Sets end-to-end acknowledgement on the destination
+- `ack_enabled` (Boolean) Acknowledge data from the source when it reaches the sink
 - `compression` (String) The compression strategy used on the encoded data prior to sending.
 - `description` (String) A user-defined value describing the sink component
 - `encoding` (String) The encoding to apply to the data.
