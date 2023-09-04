@@ -3,11 +3,14 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
 )
 
@@ -20,10 +23,9 @@ type MezmoProvider struct {
 
 // MezmoProviderModel describes the provider data model.
 type MezmoProviderModel struct {
-	Endpoint       types.String `tfsdk:"endpoint"`
-	AuthKey        types.String `tfsdk:"auth_key"`
-	AuthHeader     types.String `tfsdk:"auth_header"`
-	AuthAdditional types.String `tfsdk:"auth_additional"`
+	Endpoint String `tfsdk:"endpoint"`
+	AuthKey  String `tfsdk:"auth_key"`
+	Headers  Map    `tfsdk:"headers"`
 }
 
 func (p *MezmoProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -33,22 +35,29 @@ func (p *MezmoProvider) Metadata(ctx context.Context, req provider.MetadataReque
 
 func (p *MezmoProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		Description: "The Mezmo Terraform Provider allows organizations to manage Pipelines" +
+			" (sources, processors and destinations) programmatically via Terraform.",
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "Mezmo API endpoint containing the url scheme, host and port",
-				Optional:            true,
+				Description: "Mezmo API endpoint containing the url scheme, host and port",
+				Optional:    true,
+				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 			},
 			"auth_key": schema.StringAttribute{
-				MarkdownDescription: "The authentication key",
-				Required:            true,
-				Sensitive:           true,
+				Description: "The authentication key",
+				Required:    true,
+				Sensitive:   true,
 			},
-			"auth_header": schema.StringAttribute{
-				Optional: true,
-			},
-			"auth_additional": schema.StringAttribute{
+			"headers": schema.MapAttribute{
+				Description: "Optional map of headers to send in each request",
 				Optional:    true,
-				Description: "Used for direct auth schemes in test scenarios",
+				ElementType: StringType,
+				Validators: []validator.Map{
+					mapvalidator.All(
+						mapvalidator.KeysAre(stringvalidator.LengthAtLeast(1)),
+						mapvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
+					),
+				},
 			},
 		},
 	}
@@ -64,20 +73,18 @@ func (p *MezmoProvider) Configure(ctx context.Context, req provider.ConfigureReq
 	}
 
 	endpoint := "https://api.mezmo.com"
-	authHeader := "Authorization"
-	authAdditional := ""
+	headers := make(map[string]string)
 
 	if !data.Endpoint.IsNull() {
 		endpoint = data.Endpoint.ValueString()
 	}
-	if !data.AuthHeader.IsNull() {
-		authHeader = data.AuthHeader.ValueString()
-	}
-	if !data.AuthAdditional.IsNull() {
-		authAdditional = data.AuthAdditional.ValueString()
+	if !data.Headers.IsNull() {
+		for k, v := range data.Headers.Elements() {
+			headers[k] = v.(String).ValueString()
+		}
 	}
 
-	c := client.NewClient(endpoint, data.AuthKey.ValueString(), authHeader, authAdditional)
+	c := client.NewClient(endpoint, data.AuthKey.ValueString(), headers)
 	resp.DataSourceData = c
 	resp.ResourceData = c
 }

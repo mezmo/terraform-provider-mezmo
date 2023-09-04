@@ -30,13 +30,12 @@ type Client interface {
 	DeleteTransform(pipelineId string, id string) error
 }
 
-func NewClient(endpoint string, authKey string, authHeader string, authAdditional string) Client {
+func NewClient(endpoint string, authKey string, headers map[string]string) Client {
 	return &client{
-		httpClient:     &http.Client{},
-		authKey:        authKey,
-		authHeader:     authHeader,
-		endpoint:       endpoint,
-		authAdditional: authAdditional,
+		httpClient: &http.Client{},
+		endpoint:   endpoint,
+		authKey:    authKey,
+		headers:    headers,
 	}
 }
 
@@ -46,11 +45,10 @@ type apiResponseEnvelope[T any] struct {
 }
 
 type client struct {
-	httpClient     *http.Client
-	authKey        string
-	authHeader     string
-	endpoint       string
-	authAdditional string
+	httpClient *http.Client
+	endpoint   string
+	authKey    string
+	headers    map[string]string
 }
 
 // CreatePipeline implements Client.
@@ -143,9 +141,13 @@ func (c *client) newRequest(method string, url string, body io.Reader) *http.Req
 		// Creating a request only fails if the method is invalid
 		panic(err)
 	}
-	req.Header.Add(c.authHeader, c.authKey)
-	if c.authHeader == "x-auth-account-id" {
-		req.Header.Add("x-auth-user-email", c.authAdditional)
+	if c.authKey != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("Token %s", c.authKey))
+	}
+	if len(c.headers) > 0 {
+		for k, v := range c.headers {
+			req.Header.Add(k, v)
+		}
 	}
 
 	if method != http.MethodGet {
