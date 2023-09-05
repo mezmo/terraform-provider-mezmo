@@ -38,6 +38,46 @@ func TestReduceTransform(t *testing.T) {
 			// },
 
 			// Create
+			// {
+			// 	Config: GetCachedConfig(cacheKey) + `
+			// 		resource "mezmo_reduce_transform" "my_transform" {
+			// 			title = "transform title"
+			// 			description = "transform desc"
+			// 			pipeline_id = mezmo_pipeline.test_parent.id
+
+			// 			flush_condition = {
+			// 				when = "starts_when"
+			// 				conditional = {
+			// 					expressions = [
+			// 						{
+			// 							field = ".level"
+			// 							operator = "equal"
+			// 							value_string = "ERROR"
+			// 						},
+			// 						{
+			// 							field = ".app"
+			// 							operator = "equal"
+			// 							value_string = "worker"
+			// 						}
+			// 					],
+			// 					logical_operation = "AND"
+			// 				},
+			// 			}
+			// 		}`,
+			// 	Check: resource.ComposeTestCheckFunc(
+			// 		resource.TestMatchResourceAttr(
+			// 			"mezmo_reduce_transform.my_transform", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+			// 		StateHasExpectedValues("mezmo_reduce_transform.my_transform", map[string]any{
+			// 			"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+			// 			"title":         "transform title",
+			// 			"description":   "transform desc",
+			// 			"generation_id": "0",
+			// 			"inputs.#":      "0",
+			// 		}),
+			// 	),
+			// },
+
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_reduce_transform" "my_transform" {
