@@ -130,6 +130,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewHoneycombLogsDestinationResource,
 		NewHttpDestinationResource,
 		NewKafkaDestinationResource,
+		NewLokiDestinationResource,
 		NewMezmoDestinationResource,
 		NewNewRelicDestinationResource,
 		NewPrometheusRemoteWriteDestinationResource,

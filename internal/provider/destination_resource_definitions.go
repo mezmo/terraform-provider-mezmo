@@ -95,6 +95,17 @@ func NewKafkaDestinationResource() resource.Resource {
 	}
 }
 
+func NewLokiDestinationResource() resource.Resource {
+	return &DestinationResource[LokiDestinationModel]{
+		typeName:          "loki",
+		fromModelFunc:     LokiFromModel,
+		toModelFunc:       LokiDestinationToModel,
+		getIdFunc:         func(m *LokiDestinationModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *LokiDestinationModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     LokiDestinationResourceSchema,
+	}
+}
+
 func NewMezmoDestinationResource() resource.Resource {
 	return &DestinationResource[MezmoDestinationModel]{
 		typeName:          "logs",

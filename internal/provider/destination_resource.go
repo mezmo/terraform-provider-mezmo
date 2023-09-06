@@ -19,6 +19,7 @@ type DestinationModel interface {
 		HoneycombLogsDestinationModel |
 		HttpDestinationModel |
 		KafkaDestinationModel |
+		LokiDestinationModel |
 		MezmoDestinationModel |
 		NewRelicDestinationModel |
 		PrometheusRemoteWriteDestinationModel |
