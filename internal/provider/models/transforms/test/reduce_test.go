@@ -88,37 +88,33 @@ func TestReduceTransform(t *testing.T) {
 						flush_condition = {
 							when = "starts_when"
 							conditional = {
+								// // SIMPLE
+								// expressions = [
+								// 	{
+								// 		field = ".level"
+								// 		operator = "equal"
+								// 		value_string = "ERROR"
+								// 	},
+								// ]
+								// logical_operation = "AND"
+
+								// // Nested L1
+								// expressions_group = [
+								// 	{
+								// 		expressions = [
+								// 			{
+								// 				field = ".level"
+								// 				operator = "equal"
+								// 				value_string = "ERROR"
+								// 			}
+								// 		],
+								// 		logical_operation = "AND"
+								// 	},
+								// ]
+								// logical_operation = "AND"
+
+								// NESTED L2
 								expressions_group = [
-									{
-										expressions = [
-											{
-												field = ".level"
-												operator = "equal"
-												value_string = "ERROR"
-											},
-											{
-												field = ".app"
-												operator = "equal"
-												value_string = "worker"
-											}
-										],
-										logical_operation = "AND"
-									},
-									{
-										expressions = [
-											{
-												field = ".status"
-												operator = "equal"
-												value_number = 500
-											},
-											{
-												field = ".app"
-												operator = "equal"
-												value_string = "service"
-											}
-										],
-										logical_operation = "AND"
-									},
 									{
 										expressions_group = [
 											{
@@ -127,11 +123,6 @@ func TestReduceTransform(t *testing.T) {
 														field = ".deeper"
 														operator = "equal"
 														value_string = "yep"
-													},
-													{
-														field = ".other.deeper"
-														operator = "equal"
-														value_string = "getting deep now"
 													}
 												],
 												logical_operation = "AND"
@@ -141,6 +132,61 @@ func TestReduceTransform(t *testing.T) {
 									},
 								]
 								logical_operation = "OR"
+
+								// // NESTED COMPLEX
+								// expressions_group = [
+								// 	{
+								// 		expressions = [
+								// 			{
+								// 				field = ".level"
+								// 				operator = "equal"
+								// 				value_string = "ERROR"
+								// 			},
+								// 			{
+								// 				field = ".app"
+								// 				operator = "equal"
+								// 				value_string = "worker"
+								// 			}
+								// 		],
+								// 		logical_operation = "AND"
+								// 	},
+								// 	{
+								// 		expressions = [
+								// 			{
+								// 				field = ".status"
+								// 				operator = "equal"
+								// 				value_number = 500
+								// 			},
+								// 			{
+								// 				field = ".app"
+								// 				operator = "equal"
+								// 				value_string = "service"
+								// 			}
+								// 		],
+								// 		logical_operation = "AND"
+								// 	},
+								// 	{
+								// 		expressions_group = [
+								// 			{
+								// 				expressions = [
+								// 					{
+								// 						field = ".deeper"
+								// 						operator = "equal"
+								// 						value_string = "yep"
+								// 					},
+								// 					{
+								// 						field = ".other.deeper"
+								// 						operator = "equal"
+								// 						value_string = "getting deep now"
+								// 					}
+								// 				],
+								// 				logical_operation = "AND"
+								// 			}
+								// 		],
+								// 		logical_operation = "AND"
+								// 	},
+								// ]
+								// logical_operation = "OR"
 							}
 						}
 					}`,

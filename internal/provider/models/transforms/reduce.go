@@ -1,7 +1,7 @@
 package transforms
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
@@ -38,46 +38,6 @@ var expressionTypes = map[string]attr.Type{
 	"value_number": Float64Type,
 	"value_string": StringType,
 }
-
-// func nestedExpressionTypes(depth int) map[string]attr.Type {
-// 	if depth > 0 {
-// 		return map[string]attr.Type{
-// 			"expressions": ListType{
-// 				ElemType: ObjectType{
-// 					AttrTypes: expressionTypes,
-// 				},
-// 			},
-// 			"expressions_group": ListType{
-// 				ElemType: ObjectType{
-// 					AttrTypes: nestedExpressionTypes(depth - 1),
-// 				},
-// 			},
-// 			"logical_operation": StringType,
-// 		}
-// 	}
-// 	return map[string]attr.Type{
-// 		"expressions": ListType{
-// 			ElemType: ObjectType{
-// 				AttrTypes: expressionTypes,
-// 			},
-// 		},
-// 		"logical_operation": StringType,
-// 	}
-// }
-
-// var conditionalTypes = map[string]attr.Type{
-// 	"expressions": ListType{
-// 		ElemType: ObjectType{
-// 			AttrTypes: expressionTypes,
-// 		},
-// 	},
-// 	"expressions_group": ListType{
-// 		ElemType: ObjectType{
-// 			// AttrTypes: nestedExpressionTypes(3),
-// 		},
-// 	},
-// 	"logical_operation": StringType,
-// }
 
 var expressionAttributes = map[string]schema.Attribute{
 	"field": schema.StringAttribute{
@@ -122,64 +82,72 @@ var logicalOperation = schema.StringAttribute{
 var expressionList = schema.ListNestedAttribute{
 	Optional:    true,
 	Description: "Defines a list of expressions for field comparisons",
-	NestedObject: schema.NestedAttributeObject{
-		Attributes: expressionAttributes,
-	},
+	NestedObject: expressionItem,
 	Validators: []validator.List{
 		listvalidator.SizeAtLeast(1),
+
+		// WOW: TIL about ConflictsWith()
 		listvalidator.ConflictsWith(
 			path.MatchRelative().AtParent().AtName("expressions_group"),
 		),
 	},
 }
 
-func nestedExpressionGroup(depth int) schema.ListNestedAttribute {
-	if depth > 1 {
-		return schema.ListNestedAttribute{
-			Optional:    true,
-			Description: "A group of nested expressions joined by a logical operator",
-			NestedObject: schema.NestedAttributeObject{
-				Attributes: map[string]schema.Attribute{
-					"expressions":       expressionList,
-					"expressions_group": nestedExpressionGroup(depth - 1),
-					"logical_operation": logicalOperation,
-				},
-			},
-		}
-	}
-	// The last iteration will omit `expressions_group`
-	return schema.ListNestedAttribute{
-		Optional:    true,
-		Description: "A group of expressions joined by a logical operator",
-		NestedObject: schema.NestedAttributeObject{
-			Attributes: map[string]schema.Attribute{
-				"expressions":       expressionList,
-				"logical_operation": logicalOperation,
-			},
-		},
-	}
+var expressionItem = schema.NestedAttributeObject{
+	Attributes: expressionAttributes,
 }
 
-func getConditionalValueType(depth int) schema.SingleNestedAttribute {
-	if depth > 1 {
-		return schema.SingleNestedAttribute{
+var conditionalValueType = schema.SingleNestedAttribute{
+	Optional:    true,
+	Description: "A group of expressions (optionally nested) joined by a logical operator",
+	Attributes: map[string]schema.Attribute{
+		"expressions":       expressionList,
+		"expressions_group": schema.ListNestedAttribute{
 			Optional:    true,
-			Description: "A group of expressions (optionally nested) joined by a logical operator",
-			Attributes: map[string]schema.Attribute{
-				"expressions":       expressionList,
-				"expressions_group": nestedExpressionGroup(depth),
-				"logical_operation": logicalOperation,
-			},
-		}
-	}
-	return schema.SingleNestedAttribute{
-		Optional:    true,
-		Description: "A group of expressions (optionally nested) joined by a logical operator",
-		Attributes: map[string]schema.Attribute{
-			"expressions":       expressionList,
-			"logical_operation": logicalOperation,
+			Description: "A group of nested expressions joined by a logical operator",
+			NestedObject: nestedObjectL1,
 		},
-	}
+		"logical_operation": logicalOperation,
+	},
+}
+
+var nestedObjectL1 = schema.NestedAttributeObject{
+	Attributes: map[string]schema.Attribute{
+		"expressions":       expressionList,
+		"expressions_group": schema.ListNestedAttribute{
+			Optional:    true,
+			Description: "A group of nested expressions joined by a logical operator",
+			NestedObject: nestedObjectL2,
+		},
+		"logical_operation": logicalOperation,
+	},
+}
+
+var nestedObjectL2 = schema.NestedAttributeObject{
+	Attributes: map[string]schema.Attribute{
+		"expressions":       expressionList,
+		"expressions_group": schema.ListNestedAttribute{
+			Optional:    true,
+			Description: "A group of nested expressions joined by a logical operator",
+			NestedObject: nestedObjectL3,
+		},
+		"logical_operation": logicalOperation,
+	},
+}
+
+var nestedObjectL3 = schema.NestedAttributeObject{
+	Attributes: map[string]schema.Attribute{
+		"expressions":       expressionList,
+		"logical_operation": logicalOperation,
+	},
+}
+
+var attributesByLevel = []map[string]schema.Attribute{
+	conditionalValueType.Attributes, nestedObjectL1.Attributes, nestedObjectL2.Attributes,
+}
+
+var childExpressionGroupTypeByLevel = []attr.Type{
+	nestedObjectL1.Type(), nestedObjectL2.Type(), nestedObjectL3.Type(),
 }
 
 func ReduceTransformResourceSchema() schema.Schema {
@@ -268,7 +236,7 @@ func ReduceTransformResourceSchema() schema.Schema {
 							stringvalidator.OneOf("starts_when", "ends_when"),
 						},
 					},
-					"conditional": getConditionalValueType(3),
+					"conditional": conditionalValueType,
 				},
 			},
 		}),
@@ -363,7 +331,6 @@ func unwindConditionalFromModel(v attr.Value) map[string]any {
 }
 
 func ReduceTransformToModel(plan *ReduceTransformModel, component *Transform) {
-	fmt.Printf("------- COMPONENT --------- %+v\n", component)
 	PrintJSON(component)
 	plan.Id = StringValue(component.Id)
 	if component.Title != "" {
@@ -382,70 +349,81 @@ func ReduceTransformToModel(plan *ReduceTransformModel, component *Transform) {
 	}
 	if component.UserConfig["flush_condition"] != nil {
 		flushCondition := component.UserConfig["flush_condition"].(map[string]any)
-		unwindConditionalToModel(flushCondition["conditional"].(map[string]any), 1)
+		// TODO: set conditional
+		conditional := unwindConditionalToModel(flushCondition["conditional"].(map[string]any))
+		fmt.Println("--conditional", conditional)
 	}
 }
 
-func unwindConditionalToModel(component map[string]any, depth int) basetypes.ObjectValue {
-	conditional := map[string]attr.Value{
-		"logical_operation": StringValue(component["logical_operation"].(string)),
-	}
+func unwindConditionalToModel(component map[string]any) basetypes.ObjectValue {
+	incoming, _ := json.MarshalIndent(component, "", "   ")
+	fmt.Println("--unwinding", string(incoming))
 
-	expressionsVal := make([]attr.Value, 0)
+	value, _ := parseExpressionsItem(component, component["logical_operation"].(string), 0)
 
-	fmt.Printf("********* incoming %+v\n", component)
-	for _, e := range component["expressions"].([]any) {
-		compExpression := e.(map[string]any)
-		if _, ok := compExpression["expressions"].([]any); ok {
-			fmt.Printf("+++++++++ nesting detected in compExpression %+v\n", compExpression)
-			// There's a nested expression group.  Recurse.
-			// conditional["expressions"] = basetypes.NewListValueMust(basetypes.ObjectType{}, expressionsVal)
-			depth = depth + 1
-			nestedConditional := unwindConditionalToModel(compExpression, depth)
-			fmt.Printf("&&&&&&&&&&&&& after recursion: %+v\n", nestedConditional)
+	return value
+}
 
-			conditional["expressions_group"] = basetypes.NewListValueMust(ObjectType{
-				AttrTypes: nestedConditional.AttributeTypes(nil),
-			}, []attr.Value{nestedConditional})
+func parseExpressionsItem(component map[string]any, logicalOperation string, level int) (value basetypes.ObjectValue, isGroup bool) {
+	if childExpressionArr, ok := component["expressions"].([]any); ok {
+		// Branch
+		groupItems := make([]attr.Value, 0)
+		leafItems := make([]attr.Value, 0)
+		attributeTypes := toAttrTypes(attributesByLevel[level])
 
-			conditionalVal := basetypes.NewObjectValueMust(map[string]attr.Type{
-				"expressions_group": conditional["expressions_group"].Type(context.Background()),
-				"logical_operation": logicalOperation.GetType(),
-			}, conditional)
+		for _, e := range childExpressionArr {
+			value, isGroup := parseExpressionsItem(
+				e.(map[string]any),
+				component["logical_operation"].(string),
+				level+1)
 
-			fmt.Printf("=========== nestedConditionalsVal %+v\n", conditionalVal)
-			return conditionalVal
-		} else {
-			fmt.Printf("@@@@@@@ compExpression: %+v\n", compExpression)
-			// It's an expression object to covert to a TF type
-			expression := map[string]attr.Value{
-				"field":        StringValue(compExpression["field"].(string)),
-				"operator":     StringValue(compExpression["str_operator"].(string)),
-				"value_number": basetypes.NewFloat64Null(),
-				"value_string": StringNull(),
-			}
-			if valueNumber, ok := compExpression["value"].(float64); ok {
-				expression["value_number"] = basetypes.NewFloat64Value(valueNumber)
+			if isGroup {
+				groupItems = append(groupItems, value)
 			} else {
-				expression["value_string"] = basetypes.NewStringValue(compExpression["value"].(string))
+				leafItems = append(leafItems, value)
 			}
-			expressionsVal = append(
-				expressionsVal,
-				basetypes.NewObjectValueMust(expressionTypes, expression),
-			)
-			fmt.Printf("========== added flat conditions: %+v\n", expressionsVal)
 		}
+
+		attributeValues := map[string]attr.Value{
+			"logical_operation": StringValue(logicalOperation),
+			"expressions": ListValueMust(expressionItem.Type(), leafItems),
+		}
+
+		expressionGroupType := childExpressionGroupTypeByLevel[level]
+		if len(groupItems) > 0 {
+			attributeValues["expressions_group"] = ListValueMust(expressionGroupType, groupItems)
+		} else if attributeTypes["expressions_group"] != nil {
+			attributeValues["expressions_group"] = ListNull(expressionGroupType)
+		}
+
+		return basetypes.NewObjectValueMust(
+			attributeTypes,
+			attributeValues), true
 	}
 
-	conditional["expressions"] = basetypes.NewListValueMust(expressionList.NestedObject.Type(), expressionsVal)
+	// Leaf
+	fmt.Println("----LEAF", level, component)
+	// It's an attributeValues object to covert to a TF type
+	attributeValues := map[string]attr.Value{
+		"field":        StringValue(component["field"].(string)),
+		"operator":     StringValue(component["str_operator"].(string)),
+		"value_number": Float64Null(),
+		"value_string": StringNull(),
+	}
+	if valueNumber, ok := component["value"].(float64); ok {
+		attributeValues["value_number"] = basetypes.NewFloat64Value(valueNumber)
+	} else {
+		attributeValues["value_string"] = basetypes.NewStringValue(component["value"].(string))
+	}
 
-	fmt.Printf("--------------- depth %d\n", depth)
+	return basetypes.NewObjectValueMust(expressionTypes, attributeValues), false
+}
 
-	conditionalVal := basetypes.NewObjectValueMust(map[string]attr.Type{
-		"expressions":       conditional["expressions"].Type(context.Background()),
-		"logical_operation": logicalOperation.GetType(),
-	}, conditional)
-	fmt.Printf("\n--------------------------------- FINAL: %+v\n\n", conditionalVal)
+func toAttrTypes(attributes map[string]schema.Attribute) map[string]attr.Type{
+	result := make(map[string]attr.Type)
+	for k, v := range attributes {
+		result[k] = v.GetType()
+	}
 
-	return conditionalVal
+	return result
 }
