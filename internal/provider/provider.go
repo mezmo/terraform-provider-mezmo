@@ -126,6 +126,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewDatadogLogsDestinationResource,
 		NewDatadogMetricsDestinationResource,
 		NewElasticSearchDestinationResource,
+		NewGcpCloudStorageDestinationResource,
 		NewHoneycombLogsDestinationResource,
 		NewHttpDestinationResource,
 		NewKafkaDestinationResource,

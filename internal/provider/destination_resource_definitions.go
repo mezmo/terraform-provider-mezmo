@@ -149,3 +149,14 @@ func NewSplunkHecLogsDestinationResource() resource.Resource {
 		getSchemaFunc:     SplunkHecLogsDestinationResourceSchema,
 	}
 }
+
+func NewGcpCloudStorageDestinationResource() resource.Resource {
+	return &DestinationResource[GcpCloudStorageDestinationModel]{
+		typeName:          "gcp_cloud_storage",
+		fromModelFunc:     GcpCloudStorageDestinationFromModel,
+		toModelFunc:       GcpCloudStorageDestinationToModel,
+		getIdFunc:         func(m *GcpCloudStorageDestinationModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *GcpCloudStorageDestinationModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     GcpCloudStorageResourceSchema,
+	}
+}
