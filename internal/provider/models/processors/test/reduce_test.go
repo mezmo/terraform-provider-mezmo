@@ -117,6 +117,7 @@ func TestReduceProcessor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_http_source.my_source.id]
 
+						duration_ms = 15000
 						group_by    = [".field1.id"]
 						date_formats = [
 							{
@@ -138,7 +139,7 @@ func TestReduceProcessor(t *testing.T) {
 						"description":                 "processor desc",
 						"generation_id":               "1",
 						"inputs.#":                    "1",
-						"duration_ms":                 "30000",
+						"duration_ms":                 "15000",
 						"group_by.#":                  "1",
 						"group_by.0":                  ".field1.id",
 						"date_formats.#":              "1",

@@ -246,6 +246,45 @@ func ReduceProcessorToModel(plan *ReduceProcessorModel, component *Processor) {
 		}
 		plan.Inputs = NewListValueMust(StringType{}, inputs)
 	}
+
+	plan.DurationMs = NewInt64Value(int64(component.UserConfig["duration_ms"].(float64)))
+
+	if component.UserConfig["group_by"] != nil {
+		plan.GroupBy = SliceToStringListValue(component.UserConfig["group_by"].([]any))
+	}
+
+	if component.UserConfig["date_formats"] != nil {
+		dateFormats := make([]attr.Value, 0)
+		for _, v := range component.UserConfig["date_formats"].([]any) {
+			dateFormats = append(dateFormats, NewObjectValueMust(map[string]attr.Type{
+				"field":  StringType{},
+				"format": StringType{},
+			}, map[string]attr.Value{
+				"field":  NewStringValue(v.(map[string]any)["field"].(string)),
+				"format": NewStringValue(v.(map[string]any)["format"].(string)),
+			}))
+		}
+		plan.DateFormats = NewListValueMust(ObjectType{
+			AttrTypes: dateFormats[0].Type(context.Background()).(ObjectType).AttributeTypes(),
+		}, dateFormats)
+	}
+
+	if component.UserConfig["merge_strategies"] != nil {
+		mergeStrategies := make([]attr.Value, 0)
+		for _, v := range component.UserConfig["merge_strategies"].([]any) {
+			mergeStrategies = append(mergeStrategies, NewObjectValueMust(map[string]attr.Type{
+				"field":    StringType{},
+				"strategy": StringType{},
+			}, map[string]attr.Value{
+				"field":    NewStringValue(v.(map[string]any)["field"].(string)),
+				"strategy": NewStringValue(v.(map[string]any)["strategy"].(string)),
+			}))
+		}
+		plan.MergeStrategies = NewListValueMust(ObjectType{
+			AttrTypes: mergeStrategies[0].Type(context.Background()).(ObjectType).AttributeTypes(),
+		}, mergeStrategies)
+	}
+
 	if component.UserConfig["flush_condition"] != nil {
 		flushCondition := component.UserConfig["flush_condition"].(map[string]any)
 
