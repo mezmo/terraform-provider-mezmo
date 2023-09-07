@@ -18,9 +18,9 @@ type HttpSourceModel struct {
 	Title           String `tfsdk:"title"`
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
-	Decoding        String `tfsdk:"decoding"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata"`
 	GatewayRouteId  String `tfsdk:"gateway_route_id"`
+	Decoding        String `tfsdk:"decoding" user_config:"true"`
+	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
 func HttpSourceResourceSchema() schema.Schema {
@@ -89,12 +89,8 @@ func HttpSourceToModel(plan *HttpSourceModel, component *Source) {
 	if component.Description != "" {
 		plan.Description = StringValue(component.Description)
 	}
-	if component.UserConfig["format"] != nil {
-		decoding, _ := component.UserConfig["decoding"].(string)
-		plan.Decoding = StringValue(decoding)
-		captureMetadata, _ := component.UserConfig["capture_metadata"].(bool)
-		plan.CaptureMetadata = BoolValue(captureMetadata)
-	}
+	plan.Decoding = StringValue(component.UserConfig["decoding"].(string))
+	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.GatewayRouteId = StringValue(component.GatewayRouteId)
 }

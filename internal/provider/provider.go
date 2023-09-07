@@ -2,15 +2,21 @@ package provider
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	resourceSchema "github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
 )
 
@@ -150,5 +156,68 @@ func New(version string) func() provider.Provider {
 		return &MezmoProvider{
 			version: version,
 		}
+	}
+}
+
+// This function is used only in testing to protect us from forgetting to overwrite plan
+// values with what comes back from the API responses. Our models can be complicated, and
+// it's possible we will miss things in the provider code and in code review. What's worse is that
+// test assertions will actually give false positives even if properties have not been updated.
+// @see: https://mezmo.atlassian.net/browse/LOG-18104
+func NullifyPlanFields[M ComponentModel](plan *M, schema resourceSchema.Schema) {
+	if os.Getenv("TF_ACC") != "1" {
+		// Don't do this in prod because modifying the plan like this could have unintended side effects after upgrades
+		return
+	}
+
+	modelType := reflect.TypeOf(*plan)
+	structVal := reflect.ValueOf(plan)
+
+	for i := 0; i < modelType.NumField(); i++ {
+		field := modelType.Field(i)
+		val, isTagged := field.Tag.Lookup("user_config")
+		if isTagged == false || val != "true" {
+			// not a user_config field
+			continue
+		}
+		schemaFieldName := field.Tag.Get("tfsdk") // guaranteed to exist
+		structFieldName := field.Name
+		// Get the TF type from the schema so it can be used for object/list ElemType etc.
+		schemaFieldType, _ := schema.TypeAtPath(context.Background(), path.Empty().AtName(schemaFieldName))
+		// Get a reference to the struct field so it can be overwritten
+		structField := structVal.Elem().FieldByName(structFieldName)
+
+		var nullValue reflect.Value
+
+		switch schemaFieldType.(type) {
+		case basetypes.StringType:
+			nullValue = reflect.ValueOf(
+				basetypes.NewStringNull(),
+			)
+		case basetypes.BoolType:
+			nullValue = reflect.ValueOf(
+				basetypes.NewBoolNull(),
+			)
+		case basetypes.Int64Type:
+			nullValue = reflect.ValueOf(
+				basetypes.NewInt64Null(),
+			)
+		case basetypes.ListType:
+			nullValue = reflect.ValueOf(
+				basetypes.NewListNull(schemaFieldType.(ListType).ElemType),
+			)
+		case basetypes.ObjectType:
+			nullValue = reflect.ValueOf(
+				basetypes.NewObjectNull(schemaFieldType.(ObjectType).AttrTypes),
+			)
+		case basetypes.MapType:
+			nullValue = reflect.ValueOf(
+				basetypes.NewMapNull(schemaFieldType.(MapType).ElemType),
+			)
+		default:
+			panic(fmt.Errorf("Unsupported NullifyPlanFields type \"%T\" for field: \"%s\" in schema \"%s\"", schemaFieldType, schemaFieldName, schema.Description))
+		}
+
+		structField.Set(nullValue)
 	}
 }

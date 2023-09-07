@@ -15,12 +15,12 @@ type DatadogLogsDestinationModel struct {
 	PipelineId   String `tfsdk:"pipeline_id"`
 	Title        String `tfsdk:"title"`
 	Description  String `tfsdk:"description"`
-	ApiKey       String `tfsdk:"api_key"`
-	Site         String `tfsdk:"site"`
-	Compression  String `tfsdk:"compression"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled"`
+	ApiKey       String `tfsdk:"api_key" user_config:"true"`
+	Site         String `tfsdk:"site" user_config:"true"`
+	Compression  String `tfsdk:"compression" user_config:"true"`
+	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
 func DatadogLogsDestinationResourceSchema() schema.Schema {

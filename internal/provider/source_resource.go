@@ -3,9 +3,11 @@ package provider
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/sources"
 )
 
@@ -66,6 +68,11 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 	if setDiagnosticsHasError(dd, &resp.Diagnostics) {
 		return
 	}
+
+	if os.Getenv("DEBUG_SOURCE") == "1" {
+		PrintJSON("----- Destination TO Create api ---", component)
+	}
+
 	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -74,6 +81,12 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 		)
 		return
 	}
+
+	if os.Getenv("DEBUG_SOURCE") == "1" {
+		PrintJSON("----- Destination FROM Create api ---", stored)
+	}
+
+	NullifyPlanFields(&plan, r.getSchemaFunc())
 
 	r.toModelFunc(&plan, stored)
 	diags = resp.State.Set(ctx, plan)
@@ -123,6 +136,8 @@ func (r *SourceResource[T]) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
+	NullifyPlanFields(&state, r.getSchemaFunc())
+
 	r.toModelFunc(&state, component)
 	diags := resp.State.Set(ctx, state)
 	resp.Diagnostics.Append(diags...)
@@ -145,6 +160,10 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
+	if os.Getenv("DEBUG_SOURCE") == "1" {
+		PrintJSON("----- Destination TO Update api ---", component)
+	}
+
 	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -153,6 +172,12 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		)
 		return
 	}
+
+	if os.Getenv("DEBUG_SOURCE") == "1" {
+		PrintJSON("----- Destination FROM Update api ---", stored)
+	}
+
+	NullifyPlanFields(&plan, r.getSchemaFunc())
 
 	r.toModelFunc(&plan, stored)
 	diags := resp.State.Set(ctx, plan)

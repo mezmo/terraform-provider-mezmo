@@ -24,16 +24,16 @@ type SplunkHecLogsDestinationModel struct {
 	Description          String `tfsdk:"description"`
 	Inputs               List   `tfsdk:"inputs"`
 	GenerationId         Int64  `tfsdk:"generation_id"`
-	AckEnabled           Bool   `tfsdk:"ack_enabled"`
-	Compression          String `tfsdk:"compression"`
-	Endpoint             String `tfsdk:"endpoint"`
-	Token                String `tfsdk:"token"`
-	HostField            String `tfsdk:"host_field"`
-	TimestampField       String `tfsdk:"timestamp_field"`
-	TlsVerifyCertificate Bool   `tfsdk:"tls_verify_certificate"`
-	Source               Object `tfsdk:"source"`
-	SourceType           Object `tfsdk:"source_type"`
-	Index                Object `tfsdk:"index"`
+	AckEnabled           Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	Compression          String `tfsdk:"compression" user_config:"true"`
+	Endpoint             String `tfsdk:"endpoint" user_config:"true"`
+	Token                String `tfsdk:"token" user_config:"true"`
+	HostField            String `tfsdk:"host_field" user_config:"true"`
+	TimestampField       String `tfsdk:"timestamp_field" user_config:"true"`
+	TlsVerifyCertificate Bool   `tfsdk:"tls_verify_certificate" user_config:"true"`
+	Source               Object `tfsdk:"source" user_config:"true"`
+	SourceType           Object `tfsdk:"source_type" user_config:"true"`
+	Index                Object `tfsdk:"index" user_config:"true"`
 }
 
 var splunkValueTypeAttributes = map[string]schema.Attribute{
@@ -161,7 +161,7 @@ func splunkValueTypeFromModel(
 	dd *diag.Diagnostics,
 ) {
 	if !planValue.IsNull() {
-		m, _ := MapValuesToMapStrings(*planValue, *dd)
+		m := MapValuesToMapAny(*planValue, dd)
 		target := component.UserConfig[configName].(map[string]any)
 		if m["field"] != "" {
 			target["value_type"] = "field"

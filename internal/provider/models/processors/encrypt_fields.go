@@ -18,11 +18,11 @@ type EncryptFieldsProcessorModel struct {
 	Description    String `tfsdk:"description"`
 	Inputs         List   `tfsdk:"inputs"`
 	GenerationId   Int64  `tfsdk:"generation_id"`
-	Field          String `tfsdk:"field"`
-	Algorithm      String `tfsdk:"algorithm"`
-	Key            String `tfsdk:"key"`
-	IvField        String `tfsdk:"iv_field"`
-	EncodeRawBytes Bool   `tfsdk:"encode_raw_bytes"`
+	Field          String `tfsdk:"field" user_config:"true"`
+	Algorithm      String `tfsdk:"algorithm" user_config:"true"`
+	Key            String `tfsdk:"key" user_config:"true"`
+	IvField        String `tfsdk:"iv_field" user_config:"true"`
+	EncodeRawBytes Bool   `tfsdk:"encode_raw_bytes" user_config:"true"`
 }
 
 func EncryptFieldsProcessorResourceSchema() schema.Schema {

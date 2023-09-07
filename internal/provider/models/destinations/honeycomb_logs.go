@@ -17,9 +17,9 @@ type HoneycombLogsDestinationModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled"`
-	DataSet      String `tfsdk:"dataset"`
-	ApiKey       String `tfsdk:"api_key"`
+	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	DataSet      String `tfsdk:"dataset" user_config:"true"`
+	ApiKey       String `tfsdk:"api_key" user_config:"true"`
 }
 
 func HoneycombLogsResourceSchema() schema.Schema {

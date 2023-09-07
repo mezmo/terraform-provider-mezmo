@@ -20,8 +20,8 @@ type FlattenFieldsProcessorModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	Fields       List   `tfsdk:"fields"`
-	Delimiter    String `tfsdk:"delimiter"`
+	Fields       List   `tfsdk:"fields" user_config:"true"`
+	Delimiter    String `tfsdk:"delimiter" user_config:"true"`
 }
 
 func FlattenFieldsProcessorResourceSchema() schema.Schema {
@@ -95,9 +95,9 @@ func FlattenFieldsProcessorToModel(plan *FlattenFieldsProcessorModel, component 
 	}
 
 	if component.UserConfig["fields"] != nil {
-		fields, _ := component.UserConfig["fields"].(map[string]string)
+		fields, _ := component.UserConfig["fields"].([]any)
 		if len(fields) > 0 {
-			plan.Fields = modelutils.SliceToStringListValue(component.UserConfig["fields"].([]any))
+			plan.Fields = modelutils.SliceToStringListValue(fields)
 		}
 	}
 

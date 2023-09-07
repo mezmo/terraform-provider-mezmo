@@ -18,13 +18,13 @@ type AzureBlobStorageDestinationModel struct {
 	Description         String `tfsdk:"description"`
 	Inputs              List   `tfsdk:"inputs"`
 	GenerationId        Int64  `tfsdk:"generation_id"`
-	AckEnabled          Bool   `tfsdk:"ack_enabled"`
-	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs"`
-	Encoding            String `tfsdk:"encoding"`
-	Compression         String `tfsdk:"compression"`
-	ContainerName       String `tfsdk:"container_name"`
-	ConnectionString    String `tfsdk:"connection_string"`
-	Prefix              String `tfsdk:"prefix"`
+	AckEnabled          Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs" user_config:"true"`
+	Encoding            String `tfsdk:"encoding" user_config:"true"`
+	Compression         String `tfsdk:"compression" user_config:"true"`
+	ContainerName       String `tfsdk:"container_name" user_config:"true"`
+	ConnectionString    String `tfsdk:"connection_string" user_config:"true"`
+	Prefix              String `tfsdk:"prefix" user_config:"true"`
 }
 
 func AzureBlobStorageResourceSchema() schema.Schema {

@@ -18,7 +18,7 @@ type DropFieldsProcessorModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	Fields       List   `tfsdk:"fields"`
+	Fields       List   `tfsdk:"fields" user_config:"true"`
 }
 
 func DropFieldsProcessorResourceSchema() schema.Schema {

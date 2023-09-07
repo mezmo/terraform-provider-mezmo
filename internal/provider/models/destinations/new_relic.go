@@ -18,10 +18,10 @@ type NewRelicDestinationModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled"`
-	Api          String `tfsdk:"api"`
-	AccountId    String `tfsdk:"account_id"`
-	LicenseKey   String `tfsdk:"license_key"`
+	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	Api          String `tfsdk:"api" user_config:"true"`
+	AccountId    String `tfsdk:"account_id" user_config:"true"`
+	LicenseKey   String `tfsdk:"license_key" user_config:"true"`
 }
 
 func NewRelicDestinationResourceSchema() schema.Schema {

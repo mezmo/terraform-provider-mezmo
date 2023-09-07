@@ -2,6 +2,7 @@ package destinations
 
 import (
 	"context"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -21,13 +22,13 @@ type GcpCloudStorageDestinationModel struct {
 	Description         String `tfsdk:"description"`
 	Inputs              List   `tfsdk:"inputs"`
 	GenerationId        Int64  `tfsdk:"generation_id"`
-	Encoding            String `tfsdk:"encoding"`
-	Bucket              String `tfsdk:"bucket"`
-	Compression         String `tfsdk:"compression"`
-	Prefix              String `tfsdk:"prefix"`
-	Auth                Object `tfsdk:"auth"`
-	AckEnabled          Bool   `tfsdk:"ack_enabled"`
-	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs"`
+	Encoding            String `tfsdk:"encoding" user_config:"true"`
+	Bucket              String `tfsdk:"bucket" user_config:"true"`
+	Compression         String `tfsdk:"compression" user_config:"true"`
+	BucketPrefix        String `tfsdk:"bucket_prefix" user_config:"true"`
+	Auth                Object `tfsdk:"auth" user_config:"true"`
+	AckEnabled          Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs" user_config:"true"`
 }
 
 func GcpCloudStorageResourceSchema() schema.Schema {
@@ -59,7 +60,7 @@ func GcpCloudStorageResourceSchema() schema.Schema {
 					stringvalidator.OneOf("gzip", "none"),
 				},
 			},
-			"prefix": schema.StringAttribute{
+			"bucket_prefix": schema.StringAttribute{
 				Optional:    true,
 				Computed:    false,
 				Description: "The prefix applied to the bucket name, giving the appearance of having directories.",
@@ -107,7 +108,7 @@ func GcpCloudStorageDestinationFromModel(plan *GcpCloudStorageDestinationModel, 
 				"encoding":           plan.Encoding.ValueString(),
 				"bucket":             plan.Bucket.ValueString(),
 				"compression":        plan.Compression.ValueString(),
-				"bucket_prefix":      plan.Prefix.ValueString(),
+				"bucket_prefix":      plan.BucketPrefix.ValueString(),
 			},
 		},
 	}
@@ -140,6 +141,10 @@ func GcpCloudStorageDestinationToModel(plan *GcpCloudStorageDestinationModel, co
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
 	plan.Compression = StringValue(component.UserConfig["compression"].(string))
+	plan.Encoding = StringValue(component.UserConfig["encoding"].(string))
+	plan.BucketPrefix = StringValue(component.UserConfig["bucket_prefix"].(string))
+	plan.Bucket = StringValue(component.UserConfig["bucket"].(string))
+	plan.BatchTimeoutSeconds = Int64Value(int64(component.UserConfig["batch_timeout_secs"].(float64)))
 
 	authType, _ := component.UserConfig["auth"].(string)
 	plan.Auth = basetypes.NewObjectValueMust(

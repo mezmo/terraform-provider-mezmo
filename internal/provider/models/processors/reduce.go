@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+
 	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
@@ -23,11 +24,11 @@ type ReduceProcessorModel struct {
 	Description     StringValue `tfsdk:"description"`
 	Inputs          ListValue   `tfsdk:"inputs"`
 	GenerationId    Int64Value  `tfsdk:"generation_id"`
-	DurationMs      Int64Value  `tfsdk:"duration_ms"`
-	GroupBy         ListValue   `tfsdk:"group_by"`
-	DateFormats     ListValue   `tfsdk:"date_formats"`
-	MergeStrategies ListValue   `tfsdk:"merge_strategies"`
-	FlushCondition  ObjectValue `tfsdk:"flush_condition"`
+	DurationMs      Int64Value  `tfsdk:"duration_ms" user_config:"true"`
+	GroupBy         ListValue   `tfsdk:"group_by" user_config:"true"`
+	DateFormats     ListValue   `tfsdk:"date_formats" user_config:"true"`
+	MergeStrategies ListValue   `tfsdk:"merge_strategies" user_config:"true"`
+	FlushCondition  ObjectValue `tfsdk:"flush_condition" user_config:"true"`
 }
 
 func ReduceProcessorResourceSchema() schema.Schema {
@@ -155,18 +156,18 @@ func ReduceProcessorFromModel(plan *ReduceProcessorModel, previousState *ReduceP
 	}
 
 	if !plan.DateFormats.IsNull() {
-		dateFormats := make([]map[string]string, 0)
+		dateFormats := make([]map[string]any, 0)
 		for _, v := range plan.DateFormats.Elements() {
-			obj, _ := MapValuesToMapStrings(v, dd)
+			obj := MapValuesToMapAny(v, &dd)
 			dateFormats = append(dateFormats, obj)
 		}
 		component.UserConfig["date_formats"] = dateFormats
 	}
 
 	if !plan.MergeStrategies.IsNull() {
-		mergeStrategies := make([]map[string]string, 0)
+		mergeStrategies := make([]map[string]any, 0)
 		for _, v := range plan.MergeStrategies.Elements() {
-			obj, _ := MapValuesToMapStrings(v, dd)
+			obj := MapValuesToMapAny(v, &dd)
 			mergeStrategies = append(mergeStrategies, obj)
 		}
 		component.UserConfig["merge_strategies"] = mergeStrategies
@@ -231,6 +232,7 @@ func unwindConditionalFromModel(v attr.Value) map[string]any {
 }
 
 func ReduceProcessorToModel(plan *ReduceProcessorModel, component *Processor) {
+	// plan.ClearFields()
 	plan.Id = NewStringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = NewStringValue(component.Title)

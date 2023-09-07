@@ -16,7 +16,7 @@ type BlackholeDestinationModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled"`
+	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
 func BlackholeDestinationResourceSchema() schema.Schema {

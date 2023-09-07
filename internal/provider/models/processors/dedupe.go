@@ -21,9 +21,9 @@ type DedupeProcessorModel struct {
 	Description    String `tfsdk:"description"`
 	Inputs         List   `tfsdk:"inputs"`
 	GenerationId   Int64  `tfsdk:"generation_id"`
-	Fields         List   `tfsdk:"fields"`
-	NumberOfEvents Int64  `tfsdk:"number_of_events"`
-	ComparisonType String `tfsdk:"comparison_type"`
+	Fields         List   `tfsdk:"fields" user_config:"true"`
+	NumberOfEvents Int64  `tfsdk:"number_of_events" user_config:"true"`
+	ComparisonType String `tfsdk:"comparison_type" user_config:"true"`
 }
 
 func DedupeProcessorResourceSchema() schema.Schema {

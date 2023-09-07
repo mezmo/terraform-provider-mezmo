@@ -18,8 +18,8 @@ type UnrollProcessorModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	Field        String `tfsdk:"field"`
-	ValuesOnly   Bool   `tfsdk:"values_only"`
+	Field        String `tfsdk:"field" user_config:"true"`
+	ValuesOnly   Bool   `tfsdk:"values_only" user_config:"true"`
 }
 
 func UnrollProcessorResourceSchema() schema.Schema {

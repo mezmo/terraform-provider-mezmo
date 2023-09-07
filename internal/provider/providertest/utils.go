@@ -13,6 +13,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 const authAccountId = "tf_test_01"
@@ -127,8 +128,9 @@ func StateHasExpectedValues(resourceName string, expected map[string]any) resour
 		}
 		attributes := resource.Primary.Attributes
 
-		// For debugging:
-		// fmt.Printf("---------- attributes ------- %+v\n", attributes)
+		if os.Getenv("DEBUG_ATTRIBUTES") == "1" {
+			modelutils.PrintJSON(fmt.Sprintf("------ %s STATE ATTRIBUTES ------", resourceName), attributes)
+		}
 
 		for expectedKey, expectedVal := range expected {
 			foundVal, state_has_key := attributes[expectedKey]

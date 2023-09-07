@@ -1,10 +1,11 @@
 package destinations
 
 import (
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/providertest"
 	"regexp"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/providertest"
 )
 
 func TestGcpCloudStorageSinkResource(t *testing.T) {
@@ -107,13 +108,13 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 						inputs = ["abc"]
 						pipeline_id = "pipeline-id"
 						bucket = "test_bucket"
-						prefix = ""
+						bucket_prefix = ""
 						auth = {
 							type = "api_key"
 							value = "key"
 						}
 					}`,
-				ExpectError: regexp.MustCompile("Attribute prefix string length must be at least 1"),
+				ExpectError: regexp.MustCompile("Attribute bucket_prefix string length must be at least 1"),
 			},
 			{
 				Config: GetProviderConfig() + `
@@ -160,7 +161,7 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 						encoding = "json"
 						compression = "gzip"
 						bucket = "test_bucket"
-						prefix = "prefix"
+						bucket_prefix = "bucket_prefix"
 						auth = {
 							type = "api_key"
 							value = "key"
@@ -179,7 +180,7 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 						"encoding":      "json",
 						"compression":   "gzip",
 						"bucket":        "test_bucket",
-						"prefix":        "prefix",
+						"bucket_prefix": "bucket_prefix",
 						"auth.type":     "api_key",
 						"auth.value":    "key",
 					}),
@@ -199,7 +200,7 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 						encoding = "text"
 						compression = "none"
 						bucket = "new_bucket"
-						prefix = "newprefix"
+						bucket_prefix = "newprefix"
 						ack_enabled = false
 						auth = {
 							type = "credentials_json"
@@ -219,7 +220,7 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 						"encoding":      "text",
 						"compression":   "none",
 						"bucket":        "new_bucket",
-						"prefix":        "newprefix",
+						"bucket_prefix": "newprefix",
 						"auth.type":     "credentials_json",
 						"auth.value":    "{}",
 					}),

@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -20,9 +21,9 @@ type PrometheusRemoteWriteDestinationModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled"`
-	Endpoint     String `tfsdk:"endpoint"`
-	Auth         Object `tfsdk:"auth"`
+	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	Endpoint     String `tfsdk:"endpoint" user_config:"true"`
+	Auth         Object `tfsdk:"auth" user_config:"true"`
 }
 
 func PrometheusRemoteWriteDestinationResourceSchema() schema.Schema {
@@ -48,18 +49,24 @@ func PrometheusRemoteWriteDestinationResourceSchema() schema.Schema {
 					},
 					"user": schema.StringAttribute{
 						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
 						Description: "The username for basic authentication",
 						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 					"password": schema.StringAttribute{
 						Sensitive:   true,
 						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
 						Description: "The password to use for basic authentication",
 						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 					"token": schema.StringAttribute{
 						Sensitive:   true,
 						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
 						Description: "The token to use for bearer auth strategy",
 						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
@@ -85,7 +92,7 @@ func PrometheusRemoteWriteDestinationFromModel(plan *PrometheusRemoteWriteDestin
 	}
 
 	if !plan.Auth.IsNull() {
-		auth, _ := MapValuesToMapStrings(plan.Auth, dd)
+		auth := MapValuesToMapAny(plan.Auth, &dd)
 		component.UserConfig["auth"] = auth
 
 		if auth["strategy"] == "basic" {
@@ -126,11 +133,11 @@ func PrometheusRemoteWriteDestinationToModel(plan *PrometheusRemoteWriteDestinat
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
 
 	plan.Endpoint = StringValue(component.UserConfig["endpoint"].(string))
-	auth, _ := component.UserConfig["auth"].(map[string]string)
+	auth, _ := component.UserConfig["auth"].(map[string]any)
 	if len(auth) > 0 {
 		if auth["strategy"] != "none" && auth["strategy"] != "" {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, MapStringsToMapValues(auth))
+			plan.Auth = basetypes.NewObjectValueMust(types, MapAnyToMapValues(auth))
 		}
 	}
 }

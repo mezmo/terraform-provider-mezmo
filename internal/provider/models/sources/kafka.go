@@ -22,12 +22,12 @@ type KafkaSourceModel struct {
 	Title        String `tfsdk:"title"`
 	Description  String `tfsdk:"description"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	Brokers      List   `tfsdk:"brokers"`
-	Topics       List   `tfsdk:"topics"`
-	GroupId      String `tfsdk:"group_id"`
-	TLSEnabled   Bool   `tfsdk:"tls_enabled"`
-	SASL         Object `tfsdk:"sasl"`
-	Decoding     String `tfsdk:"decoding"`
+	Brokers      List   `tfsdk:"brokers" user_config:"true"`
+	Topics       List   `tfsdk:"topics" user_config:"true"`
+	GroupId      String `tfsdk:"group_id" user_config:"true"`
+	TLSEnabled   Bool   `tfsdk:"tls_enabled" user_config:"true"`
+	SASL         Object `tfsdk:"sasl" user_config:"true"`
+	Decoding     String `tfsdk:"decoding" user_config:"true"`
 }
 
 func KafkaSourceResourceSchema() schema.Schema {

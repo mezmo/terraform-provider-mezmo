@@ -18,9 +18,9 @@ type LogStashSourceModel struct {
 	Title           String `tfsdk:"title"`
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
-	Format          String `tfsdk:"format"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata"`
 	GatewayRouteId  String `tfsdk:"gateway_route_id"`
+	Format          String `tfsdk:"format" user_config:"true"`
+	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
 func LogStashSourceResourceSchema() schema.Schema {

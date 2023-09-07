@@ -21,7 +21,7 @@ type RouteProcessorModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	Conditionals List   `tfsdk:"conditionals"`
+	Conditionals List   `tfsdk:"conditionals" user_config:"true"`
 }
 
 var RouteProcessorName = "route"

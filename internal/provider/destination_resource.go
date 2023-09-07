@@ -3,10 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/destinations"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type DestinationModel interface {
@@ -69,6 +71,11 @@ func (r *DestinationResource[T]) Create(ctx context.Context, req resource.Create
 	if setDiagnosticsHasError(dd, &resp.Diagnostics) {
 		return
 	}
+
+	if os.Getenv("DEBUG_DESTINATION") == "1" {
+		PrintJSON("----- Destination TO Create api ---", component)
+	}
+
 	stored, err := r.client.CreateDestination(r.getPipelineIdFunc(&plan).ValueString(), component)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -77,6 +84,13 @@ func (r *DestinationResource[T]) Create(ctx context.Context, req resource.Create
 		)
 		return
 	}
+
+	if os.Getenv("DEBUG_DESTINATION") == "1" {
+		PrintJSON("----- Destination FROM Create api ---", stored)
+	}
+
+	NullifyPlanFields(&plan, r.getSchemaFunc())
+
 	r.toModelFunc(&plan, stored)
 	diags = resp.State.Set(ctx, plan)
 	resp.Diagnostics.Append(diags...)
@@ -125,6 +139,8 @@ func (r *DestinationResource[T]) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
+	NullifyPlanFields(&state, r.getSchemaFunc())
+
 	r.toModelFunc(&state, component)
 	diags := resp.State.Set(ctx, state)
 	resp.Diagnostics.Append(diags...)
@@ -146,6 +162,11 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 	if setDiagnosticsHasError(dd, &resp.Diagnostics) {
 		return
 	}
+
+	if os.Getenv("DEBUG_DESTINATION") == "1" {
+		PrintJSON("----- Destination TO Update api ---", component)
+	}
+
 	// Set id from the current state (not in plan)
 	stored, err := r.client.UpdateDestination(r.getPipelineIdFunc(&state).ValueString(), component)
 	if err != nil {
@@ -155,6 +176,12 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 		)
 		return
 	}
+
+	if os.Getenv("DEBUG_DESTINATION") == "1" {
+		PrintJSON("----- Destination FROM Update api ---", stored)
+	}
+
+	NullifyPlanFields(&plan, r.getSchemaFunc())
 
 	r.toModelFunc(&plan, stored)
 	diags := resp.State.Set(ctx, plan)
