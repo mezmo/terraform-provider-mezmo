@@ -25,11 +25,11 @@ Publish log events to GCP Cloud Storage
 
 - `ack_enabled` (Boolean) Acknowledge data from the source when it reaches the destination
 - `batch_timeout_secs` (Number) The maximum amount of time, in seconds, events will be buffered before being flushed to the destination
+- `bucket_prefix` (String) The prefix applied to the bucket name, giving the appearance of having directories.
 - `compression` (String) The compression strategy used on the encoded data prior to sending.
 - `description` (String) A user-defined value describing the destination
 - `encoding` (String) Dictates how the data will be serialized before storing.
 - `inputs` (List of String) The ids of the input components
-- `prefix` (String) The prefix applied to the bucket name, giving the appearance of having directories.
 - `title` (String) A user-defined title for the destination
 
 ### Read-Only

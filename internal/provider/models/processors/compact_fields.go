@@ -21,9 +21,9 @@ type CompactFieldsProcessorModel struct {
 	Description   String `tfsdk:"description"`
 	Inputs        List   `tfsdk:"inputs"`
 	GenerationId  Int64  `tfsdk:"generation_id"`
-	Fields        List   `tfsdk:"fields"`
-	CompactArray  Bool   `tfsdk:"compact_array"`
-	CompactObject Bool   `tfsdk:"compact_object"`
+	Fields        List   `tfsdk:"fields" user_config:"true"`
+	CompactArray  Bool   `tfsdk:"compact_array" user_config:"true"`
+	CompactObject Bool   `tfsdk:"compact_object" user_config:"true"`
 }
 
 func CompactFieldsProcessorResourceSchema() schema.Schema {
@@ -115,9 +115,9 @@ func CompactFieldsProcessorToModel(plan *CompactFieldsProcessorModel, component 
 	}
 
 	plan.Fields = modelutils.SliceToStringListValue(component.UserConfig["fields"].([]any))
-	options, _ := component.UserConfig["options"].(map[string]bool)
+	options, _ := component.UserConfig["options"].(map[string]any)
 	if options != nil {
-		plan.CompactArray = BoolValue(options["compact_array"])
-		plan.CompactObject = BoolValue(options["compact_object"])
+		plan.CompactArray = BoolValue(options["compact_array"].(bool))
+		plan.CompactObject = BoolValue(options["compact_object"].(bool))
 	}
 }

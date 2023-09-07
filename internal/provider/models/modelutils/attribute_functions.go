@@ -14,17 +14,22 @@ import (
 
 // This function can help with taking an object from an API response and translating
 // it into a basetype object from the terraform-plugin-framework
-func MapStringsToMapValues(values map[string]string) map[string]attr.Value {
+func MapAnyToMapValues(values map[string]any) map[string]attr.Value {
 	result := make(map[string]attr.Value, len(values))
 	for k, v := range values {
-		result[k] = StringValue(v)
+		// Add other types here if you need
+		switch v.(type) {
+		case string:
+			result[k] = StringValue(v.(string))
+		default:
+			panic(fmt.Errorf("unsupported value type %T for key %v", v, k))
+		}
 	}
 	return result
 }
 
-// Convert from an API response object to a terraform plugin framework
-// basetype object
-func MapAnyToMapValues(attrs map[string]attr.Type, values map[string]any, optional_fields []string) map[string]attr.Value {
+// Make a complete map of values, using a null-equivalent for any missing fields
+func MapAnyFillMissingValues(attrs map[string]attr.Type, values map[string]any, optional_fields []string) map[string]attr.Value {
 	result := make(map[string]attr.Value, len(values))
 	for k, v := range values {
 		switch reflect.TypeOf(v).Kind() {
@@ -44,7 +49,7 @@ func MapAnyToMapValues(attrs map[string]attr.Type, values map[string]any, option
 			if slices.Contains(optional_fields, k) && v == nil {
 				result[k] = ListNull(StringType)
 			} else {
-				result[k] = SliceToStringListValue(v.([]string))
+				result[k] = SliceToStringListValue(v.([]any))
 			}
 		}
 	}
@@ -76,11 +81,9 @@ func PopulateMissingMapValues(attrs map[string]attr.Type, result map[string]attr
 }
 
 // This function can receive a terraform object (as defined in their basetypes) and
-// return a regular map[string]string object that can be used in `Component` such that
+// return a regular map[string]any object that can be used in `Component` such that
 // it can be used in an API call.
-// TODO: This currently only supports string values, not numbers or any other type.
-// TODO: perhaps this should accept a mutable interface that can be inspected for casting
-func MapValuesToMapStrings(obj interface{}, dd diag.Diagnostics) (map[string]string, bool) {
+func MapValuesToMapAny(obj interface{}, dd *diag.Diagnostics) map[string]any {
 	var attrs map[string]attr.Value
 	switch obj.(type) {
 	case Object:
@@ -88,24 +91,32 @@ func MapValuesToMapStrings(obj interface{}, dd diag.Diagnostics) (map[string]str
 	case Map:
 		attrs = obj.(Map).Elements()
 	default:
-		panic(fmt.Sprintf("Unsupported object type for `fromAttributes`: %s", reflect.TypeOf(obj)))
+		panic(fmt.Sprintf("Unsupported object type for `fromAttributes`: %T", obj))
 	}
-	target := make(map[string]string, len(attrs))
+
+	target := make(map[string]any, len(attrs))
+
 	for k, v := range attrs {
 		if v.IsUnknown() {
 			continue
 		}
-		stringValue, ok := attrs[k].(basetypes.StringValue)
-		if !ok {
-			dd.AddError(
-				"Could not look up attribute value",
-				fmt.Sprintf("Cannot cast key %s to a string value. Please report this to Mezmo.", k),
-			)
-			continue
+		switch v.(type) {
+		// Add more types here if need be
+		case String:
+			stringValue, ok := attrs[k].(basetypes.StringValue)
+			if !ok {
+				dd.AddError(
+					"Could not look up attribute value",
+					fmt.Sprintf("Cannot cast key %s to a string value. Please report this to Mezmo.", k),
+				)
+				continue
+			}
+			target[k] = stringValue.ValueString()
+		case List:
+			target[k] = StringListValueToStringSlice(v.(List))
 		}
-		target[k] = stringValue.ValueString()
 	}
-	return target, dd.HasError()
+	return target
 }
 
 // Gets a known attribute value from an attribute map and casts it to the provided type.

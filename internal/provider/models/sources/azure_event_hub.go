@@ -18,11 +18,11 @@ type AzureEventHubSourceModel struct {
 	Title            String `tfsdk:"title"`
 	Description      String `tfsdk:"description"`
 	GenerationId     Int64  `tfsdk:"generation_id"`
-	Decoding         String `tfsdk:"decoding"`
-	ConnectionString String `tfsdk:"connection_string"`
-	Namespace        String `tfsdk:"namespace"`
-	GroupId          String `tfsdk:"group_id"`
-	Topics           List   `tfsdk:"topics"`
+	Decoding         String `tfsdk:"decoding" user_config:"true"`
+	ConnectionString String `tfsdk:"connection_string" user_config:"true"`
+	Namespace        String `tfsdk:"namespace" user_config:"true"`
+	GroupId          String `tfsdk:"group_id" user_config:"true"`
+	Topics           List   `tfsdk:"topics" user_config:"true"`
 }
 
 func AzureEventHubSourceResourceSchema() schema.Schema {

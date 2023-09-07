@@ -23,8 +23,8 @@ type SampleProcessorModel struct {
 	Description   String `tfsdk:"description"`
 	Inputs        List   `tfsdk:"inputs"`
 	GenerationId  Int64  `tfsdk:"generation_id"`
-	Rate          Int64  `tfsdk:"rate"`
-	AlwaysInclude Object `tfsdk:"always_include"`
+	Rate          Int64  `tfsdk:"rate" user_config:"true"`
+	AlwaysInclude Object `tfsdk:"always_include" user_config:"true"`
 }
 
 func SampleProcessorResourceSchema() schema.Schema {

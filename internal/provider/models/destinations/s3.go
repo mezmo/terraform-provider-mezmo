@@ -21,14 +21,14 @@ type S3DestinationModel struct {
 	Description         String `tfsdk:"description"`
 	Inputs              List   `tfsdk:"inputs"`
 	GenerationId        Int64  `tfsdk:"generation_id"`
-	AckEnabled          Bool   `tfsdk:"ack_enabled"`
-	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs"`
-	Auth                Object `tfsdk:"auth"`
-	Region              String `tfsdk:"region"`
-	Bucket              String `tfsdk:"bucket"`
-	Prefix              String `tfsdk:"prefix"`
-	Encoding            String `tfsdk:"encoding"`
-	Compression         String `tfsdk:"compression"`
+	AckEnabled          Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs" user_config:"true"`
+	Auth                Object `tfsdk:"auth" user_config:"true"`
+	Region              String `tfsdk:"region" user_config:"true"`
+	Bucket              String `tfsdk:"bucket" user_config:"true"`
+	Prefix              String `tfsdk:"prefix" user_config:"true"`
+	Encoding            String `tfsdk:"encoding" user_config:"true"`
+	Compression         String `tfsdk:"compression" user_config:"true"`
 }
 
 func S3DestinationResourceSchema() schema.Schema {
@@ -134,10 +134,10 @@ func S3DestinationToModel(plan *S3DestinationModel, component *Destination) {
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
 	plan.BatchTimeoutSeconds = Int64Value(int64(component.UserConfig["batch_timeout_secs"].(float64)))
 
-	values, _ := component.UserConfig["auth"].(map[string]string)
+	values, _ := component.UserConfig["auth"].(map[string]any)
 	if len(values) > 0 {
 		types := plan.Auth.AttributeTypes(context.Background())
-		plan.Auth = basetypes.NewObjectValueMust(types, MapStringsToMapValues(values))
+		plan.Auth = basetypes.NewObjectValueMust(types, MapAnyToMapValues(values))
 	}
 
 	plan.Region = StringValue(component.UserConfig["region"].(string))

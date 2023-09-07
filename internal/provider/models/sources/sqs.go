@@ -19,9 +19,9 @@ type SQSSourceModel struct {
 	Title        String `tfsdk:"title"`
 	Description  String `tfsdk:"description"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	QueueUrl     String `tfsdk:"queue_url"`
-	Auth         Object `tfsdk:"auth"`
-	Region       String `tfsdk:"region"`
+	QueueUrl     String `tfsdk:"queue_url" user_config:"true"`
+	Auth         Object `tfsdk:"auth" user_config:"true"`
+	Region       String `tfsdk:"region" user_config:"true"`
 }
 
 func SQSSourceResourceSchema() schema.Schema {
@@ -108,10 +108,10 @@ func SQSSourceToModel(plan *SQSSourceModel, component *Source) {
 	plan.QueueUrl = StringValue(queueUrl)
 
 	if component.UserConfig["auth"] != nil {
-		values, _ := component.UserConfig["auth"].(map[string]string)
+		values, _ := component.UserConfig["auth"].(map[string]any)
 		if len(values) > 0 {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapStringsToMapValues(values))
+			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapAnyToMapValues(values))
 		}
 	}
 

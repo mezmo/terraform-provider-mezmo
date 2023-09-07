@@ -22,12 +22,12 @@ type ElasticSearchDestinationModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled"`
-	Compression  String `tfsdk:"compression"`
-	Auth         Object `tfsdk:"auth"`
-	Endpoints    List   `tfsdk:"endpoints"`
-	Pipeline     String `tfsdk:"pipeline"`
-	Index        String `tfsdk:"index"`
+	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	Compression  String `tfsdk:"compression" user_config:"true"`
+	Auth         Object `tfsdk:"auth" user_config:"true"`
+	Endpoints    List   `tfsdk:"endpoints" user_config:"true"`
+	Pipeline     String `tfsdk:"pipeline" user_config:"true"`
+	Index        String `tfsdk:"index" user_config:"true"`
 }
 
 func ElasticSearchDestinationResourceSchema() schema.Schema {
@@ -52,29 +52,39 @@ func ElasticSearchDestinationResourceSchema() schema.Schema {
 					},
 					"user": schema.StringAttribute{
 						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
 						Description: "The username for basic authentication",
 						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 					"password": schema.StringAttribute{
 						Sensitive:   true,
 						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
 						Description: "The password to use for basic authentication",
 						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 					"access_key_id": schema.StringAttribute{
 						Sensitive:   true,
 						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
 						Description: "The AWS access key id",
 						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 					"secret_access_key": schema.StringAttribute{
 						Sensitive:   true,
 						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
 						Description: "The AWS secret access key",
 						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 					"region": schema.StringAttribute{
 						Optional:    true,
+						Computed:    true,
+						Default:     stringdefault.StaticString(""),
 						Description: "The AWS Region",
 						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
@@ -122,7 +132,7 @@ func ElasticSearchDestinationFromModel(plan *ElasticSearchDestinationModel, prev
 		},
 	}
 
-	auth, _ := MapValuesToMapStrings(plan.Auth, dd)
+	auth := MapValuesToMapAny(plan.Auth, &dd)
 	component.UserConfig["auth"] = auth
 
 	if auth["strategy"] == "basic" {
@@ -166,10 +176,10 @@ func ElasticSearchDestinationToModel(plan *ElasticSearchDestinationModel, compon
 	plan.Compression = StringValue(component.UserConfig["compression"].(string))
 	plan.Endpoints = SliceToStringListValue(component.UserConfig["endpoints"].([]any))
 	plan.Index = StringValue(component.UserConfig["index"].(string))
-	auth, _ := component.UserConfig["auth"].(map[string]string)
+	auth, _ := component.UserConfig["auth"].(map[string]any)
 	if len(auth) > 0 {
 		types := plan.Auth.AttributeTypes(context.Background())
-		plan.Auth = basetypes.NewObjectValueMust(types, MapStringsToMapValues(auth))
+		plan.Auth = basetypes.NewObjectValueMust(types, MapAnyToMapValues(auth))
 	}
 
 	if component.UserConfig["pipeline"] != nil {

@@ -24,14 +24,14 @@ type KafkaDestinationModel struct {
 	Description   String `tfsdk:"description"`
 	Inputs        List   `tfsdk:"inputs"`
 	GenerationId  Int64  `tfsdk:"generation_id"`
-	Encoding      String `tfsdk:"encoding"`
-	Compression   String `tfsdk:"compression"`
-	EventKeyField String `tfsdk:"event_key_field"`
-	Brokers       List   `tfsdk:"brokers"`
-	Topic         String `tfsdk:"topic"`
-	TLSEnabled    Bool   `tfsdk:"tls_enabled"`
-	SASL          Object `tfsdk:"sasl"`
-	AckEnabled    Bool   `tfsdk:"ack_enabled"`
+	Encoding      String `tfsdk:"encoding" user_config:"true"`
+	Compression   String `tfsdk:"compression" user_config:"true"`
+	EventKeyField String `tfsdk:"event_key_field" user_config:"true"`
+	Brokers       List   `tfsdk:"brokers" user_config:"true"`
+	Topic         String `tfsdk:"topic" user_config:"true"`
+	TLSEnabled    Bool   `tfsdk:"tls_enabled" user_config:"true"`
+	SASL          Object `tfsdk:"sasl" user_config:"true"`
+	AckEnabled    Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
 func KafkaDestinationResourceSchema() schema.Schema {

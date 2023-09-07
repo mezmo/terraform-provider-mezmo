@@ -17,7 +17,7 @@ type ScriptExecutionProcessorModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	Script       String `tfsdk:"script"`
+	Script       String `tfsdk:"script" user_config:"true"`
 }
 
 func ScriptExecutionProcessorResourceSchema() schema.Schema {

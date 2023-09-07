@@ -18,9 +18,9 @@ type FluentSourceModel struct {
 	Title           String `tfsdk:"title"`
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
-	Decoding        String `tfsdk:"decoding"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata"`
 	GatewayRouteId  String `tfsdk:"gateway_route_id"`
+	Decoding        String `tfsdk:"decoding" user_config:"true"`
+	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
 func FluentSourceResourceSchema() schema.Schema {

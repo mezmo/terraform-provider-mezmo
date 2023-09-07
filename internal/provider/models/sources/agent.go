@@ -15,8 +15,8 @@ type AgentSourceModel struct {
 	Title           String `tfsdk:"title"`
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata"`
 	GatewayRouteId  String `tfsdk:"gateway_route_id"`
+	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
 func AgentSourceResourceSchema() schema.Schema {
@@ -72,9 +72,8 @@ func AgentSourceToModel(plan *AgentSourceModel, component *Source) {
 	if component.Description != "" {
 		plan.Description = StringValue(component.Description)
 	}
-	if component.UserConfig["format"] != nil {
-		captureMetadata, _ := component.UserConfig["capture_metadata"].(bool)
-		plan.CaptureMetadata = BoolValue(captureMetadata)
+	if component.UserConfig["capture_metadata"] != nil {
+		plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	}
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.GatewayRouteId = StringValue(component.GatewayRouteId)

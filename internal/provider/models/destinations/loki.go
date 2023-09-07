@@ -12,7 +12,7 @@ import (
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type LokiDestinationModel struct {
@@ -20,14 +20,14 @@ type LokiDestinationModel struct {
 	PipelineId   String `tfsdk:"pipeline_id"`
 	Title        String `tfsdk:"title"`
 	Description  String `tfsdk:"description"`
-	Endpoint     String `tfsdk:"endpoint"`
-	Path         String `tfsdk:"path"`
-	Encoding     String `tfsdk:"encoding"`
-	Auth         Object `tfsdk:"auth"`
-	Labels       Map    `tfsdk:"labels"`
-	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled"`
+	Endpoint     String `tfsdk:"endpoint" user_config:"true"`
+	Path         String `tfsdk:"path" user_config:"true"`
+	Encoding     String `tfsdk:"encoding" user_config:"true"`
+	Auth         Object `tfsdk:"auth" user_config:"true"`
+	Labels       Map    `tfsdk:"labels" user_config:"true"`
+	Inputs       List   `tfsdk:"inputs" user_config:"true"`
+	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
 func LokiDestinationResourceSchema() schema.Schema {
@@ -95,7 +95,7 @@ func LokiFromModel(plan *LokiDestinationModel, previousState *LokiDestinationMod
 			Type:        "loki",
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
-			Inputs:      modelutils.StringListValueToStringSlice(plan.Inputs),
+			Inputs:      StringListValueToStringSlice(plan.Inputs),
 			UserConfig: map[string]any{
 				"endpoint":    plan.Endpoint.ValueString(),
 				"path":        plan.Path.ValueString(),
@@ -105,7 +105,7 @@ func LokiFromModel(plan *LokiDestinationModel, previousState *LokiDestinationMod
 	}
 
 	if !plan.Auth.IsNull() {
-		component.UserConfig["auth"], _ = modelutils.MapValuesToMapStrings(plan.Auth, dd)
+		component.UserConfig["auth"] = MapValuesToMapAny(plan.Auth, &dd)
 	}
 
 	if !plan.Encoding.IsNull() {
@@ -113,11 +113,11 @@ func LokiFromModel(plan *LokiDestinationModel, previousState *LokiDestinationMod
 	}
 
 	if !plan.Labels.IsNull() {
-		lablesMap, ok := modelutils.MapValuesToMapStrings(plan.Labels, dd)
-		if ok == false {
+		lablesMap := MapValuesToMapAny(plan.Labels, &dd)
+		if !dd.HasError() {
 			labelsArray := make([]map[string]string, 0, len(lablesMap))
 			for k, v := range lablesMap {
-				labelsArray = append(labelsArray, map[string]string{"label_name": k, "label_value": v})
+				labelsArray = append(labelsArray, map[string]string{"label_name": k, "label_value": v.(string)})
 			}
 			component.UserConfig["labels"] = labelsArray
 		}
@@ -135,16 +135,16 @@ func LokiDestinationToModel(plan *LokiDestinationModel, component *Destination) 
 	plan.Id = StringValue(component.Id)
 	plan.Title = StringValue(component.Title)
 	plan.Description = StringValue(component.Description)
-	plan.Inputs = modelutils.SliceToStringListValue(component.Inputs)
+	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
 	plan.Endpoint = StringValue(component.UserConfig["endpoint"].(string))
 	plan.Path = StringValue(component.UserConfig["path"].(string))
 	if component.UserConfig["auth"] != nil {
-		values, _ := component.UserConfig["auth"].(map[string]string)
+		values, _ := component.UserConfig["auth"].(map[string]any)
 		if len(values) > 0 {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapStringsToMapValues(values))
+			plan.Auth = basetypes.NewObjectValueMust(types, MapAnyToMapValues(values))
 		}
 	}
 	if component.UserConfig["encoding"] != nil {
@@ -152,13 +152,16 @@ func LokiDestinationToModel(plan *LokiDestinationModel, component *Destination) 
 		plan.Encoding = StringValue(codecValue["codec"].(string))
 	}
 	if component.UserConfig["labels"] != nil {
-		labelsArray, _ := component.UserConfig["labels"].([]map[string]string)
+		labelsArray, _ := component.UserConfig["labels"].([]any)
 		if len(labelsArray) > 0 {
-			labelMap := make(map[string]string, len(labelsArray))
+			labelMap := make(map[string]any, len(labelsArray))
 			for _, obj := range labelsArray {
-				labelMap[obj["label_name"]] = obj["label_value"]
+				obj := obj.(map[string]any)
+				key := obj["label_name"].(string)
+				value := obj["label_value"].(string)
+				labelMap[key] = value
 			}
-			plan.Labels = basetypes.NewMapValueMust(MapType{}, modelutils.MapStringsToMapValues(labelMap))
+			plan.Labels = basetypes.NewMapValueMust(plan.Labels.ElementType(nil), MapAnyToMapValues(labelMap))
 		}
 	}
 }

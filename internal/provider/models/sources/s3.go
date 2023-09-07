@@ -20,11 +20,11 @@ type S3SourceModel struct {
 	PipelineId   String `tfsdk:"pipeline_id"`
 	Title        String `tfsdk:"title"`
 	Description  String `tfsdk:"description"`
-	Auth         Object `tfsdk:"auth"`
-	Region       String `tfsdk:"region"`
-	SqsQueueUrl  String `tfsdk:"sqs_queue_url"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	Compression  String `tfsdk:"compression"`
+	Auth         Object `tfsdk:"auth" user_config:"true"`
+	Region       String `tfsdk:"region" user_config:"true"`
+	SqsQueueUrl  String `tfsdk:"sqs_queue_url" user_config:"true"`
+	Compression  String `tfsdk:"compression" user_config:"true"`
 }
 
 func S3SourceResourceSchema() schema.Schema {
@@ -118,10 +118,10 @@ func S3SourceToModel(plan *S3SourceModel, component *Source) {
 		plan.Compression = StringValue(value)
 	}
 	if component.UserConfig["auth"] != nil {
-		values, _ := component.UserConfig["auth"].(map[string]string)
+		values, _ := component.UserConfig["auth"].(map[string]any)
 		if len(values) > 0 {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapStringsToMapValues(values))
+			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapAnyToMapValues(values))
 		}
 	}
 

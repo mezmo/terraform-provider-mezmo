@@ -23,12 +23,12 @@ type MezmoDestinationModel struct {
 	Description           String `tfsdk:"description"`
 	Inputs                List   `tfsdk:"inputs"`
 	GenerationId          Int64  `tfsdk:"generation_id"`
-	AckEnabled            Bool   `tfsdk:"ack_enabled"`
-	Host                  String `tfsdk:"host"`
-	IngestionKey          String `tfsdk:"ingestion_key"`
-	Query                 Object `tfsdk:"query"`
-	LogConstructionScheme String `tfsdk:"log_construction_scheme"`
-	ExplicitSchemeOptions Object `tfsdk:"explicit_scheme_options"`
+	AckEnabled            Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	Host                  String `tfsdk:"host" user_config:"true"`
+	IngestionKey          String `tfsdk:"ingestion_key" user_config:"true"`
+	Query                 Object `tfsdk:"query" user_config:"true"`
+	LogConstructionScheme String `tfsdk:"log_construction_scheme" user_config:"true"`
+	ExplicitSchemeOptions Object `tfsdk:"explicit_scheme_options" user_config:"true"`
 }
 
 var log_construction_schemes = map[string]string{
@@ -226,6 +226,8 @@ func MezmoDestinationToModel(plan *MezmoDestinationModel, component *Destination
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
+	plan.Host = StringValue(component.UserConfig["mezmo_host"].(string))
+	plan.IngestionKey = StringValue(component.UserConfig["ingestion_key"].(string))
 
 	if component.UserConfig["query"] != nil {
 		component_map, _ := component.UserConfig["query"].(map[string]any)

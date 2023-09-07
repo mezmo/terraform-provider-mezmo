@@ -2,6 +2,7 @@ package sources
 
 import (
 	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -17,10 +18,10 @@ type KinesisFirehoseSourceModel struct {
 	PipelineId      String `tfsdk:"pipeline_id"`
 	Title           String `tfsdk:"title"`
 	Description     String `tfsdk:"description"`
-	Decoding        String `tfsdk:"decoding"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata"`
 	GatewayRouteId  String `tfsdk:"gateway_route_id"`
+	Decoding        String `tfsdk:"decoding" user_config:"true"`
+	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
 func KinesisFirehoseSourceResourceSchema() schema.Schema {

@@ -34,7 +34,7 @@ var VRL_PARSERS = map[string]string{
 	"user_agent_parser":       "parse_user_agent",
 }
 
-var VRL_PARSES_WITH_REQUIRED_OPTIONS = []string{
+var VRL_PARSERS_WITH_REQUIRED_OPTIONS = []string{
 	"apache_log",
 	"grok_parser",
 	"regex_parser",

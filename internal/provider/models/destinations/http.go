@@ -9,25 +9,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	. "github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
+	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type HttpDestinationModel struct {
-	Id           String `tfsdk:"id"`
-	PipelineId   String `tfsdk:"pipeline_id"`
-	Title        String `tfsdk:"title"`
-	Description  String `tfsdk:"description"`
-	Inputs       List   `tfsdk:"inputs"`
-	GenerationId Int64  `tfsdk:"generation_id"`
-	Uri          String `tfsdk:"uri"`
-	Encoding     String `tfsdk:"encoding"`
-	Compression  String `tfsdk:"compression"`
-	Auth         Object `tfsdk:"auth"`
-	Headers      Map    `tfsdk:"headers"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled"`
+	Id           StringValue `tfsdk:"id"`
+	PipelineId   StringValue `tfsdk:"pipeline_id"`
+	Title        StringValue `tfsdk:"title"`
+	Description  StringValue `tfsdk:"description"`
+	Inputs       ListValue   `tfsdk:"inputs"`
+	GenerationId Int64Value  `tfsdk:"generation_id"`
+	Uri          StringValue `tfsdk:"uri" user_config:"true"`
+	Encoding     StringValue `tfsdk:"encoding" user_config:"true"`
+	Compression  StringValue `tfsdk:"compression" user_config:"true"`
+	Auth         ObjectValue `tfsdk:"auth" user_config:"true"`
+	Headers      MapValue    `tfsdk:"headers" user_config:"true"`
+	AckEnabled   BoolValue   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
 func HttpDestinationResourceSchema() schema.Schema {
@@ -65,16 +64,22 @@ func HttpDestinationResourceSchema() schema.Schema {
 					},
 					"user": schema.StringAttribute{
 						Optional:   true,
+						Computed:   true,
+						Default:    stringdefault.StaticString(""),
 						Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 					"password": schema.StringAttribute{
 						Sensitive:  true,
 						Optional:   true,
+						Computed:   true,
+						Default:    stringdefault.StaticString(""),
 						Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 					"token": schema.StringAttribute{
 						Sensitive:  true,
 						Optional:   true,
+						Computed:   true,
+						Default:    stringdefault.StaticString(""),
 						Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 					},
 				},
@@ -82,7 +87,7 @@ func HttpDestinationResourceSchema() schema.Schema {
 			"headers": schema.MapAttribute{
 				Optional:    true,
 				Description: "A key/value object describing a header name and its value",
-				ElementType: StringType,
+				ElementType: StringType{},
 				Validators: []validator.Map{
 					mapvalidator.All(
 						mapvalidator.KeysAre(stringvalidator.LengthAtLeast(1)),
@@ -114,13 +119,13 @@ func HttpDestinationFromModel(plan *HttpDestinationModel, previousState *HttpDes
 	if !plan.Inputs.IsUnknown() {
 		inputs := make([]string, 0)
 		for _, v := range plan.Inputs.Elements() {
-			value, _ := v.(basetypes.StringValue)
+			value, _ := v.(StringValue)
 			inputs = append(inputs, value.ValueString())
 		}
 		component.Inputs = inputs
 	}
 	if !plan.Auth.IsNull() {
-		auth, _ := modelutils.MapValuesToMapStrings(plan.Auth, dd)
+		auth := MapValuesToMapAny(plan.Auth, &dd)
 		component.UserConfig["auth"] = auth
 
 		if auth["strategy"] == "basic" {
@@ -141,12 +146,13 @@ func HttpDestinationFromModel(plan *HttpDestinationModel, previousState *HttpDes
 	}
 
 	if !plan.Headers.IsNull() {
-		headerMap, ok := modelutils.MapValuesToMapStrings(plan.Headers, dd)
-		if ok {
+		headerMap := MapValuesToMapAny(plan.Headers, &dd)
+		if len(headerMap) > 0 {
 			headerArray := make([]map[string]string, 0, len(headerMap))
 			for k, v := range headerMap {
-				headerArray = append(headerArray, map[string]string{"header_name": k, "header_value": v})
+				headerArray = append(headerArray, map[string]string{"header_name": k, "header_value": v.(string)})
 			}
+
 			component.UserConfig["headers"] = headerArray
 		}
 	}
@@ -160,37 +166,40 @@ func HttpDestinationFromModel(plan *HttpDestinationModel, previousState *HttpDes
 }
 
 func HttpDestinationToModel(plan *HttpDestinationModel, component *Destination) {
-	plan.Id = StringValue(component.Id)
+	plan.Id = NewStringValue(component.Id)
 	if component.Title != "" {
-		plan.Title = StringValue(component.Title)
+		plan.Title = NewStringValue(component.Title)
 	}
 	if component.Description != "" {
-		plan.Description = StringValue(component.Description)
+		plan.Description = NewStringValue(component.Description)
 	}
 
-	plan.Inputs = modelutils.SliceToStringListValue(component.Inputs)
-	plan.Uri = StringValue(component.UserConfig["uri"].(string))
-	plan.Encoding = StringValue(component.UserConfig["encoding"].(string))
-	plan.Compression = StringValue(component.UserConfig["compression"].(string))
-	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
-	plan.GenerationId = Int64Value(component.GenerationId)
+	plan.Inputs = SliceToStringListValue(component.Inputs)
+	plan.Uri = NewStringValue(component.UserConfig["uri"].(string))
+	plan.Encoding = NewStringValue(component.UserConfig["encoding"].(string))
+	plan.Compression = NewStringValue(component.UserConfig["compression"].(string))
+	plan.AckEnabled = NewBoolValue(component.UserConfig["ack_enabled"].(bool))
+	plan.GenerationId = NewInt64Value(component.GenerationId)
 
-	auth, _ := component.UserConfig["auth"].(map[string]string)
+	auth, _ := component.UserConfig["auth"].(map[string]any)
 	if len(auth) > 0 {
 		if auth["strategy"] != "none" && auth["strategy"] != "" {
 			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapStringsToMapValues(auth))
+			plan.Auth = NewObjectValueMust(types, MapAnyToMapValues(auth))
 		}
 	}
 
 	if component.UserConfig["headers"] != nil {
-		headerArray, _ := component.UserConfig["headers"].([]map[string]string)
+		headerArray, _ := component.UserConfig["headers"].([]any)
 		if len(headerArray) > 0 {
-			headerMap := make(map[string]string, len(headerArray))
+			headerMap := make(map[string]any, len(headerArray))
 			for _, obj := range headerArray {
-				headerMap[obj["header_name"]] = obj["header_value"]
+				obj := obj.(map[string]any)
+				key := obj["header_name"].(string)
+				value := obj["header_value"].(string)
+				headerMap[key] = value
 			}
-			plan.Headers = basetypes.NewMapValueMust(MapType{}, modelutils.MapStringsToMapValues(headerMap))
+			plan.Headers = NewMapValueMust(plan.Headers.ElementType(nil), MapAnyToMapValues(headerMap))
 		}
 	}
 }

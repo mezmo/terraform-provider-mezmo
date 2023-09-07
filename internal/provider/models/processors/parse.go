@@ -21,17 +21,17 @@ type ParseProcessorModel struct {
 	Description      String `tfsdk:"description"`
 	Inputs           List   `tfsdk:"inputs"`
 	GenerationId     Int64  `tfsdk:"generation_id"`
-	Field            String `tfsdk:"field"`
-	TargetField      String `tfsdk:"target_field"`
-	Parser           String `tfsdk:"parser"`
-	ApacheOptions    Object `tfsdk:"apache_log_options"`
-	CefOptions       Object `tfsdk:"cef_log_options"`
-	CsvOptions       Object `tfsdk:"csv_row_options"`
-	GrokOptions      Object `tfsdk:"grok_parser_options"`
-	KeyValueOptions  Object `tfsdk:"key_value_log_options"`
-	NginxOptions     Object `tfsdk:"nginx_log_options"`
-	RegexOptions     Object `tfsdk:"regex_parser_options"`
-	TimestampOptions Object `tfsdk:"timestamp_parser_options"`
+	Field            String `tfsdk:"field" user_config:"true"`
+	TargetField      String `tfsdk:"target_field" user_config:"true"`
+	Parser           String `tfsdk:"parser" user_config:"true"`
+	ApacheOptions    Object `tfsdk:"apache_log_options" user_config:"true"`
+	CefOptions       Object `tfsdk:"cef_log_options" user_config:"true"`
+	CsvOptions       Object `tfsdk:"csv_row_options" user_config:"true"`
+	GrokOptions      Object `tfsdk:"grok_parser_options" user_config:"true"`
+	KeyValueOptions  Object `tfsdk:"key_value_log_options" user_config:"true"`
+	NginxOptions     Object `tfsdk:"nginx_log_options" user_config:"true"`
+	RegexOptions     Object `tfsdk:"regex_parser_options" user_config:"true"`
+	TimestampOptions Object `tfsdk:"timestamp_parser_options" user_config:"true"`
 }
 
 func ParseProcessorResourceSchema() schema.Schema {
@@ -73,11 +73,11 @@ func ParseProcessorFromModel(plan *ParseProcessorModel, previousState *ParseProc
 	model_options := plan.optionsFromModel()
 
 	if !model_options.IsNull() {
-		options, has_error := MapValuesToMapStrings(model_options, dd)
-		if !has_error {
+		options := MapValuesToMapAny(model_options, &dd)
+		if !dd.HasError() {
 			component.UserConfig["options"] = options
 		}
-	} else if slices.Contains(VRL_PARSES_WITH_REQUIRED_OPTIONS, parser) {
+	} else if slices.Contains(VRL_PARSERS_WITH_REQUIRED_OPTIONS, parser) {
 		options_key := fmt.Sprintf("%s_options", parser)
 		dd.AddAttributeError(
 			path.Root(options_key),
@@ -178,7 +178,7 @@ func optionsToModel(obj basetypes.ObjectValue, options map[string]any, optional_
 	attr_types := obj.AttributeTypes(context.Background())
 
 	if len(options) > 0 {
-		values := MapAnyToMapValues(attr_types, options, optional_fields)
+		values := MapAnyFillMissingValues(attr_types, options, optional_fields)
 		new_options := basetypes.NewObjectValueMust(attr_types, values)
 
 		return new_options
