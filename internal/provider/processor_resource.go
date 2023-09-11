@@ -18,6 +18,7 @@ type ProcessorModel interface {
 		FlattenFieldsProcessorModel |
 		ParseProcessorModel |
 		ReduceProcessorModel |
+		RouteProcessorModel |
 		SampleProcessorModel |
 		ScriptExecutionProcessorModel |
 		StringifyProcessorModel |

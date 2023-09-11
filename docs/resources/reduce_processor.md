@@ -3,12 +3,12 @@
 page_title: "mezmo_reduce_processor Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  Remove empty values from a list of fields
+  Combine multiple events over time into one based on a set of criteria
 ---
 
 # mezmo_reduce_processor (Resource)
 
-Remove empty values from a list of fields
+Combine multiple events over time into one based on a set of criteria
 
 
 
@@ -21,7 +21,7 @@ Remove empty values from a list of fields
 
 ### Optional
 
-- `date_formats` (Attributes List) Before reducing, group events based on matching data from each of these field paths. Supports nesting via dot-notation. (see [below for nested schema](#nestedatt--date_formats))
+- `date_formats` (Attributes List) Describes which root-level properties are dates, and their expected format. Dot-notation is supported, but nested field lookup paths will be an error. (see [below for nested schema](#nestedatt--date_formats))
 - `description` (String) A user-defined value describing the processor
 - `duration_ms` (Number) The amount of time (in milliseconds) to allow streaming events to accumulate into a single "reduced" event. The process repeats indefinitely, or until an "ends when" condition is satisfied.
 - `flush_condition` (Attributes) Force accumulated event reduction to flush the result when a conditional expression evaluates to true on an inbound event. (see [below for nested schema](#nestedatt--flush_condition))

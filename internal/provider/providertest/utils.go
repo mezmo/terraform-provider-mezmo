@@ -133,12 +133,19 @@ func StateHasExpectedValues(resourceName string, expected map[string]any) resour
 		for expectedKey, expectedVal := range expected {
 			foundVal, state_has_key := attributes[expectedKey]
 			if state_has_key {
-				lookupVal, err := lookupValue(expectedVal.(string), s)
-				if err != nil {
-					return err
-				}
-				if foundVal != lookupVal {
-					return fmt.Errorf("Expected values do not match for key \"%s\". Found value: %s, Expected value: %s", expectedKey, foundVal, lookupVal)
+				switch expectedVal := expectedVal.(type) {
+				case *regexp.Regexp:
+					if !expectedVal.MatchString(foundVal) {
+						return fmt.Errorf("expected value \"%s\" for key \"%s\" does not match pattern \"%s\"", foundVal, expectedKey, expectedVal.String())
+					}
+				default:
+					lookupVal, err := lookupValue(expectedVal.(string), s)
+					if err != nil {
+						return err
+					}
+					if foundVal != lookupVal {
+						return fmt.Errorf("Expected values do not match for key \"%s\". Found value: %s, Expected value: %s", expectedKey, foundVal, lookupVal)
+					}
 				}
 			} else if expectedVal != nil { // Using a nil value means the key should not be present at all
 				return fmt.Errorf("Expected key \"%s\" was not found in %s", expectedKey, resourceName)
