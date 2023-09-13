@@ -43,6 +43,9 @@ Optional:
 - `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditionals--expressions))
 - `expressions_group` (Attributes List) A group of expressions joined by a logical operator (see [below for nested schema](#nestedatt--conditionals--expressions_group))
 - `logical_operation` (String) The logical operation (AND/OR) to be applied to the list of conditionals
+
+Read-Only:
+
 - `output_name` (String) A system generated value to identify the results of this expression. This value should be used when connecting the results to another processor or destination.
 
 <a id="nestedatt--conditionals--expressions"></a>

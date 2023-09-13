@@ -138,3 +138,14 @@ func NewKinesisFirehoseSourceResource() resource.Resource {
 		getSchemaFunc:     KinesisFirehoseSourceResourceSchema,
 	}
 }
+
+func NewLogAnalysisSourceResource() resource.Resource {
+	return &SourceResource[LogAnalysisSourceModel]{
+		typeName:          "log_analysis",
+		fromModelFunc:     LogAnalysisSourceFromModel,
+		toModelFunc:       LogAnalysisSourceToModel,
+		getIdFunc:         func(m *LogAnalysisSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *LogAnalysisSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     LogAnalysisSourceResourceSchema,
+	}
+}
