@@ -19,6 +19,7 @@ type SourceModel interface {
 		HttpSourceModel |
 		KafkaSourceModel |
 		KinesisFirehoseSourceModel |
+		LogAnalysisSourceModel |
 		LogStashSourceModel |
 		PrometheusRemoteWriteSourceModel |
 		S3SourceModel |
