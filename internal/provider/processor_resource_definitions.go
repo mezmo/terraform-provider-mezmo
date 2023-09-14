@@ -149,3 +149,14 @@ func NewRouteProcessorResource() resource.Resource {
 		getSchemaFunc:     RouteProcessorResourceSchema,
 	}
 }
+
+func NewParseSequentiallyProcessorResource() resource.Resource {
+	return &ProcessorResource[ParseSequentiallyProcessorModel]{
+		typeName:          ParseSequentiallyProcessorName,
+		fromModelFunc:     ParseSequentiallyProcessorFromModel,
+		toModelFunc:       ParseSequentiallyProcessorToModel,
+		getIdFunc:         func(m *ParseSequentiallyProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *ParseSequentiallyProcessorModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     ParseSequentiallyProcessorResourceSchema,
+	}
+}
