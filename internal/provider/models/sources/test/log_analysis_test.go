@@ -36,6 +36,9 @@ func TestLogAnalysisSource(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_log_analysis_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					resource.TestCheckNoResourceAttr("mezmo_log_analysis_source.my_source", "gateway_route_id"),
+
 					StateHasExpectedValues("mezmo_log_analysis_source.my_source", map[string]any{
 						"description":   "my source description",
 						"generation_id": "0",
