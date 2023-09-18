@@ -316,7 +316,7 @@ func parseExpressionsItem(component map[string]any, level int) (value ObjectValu
 		// Branch
 		groupItems := make([]attr.Value, 0)
 		leafItems := make([]attr.Value, 0)
-		attributeTypes := toAttrTypes(GetAttributesByLevel(level))
+		attributeTypes := ToAttrTypes(GetAttributesByLevel(level))
 
 		for _, e := range childExpressionArr {
 			child := e.(map[string]any)
@@ -364,13 +364,4 @@ func parseExpressionsItem(component map[string]any, level int) (value ObjectValu
 	}
 
 	return NewObjectValueMust(ExpressionTypes, attributeValues), false
-}
-
-func toAttrTypes(attributes map[string]schema.Attribute) map[string]attr.Type {
-	result := make(map[string]attr.Type)
-	for k, v := range attributes {
-		result[k] = v.GetType()
-	}
-
-	return result
 }

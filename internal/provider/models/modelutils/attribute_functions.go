@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"golang.org/x/exp/slices"
@@ -250,4 +251,14 @@ func KafkaDestinationSASLToModel(types map[string]attr.Type, user_config map[str
 		sasl["mechanism"] = StringValue(user_config["sasl_mechanism"].(string))
 	}
 	return basetypes.NewObjectValueMust(types, sasl)
+}
+
+// Given a map of schema (resource, data, etc) attributes, returns the attribute types
+func ToAttrTypes(attributes map[string]schema.Attribute) map[string]attr.Type {
+	result := make(map[string]attr.Type)
+	for k, v := range attributes {
+		result[k] = v.GetType()
+	}
+
+	return result
 }

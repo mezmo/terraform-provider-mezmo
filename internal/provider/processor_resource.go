@@ -19,6 +19,7 @@ type ProcessorModel interface {
 		EncryptFieldsProcessorModel |
 		FlattenFieldsProcessorModel |
 		ParseProcessorModel |
+		ParseSequentiallyProcessorModel |
 		ReduceProcessorModel |
 		RouteProcessorModel |
 		SampleProcessorModel |
