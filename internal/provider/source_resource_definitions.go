@@ -149,3 +149,14 @@ func NewLogAnalysisSourceResource() resource.Resource {
 		getSchemaFunc:     LogAnalysisSourceResourceSchema,
 	}
 }
+
+func NewOpenTelemetryTracesSourceResource() resource.Resource {
+	return &SourceResource[OpenTelemetryTracesSourceModel]{
+		typeName:          "open_telemetry_traces",
+		fromModelFunc:     OpenTelemetryTracesSourceFromModel,
+		toModelFunc:       OpenTelemetryTracesSourceToModel,
+		getIdFunc:         func(m *OpenTelemetryTracesSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *OpenTelemetryTracesSourceModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     OpenTelemetryTracesSourceResourceSchema,
+	}
+}
