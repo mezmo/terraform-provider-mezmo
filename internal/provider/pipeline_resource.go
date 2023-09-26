@@ -2,7 +2,10 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -21,6 +24,30 @@ func NewPipelineResource() resource.Resource {
 
 type PipelineResource struct {
 	client client.Client
+}
+
+func (r *PipelineResource) TypeName() string {
+	return "pipeline"
+}
+
+func (r *PipelineResource) TerraformSchema() schema.Schema {
+	return PipelineResourceSchema()
+}
+
+func (r *PipelineResource) ConvertToTerraformModel(component *reflect.Value) (*reflect.Value, error) {
+	if !component.CanInterface() {
+		return nil, errors.New("component Value does not contain an interfaceable type")
+	}
+
+	pipeline, ok := component.Interface().(client.Pipeline)
+	if !ok {
+		return nil, errors.New("component Value cannot be cast to Pipeline")
+	}
+
+	var model PipelineResourceModel
+	PipelineToModel(&model, &pipeline)
+	res := reflect.ValueOf(model)
+	return &res, nil
 }
 
 // Configure implements resource.ResourceWithConfigure.

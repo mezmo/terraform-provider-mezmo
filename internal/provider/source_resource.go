@@ -2,8 +2,11 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"os"
+	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
@@ -36,6 +39,30 @@ type SourceResource[T SourceModel] struct {
 	getIdFunc         idGetterFunc[T]
 	getPipelineIdFunc idGetterFunc[T]
 	getSchemaFunc     getSchemaFunc
+}
+
+func (r *SourceResource[T]) TypeName() string {
+	return r.typeName
+}
+
+func (r *SourceResource[T]) TerraformSchema() schema.Schema {
+	return r.getSchemaFunc()
+}
+
+func (r *SourceResource[T]) ConvertToTerraformModel(component *reflect.Value) (*reflect.Value, error) {
+	if !component.CanInterface() {
+		return nil, errors.New("component Value does not contain an interfaceable type")
+	}
+
+	source, ok := component.Interface().(Source)
+	if !ok {
+		return nil, errors.New("component Value cannot be cast to Source")
+	}
+
+	var model T
+	r.toModelFunc(&model, &source)
+	res := reflect.ValueOf(model)
+	return &res, nil
 }
 
 // Configure implements resource.ResourceWithConfigure.
