@@ -1,4 +1,4 @@
-module github.com/mezmo-inc/terraform-provider-mezmo
+module github.com/mezmo/terraform-provider-mezmo
 
 go 1.20
 

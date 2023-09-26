@@ -2,7 +2,7 @@ package sources
 
 import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/providertest"
+	"github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 	"regexp"
 	"testing"
 )

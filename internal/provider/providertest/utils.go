@@ -13,7 +13,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
+	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 const authAccountId = "tf_test_01"

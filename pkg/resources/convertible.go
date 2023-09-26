@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider"
+	"github.com/mezmo/terraform-provider-mezmo/internal/client"
+	"github.com/mezmo/terraform-provider-mezmo/internal/provider"
 	"reflect"
 )
 

@@ -9,9 +9,9 @@ import (
 	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/modelutils"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/sources"
+	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
+	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/sources"
 )
 
 type SourceModel interface {
