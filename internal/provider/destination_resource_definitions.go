@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/provider/models/destinations"
+	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/destinations"
 )
 
 func NewAzureBlobStorageDestinationResource() resource.Resource {

@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
 type BlackholeDestinationModel struct {

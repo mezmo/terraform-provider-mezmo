@@ -2,7 +2,7 @@ package resources
 
 import (
 	"context"
-	"github.com/mezmo-inc/terraform-provider-mezmo/internal/provider"
+	"github.com/mezmo/terraform-provider-mezmo/internal/provider"
 	"reflect"
 	"testing"
 )
