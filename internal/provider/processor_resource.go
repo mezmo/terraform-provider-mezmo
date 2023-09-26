@@ -2,8 +2,11 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"os"
+	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	. "github.com/mezmo-inc/terraform-provider-mezmo/internal/client"
@@ -36,6 +39,30 @@ type ProcessorResource[T ProcessorModel] struct {
 	getIdFunc         idGetterFunc[T]
 	getPipelineIdFunc idGetterFunc[T]
 	getSchemaFunc     getSchemaFunc
+}
+
+func (r *ProcessorResource[T]) TypeName() string {
+	return r.typeName
+}
+
+func (r *ProcessorResource[T]) TerraformSchema() schema.Schema {
+	return r.getSchemaFunc()
+}
+
+func (r *ProcessorResource[T]) ConvertToTerraformModel(component *reflect.Value) (*reflect.Value, error) {
+	if !component.CanInterface() {
+		return nil, errors.New("component Value does not contain an interfaceable type")
+	}
+
+	processor, ok := component.Interface().(Processor)
+	if !ok {
+		return nil, errors.New("component Value cannot be cast to Processor")
+	}
+
+	var model T
+	r.toModelFunc(&model, &processor)
+	res := reflect.ValueOf(model)
+	return &res, nil
 }
 
 // Configure implements resource.ResourceWithConfigure.
