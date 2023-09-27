@@ -186,3 +186,15 @@ func NewDatadogSourceResource() resource.Resource {
 		schema:            DatadogSourceResourceSchema,
 	}
 }
+
+func NewOpenTelemetryTracesSourceResource() resource.Resource {
+	return &SourceResource[OpenTelemetryTracesSourceModel]{
+		typeName:          OPEN_TELEMETRY_TRACES_SOURCE_TYPE_NAME,
+		nodeName:          OPEN_TELEMETRY_TRACES_SOURCE_NODE_NAME,
+		fromModelFunc:     OpenTelemetryTracesSourceFromModel,
+		toModelFunc:       OpenTelemetryTracesSourceToModel,
+		getIdFunc:         func(m *OpenTelemetryTracesSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *OpenTelemetryTracesSourceModel) basetypes.StringValue { return m.PipelineId },
+		schema:            OpenTelemetryTracesSourceResourceSchema,
+	}
+}
