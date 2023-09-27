@@ -113,7 +113,6 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewS3SourceResource,
 		NewSplunkHecSourceResource,
 		NewSQSSourceResource,
-		NewOpenTelemetryTracesSourceResource,
 
 		// Processors
 		NewCompactFieldsProcessorResource,
