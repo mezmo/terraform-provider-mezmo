@@ -40,6 +40,17 @@ func NewFlattenFieldsProcessorResource() resource.Resource {
 	}
 }
 
+func NewMapFieldsProcessorResource() resource.Resource {
+	return &ProcessorResource[MapFieldsProcessorModel]{
+		typeName:          "map_fields",
+		fromModelFunc:     MapFieldsProcessorFromModel,
+		toModelFunc:       MapFieldsProcessorToModel,
+		getIdFunc:         func(m *MapFieldsProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *MapFieldsProcessorModel) basetypes.StringValue { return m.PipelineId },
+		getSchemaFunc:     MapFieldsProcessorResourceSchema,
+	}
+}
+
 func NewSampleProcessorResource() resource.Resource {
 	return &ProcessorResource[SampleProcessorModel]{
 		typeName:          "sample",

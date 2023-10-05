@@ -86,11 +86,11 @@ func PopulateMissingMapValues(attrs map[string]attr.Type, result map[string]attr
 // it can be used in an API call.
 func MapValuesToMapAny(obj interface{}, dd *diag.Diagnostics) map[string]any {
 	var attrs map[string]attr.Value
-	switch obj.(type) {
+	switch obj := obj.(type) {
 	case Object:
-		attrs = obj.(Object).Attributes()
+		attrs = obj.Attributes()
 	case Map:
-		attrs = obj.(Map).Elements()
+		attrs = obj.Elements()
 	default:
 		panic(fmt.Sprintf("Unsupported object type for `fromAttributes`: %T", obj))
 	}
@@ -101,20 +101,16 @@ func MapValuesToMapAny(obj interface{}, dd *diag.Diagnostics) map[string]any {
 		if v.IsUnknown() {
 			continue
 		}
-		switch v.(type) {
+		switch v := v.(type) {
 		// Add more types here if need be
+		case Bool:
+			target[k] = v.ValueBool()
 		case String:
-			stringValue, ok := attrs[k].(basetypes.StringValue)
-			if !ok {
-				dd.AddError(
-					"Could not look up attribute value",
-					fmt.Sprintf("Cannot cast key %s to a string value. Please report this to Mezmo.", k),
-				)
-				continue
-			}
-			target[k] = stringValue.ValueString()
+			target[k] = v.ValueString()
 		case List:
-			target[k] = StringListValueToStringSlice(v.(List))
+			target[k] = StringListValueToStringSlice(v)
+		default:
+			panic("unhandled type (add new type if it needs to be handled)")
 		}
 	}
 	return target

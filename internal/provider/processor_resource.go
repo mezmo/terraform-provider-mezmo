@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"os"
 	"reflect"
+
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
@@ -21,6 +22,7 @@ type ProcessorModel interface {
 		DropFieldsProcessorModel |
 		EncryptFieldsProcessorModel |
 		FlattenFieldsProcessorModel |
+		MapFieldsProcessorModel |
 		ParseProcessorModel |
 		ParseSequentiallyProcessorModel |
 		ReduceProcessorModel |
