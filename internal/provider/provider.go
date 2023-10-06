@@ -121,6 +121,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewDropFieldsProcessorResource,
 		NewEncryptFieldsProcessorResource,
 		NewFlattenFieldsProcessorResource,
+		NewMapFieldsProcessorResource,
 		NewParseProcessorResource,
 		NewParseSequentiallyProcessorResource,
 		NewRouteProcessorResource,
