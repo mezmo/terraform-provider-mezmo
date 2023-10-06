@@ -44,7 +44,7 @@ type ProcessorResource[T ProcessorModel] struct {
 }
 
 func (r *ProcessorResource[T]) TypeName() string {
-	return r.typeName
+	return r.typeName + "_processor"
 }
 
 func (r *ProcessorResource[T]) TerraformSchema() schema.Schema {
@@ -146,7 +146,7 @@ func (r *ProcessorResource[T]) Delete(ctx context.Context, req resource.DeleteRe
 
 // Metadata implements resource.Resource.
 func (r *ProcessorResource[T]) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + r.typeName + "_processor"
+	resp.TypeName = req.ProviderTypeName + "_" + r.TypeName()
 }
 
 // Read implements resource.Resource.

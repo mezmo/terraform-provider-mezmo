@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"os"
 	"reflect"
+
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
@@ -43,7 +44,7 @@ type DestinationResource[T DestinationModel] struct {
 }
 
 func (r *DestinationResource[T]) TypeName() string {
-	return r.typeName
+	return r.typeName + "_destination"
 }
 
 func (r *DestinationResource[T]) TerraformSchema() schema.Schema {
@@ -145,7 +146,7 @@ func (r *DestinationResource[T]) Delete(ctx context.Context, req resource.Delete
 
 // Metadata implements resource.Resource.
 func (r *DestinationResource[T]) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + r.typeName + "_destination"
+	resp.TypeName = req.ProviderTypeName + "_" + r.TypeName()
 }
 
 // Read implements resource.Resource.
