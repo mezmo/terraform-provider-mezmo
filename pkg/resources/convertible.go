@@ -4,16 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"reflect"
+
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/mezmo/terraform-provider-mezmo/internal/client"
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider"
-	"reflect"
 )
 
 type PipelineApiModel = client.Pipeline
 type SourceApiModel = client.Source
 type ProcessorApiModel = client.Processor
 type DestinationApiModel = client.Destination
+type BaseApiModel = client.BaseNode
 
 type ConvertibleResourceDef interface {
 	TypeName() string
