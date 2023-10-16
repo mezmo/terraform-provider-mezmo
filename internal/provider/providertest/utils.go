@@ -20,17 +20,19 @@ const authAccountId = "tf_test_01"
 
 var setupMutex sync.Mutex
 var isAccountCreated bool
-var testConfigCache = make(map[string]string, 0)
+var testConfigCache = sync.Map{}
 
 func SetCachedConfig(key string, body string) string {
 	toCache := GetProviderConfig() + body
-	testConfigCache[key] = toCache
+	testConfigCache.Store(key, toCache)
 	return toCache
 }
+
 func GetCachedConfig(key string) string {
-	if fromCache, ok := testConfigCache[key]; ok {
-		return fromCache
+	if fromCache, ok := testConfigCache.Load(key); ok {
+		return fromCache.(string)
 	}
+
 	panic(fmt.Sprintf("GetCachedConfig cannot find key %s", key))
 }
 
