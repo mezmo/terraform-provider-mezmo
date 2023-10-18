@@ -9,13 +9,14 @@ import (
 )
 
 func TestCompactFieldsProcessor(t *testing.T) {
+	const cacheKey = "compact_fields_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
 		Steps: []resource.TestStep{
 			// Error: pipeline_id is required
 			{
-				Config: SetCachedConfig("compact_fields_resources", `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "pipeline"
 					}
@@ -30,7 +31,7 @@ func TestCompactFieldsProcessor(t *testing.T) {
 
 			// Error: `fields` is required
 			{
-				Config: GetCachedConfig("compact_fields_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_compact_fields_processor" "my_processor" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 					}`,
@@ -39,7 +40,7 @@ func TestCompactFieldsProcessor(t *testing.T) {
 
 			// Error: `fields` array length validation
 			{
-				Config: GetCachedConfig("compact_fields_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_compact_fields_processor" "my_processor" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						fields = []
@@ -49,7 +50,7 @@ func TestCompactFieldsProcessor(t *testing.T) {
 
 			// Error: `fields` values validates length
 			{
-				Config: GetCachedConfig("compact_fields_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_compact_fields_processor" "my_processor" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						fields = [""]
@@ -59,7 +60,7 @@ func TestCompactFieldsProcessor(t *testing.T) {
 
 			// Create with defaults
 			{
-				Config: GetCachedConfig("compact_fields_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_compact_fields_processor" "my_processor" {
 						title = "compact fields title"
 						description = "compact fields desc"
@@ -87,7 +88,7 @@ func TestCompactFieldsProcessor(t *testing.T) {
 
 			// Update fields
 			{
-				Config: GetCachedConfig("compact_fields_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_compact_fields_processor" "my_processor" {
 						title = "new title"
 						description = "new desc"
@@ -115,7 +116,7 @@ func TestCompactFieldsProcessor(t *testing.T) {
 
 			// Error: server-side validation
 			{
-				Config: GetCachedConfig("compact_fields_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 				resource "mezmo_compact_fields_processor" "my_processor" {
 					pipeline_id = mezmo_pipeline.test_parent.id
 					inputs = []

@@ -9,7 +9,7 @@ import (
 )
 
 func TestKafkaSourceResource(t *testing.T) {
-	const cacheKey = "kafka_resources"
+	const cacheKey = "kafka_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
