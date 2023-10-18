@@ -9,7 +9,7 @@ import (
 )
 
 func TestMapFieldsProcessor(t *testing.T) {
-	const cacheKey = "reduce_resources"
+	const cacheKey = "map_fields_reduce_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },

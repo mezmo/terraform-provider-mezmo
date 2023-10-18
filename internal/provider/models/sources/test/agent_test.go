@@ -9,7 +9,7 @@ import (
 )
 
 func TestAgentSourceResource(t *testing.T) {
-	const cacheKey = "agent_resources"
+	const cacheKey = "agent_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
