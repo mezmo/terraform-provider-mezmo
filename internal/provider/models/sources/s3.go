@@ -27,46 +27,44 @@ type S3SourceModel struct {
 	Compression  String `tfsdk:"compression" user_config:"true"`
 }
 
-func S3SourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents an S3 pull source.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"auth": schema.SingleNestedAttribute{
-				Required:    true,
-				Description: "Configures AWS authentication",
-				Attributes: map[string]schema.Attribute{
-					"access_key_id": schema.StringAttribute{
-						Required:    true,
-						Description: "The AWS access key id",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"secret_access_key": schema.StringAttribute{
-						Required:    true,
-						Sensitive:   true,
-						Description: "The AWS secret access key",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
+var S3SourceResourceSchema = schema.Schema{
+	Description: "Represents an S3 pull source.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"auth": schema.SingleNestedAttribute{
+			Required:    true,
+			Description: "Configures AWS authentication",
+			Attributes: map[string]schema.Attribute{
+				"access_key_id": schema.StringAttribute{
+					Required:    true,
+					Description: "The AWS access key id",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"secret_access_key": schema.StringAttribute{
+					Required:    true,
+					Sensitive:   true,
+					Description: "The AWS secret access key",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 			},
-			"region": schema.StringAttribute{
-				Required:    true,
-				Description: "The name of the AWS region",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"sqs_queue_url": schema.StringAttribute{
-				Required:    true,
-				Description: "The URL of a AWS SQS queue configured to receive S3 bucket notifications",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(7)},
-			},
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("auto"),
-				Description: "The compression format of the S3 objects",
-				Validators:  []validator.String{stringvalidator.OneOf([]string{"auto", "gzip", "none", "zstd"}...)},
-			},
-		}, nil),
-	}
+		},
+		"region": schema.StringAttribute{
+			Required:    true,
+			Description: "The name of the AWS region",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"sqs_queue_url": schema.StringAttribute{
+			Required:    true,
+			Description: "The URL of a AWS SQS queue configured to receive S3 bucket notifications",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(7)},
+		},
+		"compression": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("auto"),
+			Description: "The compression format of the S3 objects",
+			Validators:  []validator.String{stringvalidator.OneOf([]string{"auto", "gzip", "none", "zstd"}...)},
+		},
+	}, nil),
 }
 
 func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Source, diag.Diagnostics) {

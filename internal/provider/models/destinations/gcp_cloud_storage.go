@@ -31,66 +31,64 @@ type GcpCloudStorageDestinationModel struct {
 	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs" user_config:"true"`
 }
 
-func GcpCloudStorageResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Publish log events to GCP Cloud Storage",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"encoding": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "Dictates how the data will be serialized before storing.",
-				Default:     stringdefault.StaticString("text"),
-				Validators: []validator.String{
-					stringvalidator.OneOf("json", "text"),
-				},
+var GcpCloudStorageResourceSchema = schema.Schema{
+	Description: "Publish log events to GCP Cloud Storage",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"encoding": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "Dictates how the data will be serialized before storing.",
+			Default:     stringdefault.StaticString("text"),
+			Validators: []validator.String{
+				stringvalidator.OneOf("json", "text"),
 			},
-			"bucket": schema.StringAttribute{
-				Required:    true,
-				Description: "The name of the bucket in GCP where the data will be stored.",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
+		},
+		"bucket": schema.StringAttribute{
+			Required:    true,
+			Description: "The name of the bucket in GCP where the data will be stored.",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
 			},
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "The compression strategy used on the encoded data prior to sending.",
-				Default:     stringdefault.StaticString("none"),
-				Validators: []validator.String{
-					stringvalidator.OneOf("gzip", "none"),
-				},
+		},
+		"compression": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "The compression strategy used on the encoded data prior to sending.",
+			Default:     stringdefault.StaticString("none"),
+			Validators: []validator.String{
+				stringvalidator.OneOf("gzip", "none"),
 			},
-			"bucket_prefix": schema.StringAttribute{
-				Optional:    true,
-				Computed:    false,
-				Description: "The prefix applied to the bucket name, giving the appearance of having directories.",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
+		},
+		"bucket_prefix": schema.StringAttribute{
+			Optional:    true,
+			Computed:    false,
+			Description: "The prefix applied to the bucket name, giving the appearance of having directories.",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
 			},
-			"auth": schema.SingleNestedAttribute{
-				Required:    true,
-				Description: "Configure GCP Cloud Storage authentication",
-				Attributes: map[string]schema.Attribute{
-					"type": schema.StringAttribute{
-						Required:    true,
-						Description: "The type of authentication to use.",
-						Validators: []validator.String{
-							stringvalidator.OneOf("api_key", "credentials_json"),
-						},
+		},
+		"auth": schema.SingleNestedAttribute{
+			Required:    true,
+			Description: "Configure GCP Cloud Storage authentication",
+			Attributes: map[string]schema.Attribute{
+				"type": schema.StringAttribute{
+					Required:    true,
+					Description: "The type of authentication to use.",
+					Validators: []validator.String{
+						stringvalidator.OneOf("api_key", "credentials_json"),
 					},
-					"value": schema.StringAttribute{
-						Required:    true,
-						Sensitive:   true,
-						Description: "Authentication secret value.",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-						},
+				},
+				"value": schema.StringAttribute{
+					Required:    true,
+					Sensitive:   true,
+					Description: "Authentication secret value.",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
 					},
 				},
 			},
-		}, []string{"batch_timeout_secs"}),
-	}
+		},
+	}, []string{"batch_timeout_secs"}),
 }
 
 func GcpCloudStorageDestinationFromModel(plan *GcpCloudStorageDestinationModel, previousState *GcpCloudStorageDestinationModel) (*Destination, diag.Diagnostics) {

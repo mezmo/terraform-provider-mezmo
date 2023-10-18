@@ -31,52 +31,50 @@ var mapFieldsAttrTypes = map[string]attr.Type{
 	"overwrite_target": BoolType{},
 }
 
-func MapFieldsProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Maps data from one field to another, either by moving or copying",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"mappings": schema.ListNestedAttribute{
-				Required:    true,
-				Description: "A list of field mappings. Mappings are applied in the order they are defined",
-				Validators: []validator.List{
-					listvalidator.SizeAtLeast(1),
-				},
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"source_field": schema.StringAttribute{
-							Required:    true,
-							Description: "The field to copy data from",
-							Validators: []validator.String{
-								stringvalidator.LengthAtLeast(1),
-							},
+var MapFieldsProcessorResourceSchema = schema.Schema{
+	Description: "Maps data from one field to another, either by moving or copying",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"mappings": schema.ListNestedAttribute{
+			Required:    true,
+			Description: "A list of field mappings. Mappings are applied in the order they are defined",
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+			},
+			NestedObject: schema.NestedAttributeObject{
+				Attributes: map[string]schema.Attribute{
+					"source_field": schema.StringAttribute{
+						Required:    true,
+						Description: "The field to copy data from",
+						Validators: []validator.String{
+							stringvalidator.LengthAtLeast(1),
 						},
-						"target_field": schema.StringAttribute{
-							Required:    true,
-							Description: "The field to copy data into",
-							Validators: []validator.String{
-								stringvalidator.LengthAtLeast(1),
-							},
+					},
+					"target_field": schema.StringAttribute{
+						Required:    true,
+						Description: "The field to copy data into",
+						Validators: []validator.String{
+							stringvalidator.LengthAtLeast(1),
 						},
-						"drop_source": schema.BoolAttribute{
-							Optional: true,
-							Computed: true,
-							Default:  booldefault.StaticBool(false),
-							Description: "When enabled, the source field is dropped after the data is copied " +
-								"to the target field. Otherwise, it is preserved.",
-						},
-						"overwrite_target": schema.BoolAttribute{
-							Optional: true,
-							Computed: true,
-							Default:  booldefault.StaticBool(false),
-							Description: "When enabled, any existing data in the target field is overwritten. " +
-								"Otherwise, the target field will be preserved and this mapping will " +
-								"have no effect.",
-						},
+					},
+					"drop_source": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+						Description: "When enabled, the source field is dropped after the data is copied " +
+							"to the target field. Otherwise, it is preserved.",
+					},
+					"overwrite_target": schema.BoolAttribute{
+						Optional: true,
+						Computed: true,
+						Default:  booldefault.StaticBool(false),
+						Description: "When enabled, any existing data in the target field is overwritten. " +
+							"Otherwise, the target field will be preserved and this mapping will " +
+							"have no effect.",
 					},
 				},
 			},
-		}),
-	}
+		},
+	}),
 }
 
 func MapFieldsProcessorFromModel(plan *MapFieldsProcessorModel, previousState *MapFieldsProcessorModel) (*Processor, diag.Diagnostics) {

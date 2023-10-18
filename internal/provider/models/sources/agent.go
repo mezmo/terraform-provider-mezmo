@@ -19,11 +19,9 @@ type AgentSourceModel struct {
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
-func AgentSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a Mezmo agent source.",
-		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "gateway_route_id"}),
-	}
+var AgentSourceResourceSchema = schema.Schema{
+	Description: "Represents a Mezmo agent source.",
+	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "gateway_route_id"}),
 }
 
 func AgentSourceFromModel(plan *AgentSourceModel, previousState *AgentSourceModel) (*Source, diag.Diagnostics) {

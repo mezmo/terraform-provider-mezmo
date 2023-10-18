@@ -40,7 +40,7 @@ type ProcessorResource[T ProcessorModel] struct {
 	toModelFunc       processorToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
 	getPipelineIdFunc idGetterFunc[T]
-	getSchemaFunc     getSchemaFunc
+	schema            schema.Schema
 }
 
 func (r *ProcessorResource[T]) TypeName() string {
@@ -48,7 +48,7 @@ func (r *ProcessorResource[T]) TypeName() string {
 }
 
 func (r *ProcessorResource[T]) TerraformSchema() schema.Schema {
-	return r.getSchemaFunc()
+	return r.schema
 }
 
 func (r *ProcessorResource[T]) ConvertToTerraformModel(component *reflect.Value) (*reflect.Value, error) {
@@ -117,7 +117,7 @@ func (r *ProcessorResource[T]) Create(ctx context.Context, req resource.CreateRe
 		PrintJSON("----- Processor FROM Create api ---", stored)
 	}
 
-	NullifyPlanFields(&plan, r.getSchemaFunc())
+	NullifyPlanFields(&plan, r.schema)
 
 	r.toModelFunc(&plan, stored)
 	diags = resp.State.Set(ctx, plan)
@@ -167,7 +167,7 @@ func (r *ProcessorResource[T]) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	NullifyPlanFields(&state, r.getSchemaFunc())
+	NullifyPlanFields(&state, r.schema)
 
 	r.toModelFunc(&state, component)
 	diags := resp.State.Set(ctx, state)
@@ -208,7 +208,7 @@ func (r *ProcessorResource[T]) Update(ctx context.Context, req resource.UpdateRe
 		PrintJSON("----- Processor FROM Update api ---", stored)
 	}
 
-	NullifyPlanFields(&plan, r.getSchemaFunc())
+	NullifyPlanFields(&plan, r.schema)
 
 	r.toModelFunc(&plan, stored)
 	diags := resp.State.Set(ctx, plan)
@@ -217,5 +217,5 @@ func (r *ProcessorResource[T]) Update(ctx context.Context, req resource.UpdateRe
 
 // Schema implements resource.Resource.
 func (r *ProcessorResource[T]) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = r.getSchemaFunc()
+	resp.Schema = r.schema
 }

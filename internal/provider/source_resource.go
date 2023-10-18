@@ -38,7 +38,7 @@ type SourceResource[T SourceModel] struct {
 	toModelFunc       sourceToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
 	getPipelineIdFunc idGetterFunc[T]
-	getSchemaFunc     getSchemaFunc
+	schema            schema.Schema
 }
 
 func (r *SourceResource[T]) TypeName() string {
@@ -46,7 +46,7 @@ func (r *SourceResource[T]) TypeName() string {
 }
 
 func (r *SourceResource[T]) TerraformSchema() schema.Schema {
-	return r.getSchemaFunc()
+	return r.schema
 }
 
 func (r *SourceResource[T]) ConvertToTerraformModel(component *reflect.Value) (*reflect.Value, error) {
@@ -115,7 +115,7 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 		PrintJSON("----- Destination FROM Create api ---", stored)
 	}
 
-	NullifyPlanFields(&plan, r.getSchemaFunc())
+	NullifyPlanFields(&plan, r.schema)
 
 	r.toModelFunc(&plan, stored)
 	diags = resp.State.Set(ctx, plan)
@@ -165,7 +165,7 @@ func (r *SourceResource[T]) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	NullifyPlanFields(&state, r.getSchemaFunc())
+	NullifyPlanFields(&state, r.schema)
 
 	r.toModelFunc(&state, component)
 	diags := resp.State.Set(ctx, state)
@@ -206,7 +206,7 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		PrintJSON("----- Destination FROM Update api ---", stored)
 	}
 
-	NullifyPlanFields(&plan, r.getSchemaFunc())
+	NullifyPlanFields(&plan, r.schema)
 
 	r.toModelFunc(&plan, stored)
 	diags := resp.State.Set(ctx, plan)
@@ -215,5 +215,5 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 
 // Schema implements resource.Resource.
 func (r *SourceResource[T]) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
-	resp.Schema = r.getSchemaFunc()
+	resp.Schema = r.schema
 }

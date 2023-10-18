@@ -25,58 +25,56 @@ type AzureEventHubSourceModel struct {
 	Topics           List   `tfsdk:"topics" user_config:"true"`
 }
 
-func AzureEventHubSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents an Azure Event Hub source.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"decoding": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("bytes"),
-				Description: "Configures how events are decoded from raw bytes",
-				Validators: []validator.String{
-					stringvalidator.OneOf("bytes", "json"),
-				},
+var AzureEventHubSourceResourceSchema = schema.Schema{
+	Description: "Represents an Azure Event Hub source.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"decoding": schema.StringAttribute{
+			Required:    false,
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("bytes"),
+			Description: "Configures how events are decoded from raw bytes",
+			Validators: []validator.String{
+				stringvalidator.OneOf("bytes", "json"),
 			},
-			"connection_string": schema.StringAttribute{
-				Required:    true,
-				Description: "The Connection String as it appears in hub consumer SAS Policy",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-					stringvalidator.LengthAtMost(512),
-				},
+		},
+		"connection_string": schema.StringAttribute{
+			Required:    true,
+			Description: "The Connection String as it appears in hub consumer SAS Policy",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+				stringvalidator.LengthAtMost(512),
 			},
-			"namespace": schema.StringAttribute{
-				Required:    true,
-				Description: "The Event Hub Namespace",
-				Validators: []validator.String{
+		},
+		"namespace": schema.StringAttribute{
+			Required:    true,
+			Description: "The Event Hub Namespace",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+				stringvalidator.LengthAtMost(256),
+			},
+		},
+		"group_id": schema.StringAttribute{
+			Required:    true,
+			Description: "The consumer group name that this consumer belongs to.",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+				stringvalidator.LengthAtMost(256),
+			},
+		},
+		"topics": schema.ListAttribute{
+			Required:    true,
+			ElementType: StringType,
+			Description: "The list of Azure Event Hub name(s) to read events from.",
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+				listvalidator.ValueStringsAre(
 					stringvalidator.LengthAtLeast(1),
 					stringvalidator.LengthAtMost(256),
-				},
+				),
 			},
-			"group_id": schema.StringAttribute{
-				Required:    true,
-				Description: "The consumer group name that this consumer belongs to.",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-					stringvalidator.LengthAtMost(256),
-				},
-			},
-			"topics": schema.ListAttribute{
-				Required:    true,
-				ElementType: StringType,
-				Description: "The list of Azure Event Hub name(s) to read events from.",
-				Validators: []validator.List{
-					listvalidator.SizeAtLeast(1),
-					listvalidator.ValueStringsAre(
-						stringvalidator.LengthAtLeast(1),
-						stringvalidator.LengthAtMost(256),
-					),
-				},
-			},
-		}, nil),
-	}
+		},
+	}, nil),
 }
 
 func AzureEventHubSourceFromModel(plan *AzureEventHubSourceModel, previousState *AzureEventHubSourceModel) (*Source, diag.Diagnostics) {

@@ -23,24 +23,22 @@ type FluentSourceModel struct {
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
-func FluentSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Receive data from Fluentd or Fluent Bit",
-		Attributes: ExtendBaseAttributes(
-			map[string]schema.Attribute{
-				"decoding": schema.StringAttribute{
-					Optional:    true,
-					Computed:    true,
-					Default:     stringdefault.StaticString("json"),
-					Description: "The decoding method for converting frames into data events",
-					Validators: []validator.String{
-						stringvalidator.OneOf("bytes", "json", "ndjson"),
-					},
+var FluentSourceResourceSchema = schema.Schema{
+	Description: "Receive data from Fluentd or Fluent Bit",
+	Attributes: ExtendBaseAttributes(
+		map[string]schema.Attribute{
+			"decoding": schema.StringAttribute{
+				Optional:    true,
+				Computed:    true,
+				Default:     stringdefault.StaticString("json"),
+				Description: "The decoding method for converting frames into data events",
+				Validators: []validator.String{
+					stringvalidator.OneOf("bytes", "json", "ndjson"),
 				},
 			},
-			[]string{"capture_metadata", "gateway_route_id"},
-		),
-	}
+		},
+		[]string{"capture_metadata", "gateway_route_id"},
+	),
 }
 
 func FluentSourceFromModel(plan *FluentSourceModel, previousState *FluentSourceModel) (*Source, diag.Diagnostics) {

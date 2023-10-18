@@ -14,7 +14,7 @@ func NewDemoSourceResource() resource.Resource {
 		toModelFunc:       DemoSourceToModel,
 		getIdFunc:         func(m *DemoSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *DemoSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     DemoSourceResourceSchema,
+		schema:            DemoSourceResourceSchema,
 	}
 }
 
@@ -25,7 +25,7 @@ func NewAgentSourceResource() resource.Resource {
 		toModelFunc:       AgentSourceToModel,
 		getIdFunc:         func(m *AgentSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *AgentSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     AgentSourceResourceSchema,
+		schema:            AgentSourceResourceSchema,
 	}
 }
 
@@ -36,7 +36,7 @@ func NewKafkaSourceResource() resource.Resource {
 		toModelFunc:       KafkaSourceToModel,
 		getIdFunc:         func(m *KafkaSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *KafkaSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     KafkaSourceResourceSchema,
+		schema:            KafkaSourceResourceSchema,
 	}
 }
 
@@ -47,7 +47,7 @@ func NewPrometheusRemoteWriteSourceResource() resource.Resource {
 		toModelFunc:       PrometheusRemoteWriteSourceToModel,
 		getIdFunc:         func(m *PrometheusRemoteWriteSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *PrometheusRemoteWriteSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     PrometheusRemoteWriteSourceResourceSchema,
+		schema:            PrometheusRemoteWriteSourceResourceSchema,
 	}
 }
 
@@ -58,7 +58,7 @@ func NewS3SourceResource() resource.Resource {
 		toModelFunc:       S3SourceToModel,
 		getIdFunc:         func(m *S3SourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *S3SourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     S3SourceResourceSchema,
+		schema:            S3SourceResourceSchema,
 	}
 }
 
@@ -69,7 +69,7 @@ func NewHttpSourceResource() resource.Resource {
 		toModelFunc:       HttpSourceToModel,
 		getIdFunc:         func(m *HttpSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *HttpSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     HttpSourceResourceSchema,
+		schema:            HttpSourceResourceSchema,
 	}
 }
 
@@ -80,7 +80,7 @@ func NewSQSSourceResource() resource.Resource {
 		toModelFunc:       SQSSourceToModel,
 		getIdFunc:         func(m *SQSSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *SQSSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     SQSSourceResourceSchema,
+		schema:            SQSSourceResourceSchema,
 	}
 }
 
@@ -91,7 +91,7 @@ func NewSplunkHecSourceResource() resource.Resource {
 		toModelFunc:       SplunkHecSourceToModel,
 		getIdFunc:         func(m *SplunkHecSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *SplunkHecSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     SplunkHecSourceResourceSchema,
+		schema:            SplunkHecSourceResourceSchema,
 	}
 }
 
@@ -102,7 +102,7 @@ func NewLogStashSourceResource() resource.Resource {
 		toModelFunc:       LogStashSourceToModel,
 		getIdFunc:         func(m *LogStashSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *LogStashSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     LogStashSourceResourceSchema,
+		schema:            LogStashSourceResourceSchema,
 	}
 }
 
@@ -113,7 +113,7 @@ func NewFluentSourceResource() resource.Resource {
 		toModelFunc:       FluentSourceToModel,
 		getIdFunc:         func(m *FluentSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *FluentSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     FluentSourceResourceSchema,
+		schema:            FluentSourceResourceSchema,
 	}
 }
 
@@ -124,7 +124,7 @@ func NewAzureEventHubSourceResource() resource.Resource {
 		toModelFunc:       AzureEventHubSourceToModel,
 		getIdFunc:         func(m *AzureEventHubSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *AzureEventHubSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     AzureEventHubSourceResourceSchema,
+		schema:            AzureEventHubSourceResourceSchema,
 	}
 }
 
@@ -135,7 +135,7 @@ func NewKinesisFirehoseSourceResource() resource.Resource {
 		toModelFunc:       KinesisFirehoseSourceToModel,
 		getIdFunc:         func(m *KinesisFirehoseSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *KinesisFirehoseSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     KinesisFirehoseSourceResourceSchema,
+		schema:            KinesisFirehoseSourceResourceSchema,
 	}
 }
 
@@ -146,6 +146,6 @@ func NewLogAnalysisSourceResource() resource.Resource {
 		toModelFunc:       LogAnalysisSourceToModel,
 		getIdFunc:         func(m *LogAnalysisSourceModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *LogAnalysisSourceModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     LogAnalysisSourceResourceSchema,
+		schema:            LogAnalysisSourceResourceSchema,
 	}
 }

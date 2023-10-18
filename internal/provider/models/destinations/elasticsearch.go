@@ -30,88 +30,86 @@ type ElasticSearchDestinationModel struct {
 	Index        String `tfsdk:"index" user_config:"true"`
 }
 
-func ElasticSearchDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents an ElasticSearch destination.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "The compression strategy used on the encoded data prior to sending",
-				Default:     stringdefault.StaticString("none"),
-				Validators:  []validator.String{stringvalidator.OneOf("gzip", "none")},
-			},
-			"auth": schema.SingleNestedAttribute{
-				Required:    true,
-				Description: "Configures ES authentication",
-				Attributes: map[string]schema.Attribute{
-					"strategy": schema.StringAttribute{
-						Required:    true,
-						Description: "The ES authentication strategy to use",
-						Validators:  []validator.String{stringvalidator.OneOf("basic", "aws")},
-					},
-					"user": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString(""),
-						Description: "The username for basic authentication",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"password": schema.StringAttribute{
-						Sensitive:   true,
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString(""),
-						Description: "The password to use for basic authentication",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"access_key_id": schema.StringAttribute{
-						Sensitive:   true,
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString(""),
-						Description: "The AWS access key id",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"secret_access_key": schema.StringAttribute{
-						Sensitive:   true,
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString(""),
-						Description: "The AWS secret access key",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"region": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString(""),
-						Description: "The AWS Region",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
+var ElasticSearchDestinationResourceSchema = schema.Schema{
+	Description: "Represents an ElasticSearch destination.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"compression": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "The compression strategy used on the encoded data prior to sending",
+			Default:     stringdefault.StaticString("none"),
+			Validators:  []validator.String{stringvalidator.OneOf("gzip", "none")},
+		},
+		"auth": schema.SingleNestedAttribute{
+			Required:    true,
+			Description: "Configures ES authentication",
+			Attributes: map[string]schema.Attribute{
+				"strategy": schema.StringAttribute{
+					Required:    true,
+					Description: "The ES authentication strategy to use",
+					Validators:  []validator.String{stringvalidator.OneOf("basic", "aws")},
+				},
+				"user": schema.StringAttribute{
+					Optional:    true,
+					Computed:    true,
+					Default:     stringdefault.StaticString(""),
+					Description: "The username for basic authentication",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"password": schema.StringAttribute{
+					Sensitive:   true,
+					Optional:    true,
+					Computed:    true,
+					Default:     stringdefault.StaticString(""),
+					Description: "The password to use for basic authentication",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"access_key_id": schema.StringAttribute{
+					Sensitive:   true,
+					Optional:    true,
+					Computed:    true,
+					Default:     stringdefault.StaticString(""),
+					Description: "The AWS access key id",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"secret_access_key": schema.StringAttribute{
+					Sensitive:   true,
+					Optional:    true,
+					Computed:    true,
+					Default:     stringdefault.StaticString(""),
+					Description: "The AWS secret access key",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"region": schema.StringAttribute{
+					Optional:    true,
+					Computed:    true,
+					Default:     stringdefault.StaticString(""),
+					Description: "The AWS Region",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 			},
-			"endpoints": schema.ListAttribute{
-				ElementType: StringType,
-				Required:    true,
-				Description: "An array of ElasticSearch endpoints",
-				Validators: []validator.List{
-					listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-				},
+		},
+		"endpoints": schema.ListAttribute{
+			ElementType: StringType,
+			Required:    true,
+			Description: "An array of ElasticSearch endpoints",
+			Validators: []validator.List{
+				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
 			},
-			"pipeline": schema.StringAttribute{
-				Optional:    true,
-				Description: "Name of an ES ingest pipeline to include",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"index": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "Index to use when writing ES events (default = mezmo-%Y.%m.%d)",
-				Default:     stringdefault.StaticString("mezmo-%Y.%m.%d"),
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-		}, nil),
-	}
+		},
+		"pipeline": schema.StringAttribute{
+			Optional:    true,
+			Description: "Name of an ES ingest pipeline to include",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"index": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "Index to use when writing ES events (default = mezmo-%Y.%m.%d)",
+			Default:     stringdefault.StaticString("mezmo-%Y.%m.%d"),
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+	}, nil),
 }
 
 func ElasticSearchDestinationFromModel(plan *ElasticSearchDestinationModel, previousState *ElasticSearchDestinationModel) (*Destination, diag.Diagnostics) {

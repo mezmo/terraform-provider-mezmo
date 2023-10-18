@@ -31,97 +31,95 @@ type ReduceProcessorModel struct {
 	FlushCondition  ObjectValue `tfsdk:"flush_condition" user_config:"true"`
 }
 
-func ReduceProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Combine multiple events over time into one based on a set of criteria",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"duration_ms": schema.Int64Attribute{
-				Optional: true,
-				Description: "The amount of time (in milliseconds) to allow streaming events to accumulate " +
-					"into a single \"reduced\" event. The process repeats indefinitely, or until " +
-					"an \"ends when\" condition is satisfied.",
-				Computed: true,
-				Default:  int64default.StaticInt64(30000),
-			},
-			"group_by": schema.ListAttribute{
-				ElementType: StringType{},
-				Optional:    true,
-				Description: "Before reducing, group events based on matching data from each of these " +
-					"field paths. Supports nesting via dot-notation.",
-			},
-			"date_formats": schema.ListNestedAttribute{
-				Optional: true,
-				Description: "Describes which root-level properties are dates, and their expected format. " +
-					"Dot-notation is supported, but nested field lookup paths will be an error.",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"field": schema.StringAttribute{
-							Required:    true,
-							Description: "Specifies a root-level path property that contains a date value.",
-							Validators: []validator.String{
-								stringvalidator.LengthAtLeast(1),
-								stringvalidator.LengthAtMost(200),
-							},
-						},
-						"format": schema.StringAttribute{
-							Required:    true,
-							Description: "The template describing the date format",
-							Validators: []validator.String{
-								stringvalidator.LengthAtLeast(1),
-								stringvalidator.LengthAtMost(200),
-							},
-						},
-					},
-				},
-				Validators: []validator.List{
-					listvalidator.SizeAtLeast(1),
-				},
-			},
-			"merge_strategies": schema.ListNestedAttribute{
-				Optional: true,
-				Description: "Specify merge strategies for individual root-level properties. " +
-					"Dot-notation is supported, but nested field lookup paths will be an error.",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"field": schema.StringAttribute{
-							Required:    true,
-							Description: "This is a root-level path property to apply a merge strategy to its value",
-							Validators: []validator.String{
-								stringvalidator.LengthAtLeast(1),
-								stringvalidator.LengthAtMost(200),
-							},
-						},
-						"strategy": schema.StringAttribute{
-							Required:    true,
-							Description: "The merge strategy to be used for the specified property",
-							Validators: []validator.String{
-								stringvalidator.OneOf(ReduceMergeStrategies...),
-							},
-						},
-					},
-				},
-				Validators: []validator.List{
-					listvalidator.SizeAtLeast(1),
-				},
-			},
-			"flush_condition": schema.SingleNestedAttribute{
-				Optional: true,
-				Description: "Force accumulated event reduction to flush the result when a " +
-					"conditional expression evaluates to true on an inbound event.",
+var ReduceProcessorResourceSchema = schema.Schema{
+	Description: "Combine multiple events over time into one based on a set of criteria",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"duration_ms": schema.Int64Attribute{
+			Optional: true,
+			Description: "The amount of time (in milliseconds) to allow streaming events to accumulate " +
+				"into a single \"reduced\" event. The process repeats indefinitely, or until " +
+				"an \"ends when\" condition is satisfied.",
+			Computed: true,
+			Default:  int64default.StaticInt64(30000),
+		},
+		"group_by": schema.ListAttribute{
+			ElementType: StringType{},
+			Optional:    true,
+			Description: "Before reducing, group events based on matching data from each of these " +
+				"field paths. Supports nesting via dot-notation.",
+		},
+		"date_formats": schema.ListNestedAttribute{
+			Optional: true,
+			Description: "Describes which root-level properties are dates, and their expected format. " +
+				"Dot-notation is supported, but nested field lookup paths will be an error.",
+			NestedObject: schema.NestedAttributeObject{
 				Attributes: map[string]schema.Attribute{
-					"when": schema.StringAttribute{
-						Required: true,
-						Description: "Specifies whether to start a new reduction of events based on the " +
-							"conditions, or end a current reduction based on them.",
+					"field": schema.StringAttribute{
+						Required:    true,
+						Description: "Specifies a root-level path property that contains a date value.",
 						Validators: []validator.String{
-							stringvalidator.OneOf("starts_when", "ends_when"),
+							stringvalidator.LengthAtLeast(1),
+							stringvalidator.LengthAtMost(200),
 						},
 					},
-					"conditional": ParentConditionalAttribute,
+					"format": schema.StringAttribute{
+						Required:    true,
+						Description: "The template describing the date format",
+						Validators: []validator.String{
+							stringvalidator.LengthAtLeast(1),
+							stringvalidator.LengthAtMost(200),
+						},
+					},
 				},
 			},
-		}),
-	}
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+			},
+		},
+		"merge_strategies": schema.ListNestedAttribute{
+			Optional: true,
+			Description: "Specify merge strategies for individual root-level properties. " +
+				"Dot-notation is supported, but nested field lookup paths will be an error.",
+			NestedObject: schema.NestedAttributeObject{
+				Attributes: map[string]schema.Attribute{
+					"field": schema.StringAttribute{
+						Required:    true,
+						Description: "This is a root-level path property to apply a merge strategy to its value",
+						Validators: []validator.String{
+							stringvalidator.LengthAtLeast(1),
+							stringvalidator.LengthAtMost(200),
+						},
+					},
+					"strategy": schema.StringAttribute{
+						Required:    true,
+						Description: "The merge strategy to be used for the specified property",
+						Validators: []validator.String{
+							stringvalidator.OneOf(ReduceMergeStrategies...),
+						},
+					},
+				},
+			},
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+			},
+		},
+		"flush_condition": schema.SingleNestedAttribute{
+			Optional: true,
+			Description: "Force accumulated event reduction to flush the result when a " +
+				"conditional expression evaluates to true on an inbound event.",
+			Attributes: map[string]schema.Attribute{
+				"when": schema.StringAttribute{
+					Required: true,
+					Description: "Specifies whether to start a new reduction of events based on the " +
+						"conditions, or end a current reduction based on them.",
+					Validators: []validator.String{
+						stringvalidator.OneOf("starts_when", "ends_when"),
+					},
+				},
+				"conditional": ParentConditionalAttribute,
+			},
+		},
+	}),
 }
 
 func ReduceProcessorFromModel(plan *ReduceProcessorModel, previousState *ReduceProcessorModel) (*Processor, diag.Diagnostics) {

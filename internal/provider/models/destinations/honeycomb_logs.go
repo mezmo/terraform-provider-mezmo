@@ -22,23 +22,21 @@ type HoneycombLogsDestinationModel struct {
 	ApiKey       String `tfsdk:"api_key" user_config:"true"`
 }
 
-func HoneycombLogsResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Send log data to Honeycomb",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"api_key": schema.StringAttribute{
-				Required:    true,
-				Sensitive:   true,
-				Description: "Honeycomb API key",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"dataset": schema.StringAttribute{
-				Required:    true,
-				Description: "The name of the targeted dataset",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-		}, nil),
-	}
+var HoneycombLogsResourceSchema = schema.Schema{
+	Description: "Send log data to Honeycomb",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"api_key": schema.StringAttribute{
+			Required:    true,
+			Sensitive:   true,
+			Description: "Honeycomb API key",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"dataset": schema.StringAttribute{
+			Required:    true,
+			Description: "The name of the targeted dataset",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+	}, nil),
 }
 
 func HoneycombLogsFromModel(plan *HoneycombLogsDestinationModel, previousState *HoneycombLogsDestinationModel) (*Destination, diag.Diagnostics) {

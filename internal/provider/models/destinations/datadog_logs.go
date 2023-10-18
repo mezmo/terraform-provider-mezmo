@@ -23,28 +23,26 @@ type DatadogLogsDestinationModel struct {
 	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
-func DatadogLogsDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Publishes log events to Datadog",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"api_key": schema.StringAttribute{
-				Sensitive:   true,
-				Required:    true,
-				Description: "Datadog logs application API key.",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"site": schema.StringAttribute{
-				Required:    true,
-				Description: "The Datadog site (region) to send logs to.",
-				Validators:  []validator.String{stringvalidator.OneOf("us1", "us3", "us5", "eu1")},
-			},
-			"compression": schema.StringAttribute{
-				Required:    true,
-				Description: "The compression strategy used on the encoded data prior to sending..",
-				Validators:  []validator.String{stringvalidator.OneOf("none", "gzip")},
-			},
-		}, nil),
-	}
+var DatadogLogsDestinationResourceSchema = schema.Schema{
+	Description: "Publishes log events to Datadog",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"api_key": schema.StringAttribute{
+			Sensitive:   true,
+			Required:    true,
+			Description: "Datadog logs application API key.",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"site": schema.StringAttribute{
+			Required:    true,
+			Description: "The Datadog site (region) to send logs to.",
+			Validators:  []validator.String{stringvalidator.OneOf("us1", "us3", "us5", "eu1")},
+		},
+		"compression": schema.StringAttribute{
+			Required:    true,
+			Description: "The compression strategy used on the encoded data prior to sending..",
+			Validators:  []validator.String{stringvalidator.OneOf("none", "gzip")},
+		},
+	}, nil),
 }
 
 func DatadogLogsFromModel(plan *DatadogLogsDestinationModel, previousState *DatadogLogsDestinationModel) (*Destination, diag.Diagnostics) {

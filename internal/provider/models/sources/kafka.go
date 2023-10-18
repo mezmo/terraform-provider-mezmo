@@ -30,102 +30,100 @@ type KafkaSourceModel struct {
 	Decoding     String `tfsdk:"decoding" user_config:"true"`
 }
 
-func KafkaSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a Kafka source.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"brokers": schema.ListNestedAttribute{
-				Required:    true,
-				Description: "The Kafka brokers to connect to.",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"host": schema.StringAttribute{
-							Required:    true,
-							Description: "The host of the Kafka broker.",
-							Validators: []validator.String{
-								stringvalidator.LengthAtLeast(1),
-								stringvalidator.LengthAtMost(255),
-							},
-						},
-						"port": schema.Int64Attribute{
-							Required:    true,
-							Description: "The port of the Kafka broker.",
-							Validators: []validator.Int64{
-								int64validator.Between(1, 65535),
-							},
-						},
-					},
-				},
-				Validators: []validator.List{
-					listvalidator.UniqueValues(),
-					listvalidator.SizeAtLeast(1),
-				},
-			},
-			"topics": schema.ListAttribute{
-				Required:    true,
-				Description: "The Kafka topics to consume from.",
-				ElementType: StringType,
-				Validators: []validator.List{
-					listvalidator.UniqueValues(),
-					listvalidator.SizeAtLeast(1),
-					listvalidator.ValueStringsAre(
-						stringvalidator.LengthBetween(1, 256),
-					),
-				},
-			},
-			"group_id": schema.StringAttribute{
-				Required:    true,
-				Description: "The Kafka consumer group ID to use.",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
-			},
-			"tls_enabled": schema.BoolAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     booldefault.StaticBool(true),
-				Description: "Whether to use TLS when connecting to Kafka.",
-			},
-			"sasl": schema.SingleNestedAttribute{
-				Optional:    true,
-				Description: "The SASL configuration to use when connecting to Kafka.",
+var KafkaSourceResourceSchema = schema.Schema{
+	Description: "Represents a Kafka source.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"brokers": schema.ListNestedAttribute{
+			Required:    true,
+			Description: "The Kafka brokers to connect to.",
+			NestedObject: schema.NestedAttributeObject{
 				Attributes: map[string]schema.Attribute{
-					"mechanism": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "The SASL mechanism to use when connecting to Kafka.",
-						Validators: []validator.String{
-							stringvalidator.OneOf("PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"),
-						},
-					},
-					"username": schema.StringAttribute{
+					"host": schema.StringAttribute{
 						Required:    true,
-						Description: "The SASL username to use when connecting to Kafka.",
+						Description: "The host of the Kafka broker.",
 						Validators: []validator.String{
 							stringvalidator.LengthAtLeast(1),
+							stringvalidator.LengthAtMost(255),
 						},
 					},
-					"password": schema.StringAttribute{
+					"port": schema.Int64Attribute{
 						Required:    true,
-						Sensitive:   true,
-						Description: "The SASL password to use when connecting to Kafka.",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
+						Description: "The port of the Kafka broker.",
+						Validators: []validator.Int64{
+							int64validator.Between(1, 65535),
 						},
 					},
 				},
 			},
-			"decoding": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("json"),
-				Description: "The decoding method for converting frames into data events.",
-				Validators: []validator.String{
-					stringvalidator.OneOf("bytes", "json"),
+			Validators: []validator.List{
+				listvalidator.UniqueValues(),
+				listvalidator.SizeAtLeast(1),
+			},
+		},
+		"topics": schema.ListAttribute{
+			Required:    true,
+			Description: "The Kafka topics to consume from.",
+			ElementType: StringType,
+			Validators: []validator.List{
+				listvalidator.UniqueValues(),
+				listvalidator.SizeAtLeast(1),
+				listvalidator.ValueStringsAre(
+					stringvalidator.LengthBetween(1, 256),
+				),
+			},
+		},
+		"group_id": schema.StringAttribute{
+			Required:    true,
+			Description: "The Kafka consumer group ID to use.",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
+		},
+		"tls_enabled": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "Whether to use TLS when connecting to Kafka.",
+		},
+		"sasl": schema.SingleNestedAttribute{
+			Optional:    true,
+			Description: "The SASL configuration to use when connecting to Kafka.",
+			Attributes: map[string]schema.Attribute{
+				"mechanism": schema.StringAttribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "The SASL mechanism to use when connecting to Kafka.",
+					Validators: []validator.String{
+						stringvalidator.OneOf("PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"),
+					},
+				},
+				"username": schema.StringAttribute{
+					Required:    true,
+					Description: "The SASL username to use when connecting to Kafka.",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+					},
+				},
+				"password": schema.StringAttribute{
+					Required:    true,
+					Sensitive:   true,
+					Description: "The SASL password to use when connecting to Kafka.",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+					},
 				},
 			},
-		}, nil),
-	}
+		},
+		"decoding": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("json"),
+			Description: "The decoding method for converting frames into data events.",
+			Validators: []validator.String{
+				stringvalidator.OneOf("bytes", "json"),
+			},
+		},
+	}, nil),
 }
 
 func KafkaSourceFromModel(plan *KafkaSourceModel, previousState *KafkaSourceModel) (*Source, diag.Diagnostics) {

@@ -15,11 +15,9 @@ type LogAnalysisSourceModel struct {
 	GenerationId Int64Value  `tfsdk:"generation_id"`
 }
 
-func LogAnalysisSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Receive data directly from your Mezmo Log Analysis account",
-		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, nil),
-	}
+var LogAnalysisSourceResourceSchema = schema.Schema{
+	Description: "Receive data directly from your Mezmo Log Analysis account",
+	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, nil),
 }
 
 func LogAnalysisSourceFromModel(plan *LogAnalysisSourceModel, previousState *LogAnalysisSourceModel) (*Source, diag.Diagnostics) {

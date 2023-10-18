@@ -49,72 +49,70 @@ var splunkValueTypeAttributes = map[string]schema.Attribute{
 	},
 }
 
-func SplunkHecLogsDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Publishes log events to a Splunk HTTP Event Collector",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "The compression strategy used on the encoded data prior to sending",
-				Default:     stringdefault.StaticString("none"),
-				Validators:  []validator.String{stringvalidator.OneOf("gzip", "none")},
-			},
-			"endpoint": schema.StringAttribute{
-				Required: true,
-				Description: "The base URL for the Splunk instance. The collector path, such as " +
-					"`/services/collector/events`, will be automatically inferred from the " +
-					"destination's configuration.",
-				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"token": schema.StringAttribute{
-				Required:    true,
-				Sensitive:   true,
-				Description: "The default token to authenticate to Splunk HEC",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"tls_verify_certificate": schema.BoolAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "Verify TLS Certificate",
-				Default:     booldefault.StaticBool(true),
-			},
-			"host_field": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "The field that contains the hostname to include in the event",
-				Default:     stringdefault.StaticString("metadata.host"),
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"timestamp_field": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "The field that contains the timestamp to include in the event",
-				Default:     stringdefault.StaticString("metadata.time"),
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"source": schema.SingleNestedAttribute{
-				Optional: true,
-				Description: "The source of events sent to this destination. This is typically the filename " +
-					"the logs originated from. Use the field path \"metadata.source\" to use the" +
-					" upstream source value from a HEC log source",
-				Attributes: splunkValueTypeAttributes,
-			},
-			"source_type": schema.SingleNestedAttribute{
-				Optional: true,
-				Description: "The sourcetype of events sent to this destination. Use the field path" +
-					" \"metadata.sourcetype\" to use the upstream sourcetype value from a HEC" +
-					" log source",
-				Attributes: splunkValueTypeAttributes,
-			},
-			"index": schema.SingleNestedAttribute{
-				Optional: true,
-				Description: "The name of the index to send events to. Use the field path " +
-					" \"metadata.index\" to use the upstream index value from a HEC log source",
-				Attributes: splunkValueTypeAttributes,
-			},
-		}, nil),
-	}
+var SplunkHecLogsDestinationResourceSchema = schema.Schema{
+	Description: "Publishes log events to a Splunk HTTP Event Collector",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"compression": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "The compression strategy used on the encoded data prior to sending",
+			Default:     stringdefault.StaticString("none"),
+			Validators:  []validator.String{stringvalidator.OneOf("gzip", "none")},
+		},
+		"endpoint": schema.StringAttribute{
+			Required: true,
+			Description: "The base URL for the Splunk instance. The collector path, such as " +
+				"`/services/collector/events`, will be automatically inferred from the " +
+				"destination's configuration.",
+			Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"token": schema.StringAttribute{
+			Required:    true,
+			Sensitive:   true,
+			Description: "The default token to authenticate to Splunk HEC",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"tls_verify_certificate": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "Verify TLS Certificate",
+			Default:     booldefault.StaticBool(true),
+		},
+		"host_field": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "The field that contains the hostname to include in the event",
+			Default:     stringdefault.StaticString("metadata.host"),
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"timestamp_field": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "The field that contains the timestamp to include in the event",
+			Default:     stringdefault.StaticString("metadata.time"),
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"source": schema.SingleNestedAttribute{
+			Optional: true,
+			Description: "The source of events sent to this destination. This is typically the filename " +
+				"the logs originated from. Use the field path \"metadata.source\" to use the" +
+				" upstream source value from a HEC log source",
+			Attributes: splunkValueTypeAttributes,
+		},
+		"source_type": schema.SingleNestedAttribute{
+			Optional: true,
+			Description: "The sourcetype of events sent to this destination. Use the field path" +
+				" \"metadata.sourcetype\" to use the upstream sourcetype value from a HEC" +
+				" log source",
+			Attributes: splunkValueTypeAttributes,
+		},
+		"index": schema.SingleNestedAttribute{
+			Optional: true,
+			Description: "The name of the index to send events to. Use the field path " +
+				" \"metadata.index\" to use the upstream index value from a HEC log source",
+			Attributes: splunkValueTypeAttributes,
+		},
+	}, nil),
 }
 
 func SplunkHecLogsDestinationFromModel(plan *SplunkHecLogsDestinationModel, previousState *SplunkHecLogsDestinationModel) (*Destination, diag.Diagnostics) {

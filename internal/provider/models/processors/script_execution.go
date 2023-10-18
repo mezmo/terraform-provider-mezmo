@@ -20,20 +20,18 @@ type ScriptExecutionProcessorModel struct {
 	Script       String `tfsdk:"script" user_config:"true"`
 }
 
-func ScriptExecutionProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Use JavaScript to reshape and transform your data" +
-			" You can combine multiple actions like filtering, dropping," +
-			" mapping, and casting inside of a single js script",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"script": schema.StringAttribute{
-				Required:   true,
-				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-				Description: "The script containing the JavaScript function that represents the " +
-					"transformation of events flowing though the pipeline",
-			},
-		}),
-	}
+var ScriptExecutionProcessorResourceSchema = schema.Schema{
+	Description: "Use JavaScript to reshape and transform your data" +
+		" You can combine multiple actions like filtering, dropping," +
+		" mapping, and casting inside of a single js script",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"script": schema.StringAttribute{
+			Required:   true,
+			Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+			Description: "The script containing the JavaScript function that represents the " +
+				"transformation of events flowing though the pipeline",
+		},
+	}),
 }
 
 func ScriptExecutionProcessorFromModel(plan *ScriptExecutionProcessorModel, previousState *ScriptExecutionProcessorModel) (*Processor, diag.Diagnostics) {

@@ -36,127 +36,125 @@ var log_construction_schemes = map[string]string{
 	"pass-through": "Message pass-through",
 }
 
-func MezmoDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a Mezmo destination.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"host": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("logs.logdna.com"),
-				Description: "The host for your Log Analysis environment",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"ingestion_key": schema.StringAttribute{
-				Required:    true,
-				Sensitive:   true,
-				Description: "Ingestion key",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"query": schema.SingleNestedAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "Query Parameters",
-				Attributes: map[string]schema.Attribute{
-					"hostname": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "Hostname string or template to attach to logs",
-						Default:     stringdefault.StaticString("mezmo"),
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+var MezmoDestinationResourceSchema = schema.Schema{
+	Description: "Represents a Mezmo destination.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"host": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("logs.logdna.com"),
+			Description: "The host for your Log Analysis environment",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"ingestion_key": schema.StringAttribute{
+			Required:    true,
+			Sensitive:   true,
+			Description: "Ingestion key",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"query": schema.SingleNestedAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "Query Parameters",
+			Attributes: map[string]schema.Attribute{
+				"hostname": schema.StringAttribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "Hostname string or template to attach to logs",
+					Default:     stringdefault.StaticString("mezmo"),
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"tags": schema.ListAttribute{
+					ElementType: StringType,
+					Optional:    true,
+					Description: "List of tag strings or templates to attach to logs",
+					Validators: []validator.List{
+						listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
 					},
-					"tags": schema.ListAttribute{
-						ElementType: StringType,
-						Optional:    true,
-						Description: "List of tag strings or templates to attach to logs",
-						Validators: []validator.List{
-							listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-						},
+				},
+				"ip": schema.StringAttribute{
+					Optional:    true,
+					Description: "IP address template to attach to logs",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+						stringvalidator.LengthAtMost(512),
 					},
-					"ip": schema.StringAttribute{
-						Optional:    true,
-						Description: "IP address template to attach to logs",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(512),
-						},
-					},
-					"mac": schema.StringAttribute{
-						Optional:    true,
-						Description: "MAC address template to attach to logs",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(512),
-						},
+				},
+				"mac": schema.StringAttribute{
+					Optional:    true,
+					Description: "MAC address template to attach to logs",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+						stringvalidator.LengthAtMost(512),
 					},
 				},
 			},
-			"log_construction_scheme": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("explicit"),
-				Description: "How to construct the log message",
-				Validators: []validator.String{
-					stringvalidator.OneOf(MapKeys(log_construction_schemes)...),
-				},
+		},
+		"log_construction_scheme": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("explicit"),
+			Description: "How to construct the log message",
+			Validators: []validator.String{
+				stringvalidator.OneOf(MapKeys(log_construction_schemes)...),
 			},
-			"explicit_scheme_options": schema.SingleNestedAttribute{
-				Optional:    true,
-				Description: "Log construction options for the explicit scheme",
-				Attributes: map[string]schema.Attribute{
-					"line": schema.StringAttribute{
-						Optional: true,
-						Description: "Template or field reference to use as the log line. " +
-							"Field reference can point to an object.",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(1024),
-						},
-					},
-					"meta_field": schema.StringAttribute{
-						Optional:    true,
-						Description: "Field containing the meta object for the log",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(512),
-						},
-					},
-					"app": schema.StringAttribute{
-						Optional:    true,
-						Description: "App name template to attach to logs",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(512),
-						},
-					},
-					"file": schema.StringAttribute{
-						Optional:    true,
-						Description: "File name template to attach to logs",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(512),
-						},
-					},
-					"timestamp_field": schema.StringAttribute{
-						Optional:    true,
-						Description: "Field containing the timestamp for the log, for example ._ts",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(512),
-						},
-					},
-					"env": schema.StringAttribute{
-						Optional:    true,
-						Description: "Environment name template to attach to logs",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(512),
-						},
+		},
+		"explicit_scheme_options": schema.SingleNestedAttribute{
+			Optional:    true,
+			Description: "Log construction options for the explicit scheme",
+			Attributes: map[string]schema.Attribute{
+				"line": schema.StringAttribute{
+					Optional: true,
+					Description: "Template or field reference to use as the log line. " +
+						"Field reference can point to an object.",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+						stringvalidator.LengthAtMost(1024),
 					},
 				},
+				"meta_field": schema.StringAttribute{
+					Optional:    true,
+					Description: "Field containing the meta object for the log",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+						stringvalidator.LengthAtMost(512),
+					},
+				},
+				"app": schema.StringAttribute{
+					Optional:    true,
+					Description: "App name template to attach to logs",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+						stringvalidator.LengthAtMost(512),
+					},
+				},
+				"file": schema.StringAttribute{
+					Optional:    true,
+					Description: "File name template to attach to logs",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+						stringvalidator.LengthAtMost(512),
+					},
+				},
+				"timestamp_field": schema.StringAttribute{
+					Optional:    true,
+					Description: "Field containing the timestamp for the log, for example ._ts",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+						stringvalidator.LengthAtMost(512),
+					},
+				},
+				"env": schema.StringAttribute{
+					Optional:    true,
+					Description: "Environment name template to attach to logs",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+						stringvalidator.LengthAtMost(512),
+					},
+				},
 			},
-		}, nil),
-	}
+		},
+	}, nil),
 }
 
 func MezmoDestinationFromModel(plan *MezmoDestinationModel, previousState *MezmoDestinationModel) (*Destination, diag.Diagnostics) {

@@ -22,23 +22,21 @@ type DatadogMetricsDestinationModel struct {
 	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
-func DatadogMetricsDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Publishes metric events to Datadog",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"api_key": schema.StringAttribute{
-				Sensitive:   true,
-				Required:    true,
-				Description: "Datadog metrics application API key.",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"site": schema.StringAttribute{
-				Required:    true,
-				Description: "The Datadog site (region) to send metrics to.",
-				Validators:  []validator.String{stringvalidator.OneOf("us1", "us3", "us5", "eu1")},
-			},
-		}, nil),
-	}
+var DatadogMetricsDestinationResourceSchema = schema.Schema{
+	Description: "Publishes metric events to Datadog",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"api_key": schema.StringAttribute{
+			Sensitive:   true,
+			Required:    true,
+			Description: "Datadog metrics application API key.",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"site": schema.StringAttribute{
+			Required:    true,
+			Description: "The Datadog site (region) to send metrics to.",
+			Validators:  []validator.String{stringvalidator.OneOf("us1", "us3", "us5", "eu1")},
+		},
+	}, nil),
 }
 
 func DatadogMetricsFromModel(plan *DatadogMetricsDestinationModel, previousState *DatadogMetricsDestinationModel) (*Destination, diag.Diagnostics) {

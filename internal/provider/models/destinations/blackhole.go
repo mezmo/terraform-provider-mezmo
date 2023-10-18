@@ -19,11 +19,9 @@ type BlackholeDestinationModel struct {
 	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
-func BlackholeDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a blackhole destination.",
-		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, nil),
-	}
+var BlackholeDestinationResourceSchema = schema.Schema{
+	Description: "Represents a blackhole destination.",
+	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, nil),
 }
 
 func BlackholeDestinationFromModel(plan *BlackholeDestinationModel, previousState *BlackholeDestinationModel) (*Destination, diag.Diagnostics) {

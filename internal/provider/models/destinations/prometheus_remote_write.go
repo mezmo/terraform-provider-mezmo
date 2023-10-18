@@ -26,54 +26,52 @@ type PrometheusRemoteWriteDestinationModel struct {
 	Auth         Object `tfsdk:"auth" user_config:"true"`
 }
 
-func PrometheusRemoteWriteDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents Prometheus remote-write destination that publishes metrics to a " +
-			"Prometheus endpoint",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"endpoint": schema.StringAttribute{
-				Required: true,
-				Description: "The full URI to make HTTP requests to. This should include the " +
-					"protocol and host, but can also include the port, path, and any other valid " +
-					"part of a URI. Example: http://example.org:8080/api/v1/push",
-				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"auth": schema.SingleNestedAttribute{
-				Optional:    true,
-				Description: "Configures authentication",
-				Attributes: map[string]schema.Attribute{
-					"strategy": schema.StringAttribute{
-						Required:    true,
-						Description: "The authentication strategy to use",
-						Validators:  []validator.String{stringvalidator.OneOf("basic", "bearer")},
-					},
-					"user": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString(""),
-						Description: "The username for basic authentication",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"password": schema.StringAttribute{
-						Sensitive:   true,
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString(""),
-						Description: "The password to use for basic authentication",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"token": schema.StringAttribute{
-						Sensitive:   true,
-						Optional:    true,
-						Computed:    true,
-						Default:     stringdefault.StaticString(""),
-						Description: "The token to use for bearer auth strategy",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
+var PrometheusRemoteWriteDestinationResourceSchema = schema.Schema{
+	Description: "Represents Prometheus remote-write destination that publishes metrics to a " +
+		"Prometheus endpoint",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"endpoint": schema.StringAttribute{
+			Required: true,
+			Description: "The full URI to make HTTP requests to. This should include the " +
+				"protocol and host, but can also include the port, path, and any other valid " +
+				"part of a URI. Example: http://example.org:8080/api/v1/push",
+			Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"auth": schema.SingleNestedAttribute{
+			Optional:    true,
+			Description: "Configures authentication",
+			Attributes: map[string]schema.Attribute{
+				"strategy": schema.StringAttribute{
+					Required:    true,
+					Description: "The authentication strategy to use",
+					Validators:  []validator.String{stringvalidator.OneOf("basic", "bearer")},
+				},
+				"user": schema.StringAttribute{
+					Optional:    true,
+					Computed:    true,
+					Default:     stringdefault.StaticString(""),
+					Description: "The username for basic authentication",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"password": schema.StringAttribute{
+					Sensitive:   true,
+					Optional:    true,
+					Computed:    true,
+					Default:     stringdefault.StaticString(""),
+					Description: "The password to use for basic authentication",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"token": schema.StringAttribute{
+					Sensitive:   true,
+					Optional:    true,
+					Computed:    true,
+					Default:     stringdefault.StaticString(""),
+					Description: "The token to use for bearer auth strategy",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 			},
-		}, nil),
-	}
+		},
+	}, nil),
 }
 
 func PrometheusRemoteWriteDestinationFromModel(plan *PrometheusRemoteWriteDestinationModel, previousState *PrometheusRemoteWriteDestinationModel) (*Destination, diag.Diagnostics) {

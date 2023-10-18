@@ -19,11 +19,9 @@ type PrometheusRemoteWriteSourceModel struct {
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
-func PrometheusRemoteWriteSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a Prometheus Remote Write source.",
-		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "gateway_route_id"}),
-	}
+var PrometheusRemoteWriteSourceResourceSchema = schema.Schema{
+	Description: "Represents a Prometheus Remote Write source.",
+	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "gateway_route_id"}),
 }
 
 func PrometheusRemoteWriteSourceFromModel(plan *PrometheusRemoteWriteSourceModel, previousState *PrometheusRemoteWriteSourceModel) (*Source, diag.Diagnostics) {

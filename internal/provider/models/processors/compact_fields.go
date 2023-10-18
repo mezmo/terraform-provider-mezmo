@@ -26,33 +26,31 @@ type CompactFieldsProcessorModel struct {
 	CompactObject Bool   `tfsdk:"compact_object" user_config:"true"`
 }
 
-func CompactFieldsProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Remove empty values from a list of fields",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"fields": schema.ListAttribute{
-				ElementType: StringType,
-				Required:    true,
-				Description: "A list of fields to remove empty values from",
-				Validators: []validator.List{
-					listvalidator.SizeAtLeast(1),
-					listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-				},
+var CompactFieldsProcessorResourceSchema = schema.Schema{
+	Description: "Remove empty values from a list of fields",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"fields": schema.ListAttribute{
+			ElementType: StringType,
+			Required:    true,
+			Description: "A list of fields to remove empty values from",
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
 			},
-			"compact_array": schema.BoolAttribute{
-				Optional:    true,
-				Description: "Remove empty arrays from a field",
-				Computed:    true,
-				Default:     booldefault.StaticBool(true),
-			},
-			"compact_object": schema.BoolAttribute{
-				Optional:    true,
-				Description: "Remove empty objects from a field",
-				Computed:    true,
-				Default:     booldefault.StaticBool(true),
-			},
-		}),
-	}
+		},
+		"compact_array": schema.BoolAttribute{
+			Optional:    true,
+			Description: "Remove empty arrays from a field",
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+		},
+		"compact_object": schema.BoolAttribute{
+			Optional:    true,
+			Description: "Remove empty objects from a field",
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+		},
+	}),
 }
 
 func CompactFieldsProcessorFromModel(plan *CompactFieldsProcessorModel, previousState *CompactFieldsProcessorModel) (*Processor, diag.Diagnostics) {

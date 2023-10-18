@@ -27,52 +27,50 @@ type SampleProcessorModel struct {
 	AlwaysInclude Object `tfsdk:"always_include" user_config:"true"`
 }
 
-func SampleProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Sample data at a given rate, retaining only a subset of data events for further processing",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"rate": schema.Int64Attribute{
-				Computed: true,
-				Optional: true,
-				Description: "The rate at which events will be forwarded, expressed as 1/N. For example," +
-					" `rate = 10` means 1 out of every 10 events will be forwarded and the rest" +
-					" will be dropped",
-				Validators: []validator.Int64{
-					int64validator.AtLeast(2),
-					int64validator.AtMost(10000),
-				},
-				Default: int64default.StaticInt64(10),
+var SampleProcessorResourceSchema = schema.Schema{
+	Description: "Sample data at a given rate, retaining only a subset of data events for further processing",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"rate": schema.Int64Attribute{
+			Computed: true,
+			Optional: true,
+			Description: "The rate at which events will be forwarded, expressed as 1/N. For example," +
+				" `rate = 10` means 1 out of every 10 events will be forwarded and the rest" +
+				" will be dropped",
+			Validators: []validator.Int64{
+				int64validator.AtLeast(2),
+				int64validator.AtMost(10000),
 			},
-			"always_include": schema.SingleNestedAttribute{
-				Optional:    true,
-				Description: "Events matching this criteria will always show up in the results",
-				Attributes: map[string]schema.Attribute{
-					"field": schema.StringAttribute{
-						Required:    true,
-						Description: "The field to use in a condition to always include in sampling",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"operator": schema.StringAttribute{
-						Required: true,
-						Description: "The comparison operator to check the value of the field or" +
-							" whether the first exists",
-						Validators: []validator.String{
-							stringvalidator.OneOf(Operators...),
-						},
-					},
-					"value_string": schema.StringAttribute{
-						Optional:    true,
-						Description: "The operand to compare the field value with, when the value is a string",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"value_number": schema.Float64Attribute{
-						Optional:    true,
-						Description: "The operand to compare the field value with, when the value is a number",
+			Default: int64default.StaticInt64(10),
+		},
+		"always_include": schema.SingleNestedAttribute{
+			Optional:    true,
+			Description: "Events matching this criteria will always show up in the results",
+			Attributes: map[string]schema.Attribute{
+				"field": schema.StringAttribute{
+					Required:    true,
+					Description: "The field to use in a condition to always include in sampling",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"operator": schema.StringAttribute{
+					Required: true,
+					Description: "The comparison operator to check the value of the field or" +
+						" whether the first exists",
+					Validators: []validator.String{
+						stringvalidator.OneOf(Operators...),
 					},
 				},
+				"value_string": schema.StringAttribute{
+					Optional:    true,
+					Description: "The operand to compare the field value with, when the value is a string",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"value_number": schema.Float64Attribute{
+					Optional:    true,
+					Description: "The operand to compare the field value with, when the value is a number",
+				},
 			},
-		}),
-	}
+		},
+	}),
 }
 
 func SampleProcessorFromModel(plan *SampleProcessorModel, previousState *SampleProcessorModel) (*Processor, diag.Diagnostics) {

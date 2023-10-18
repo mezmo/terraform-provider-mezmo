@@ -14,7 +14,7 @@ func NewAzureBlobStorageDestinationResource() resource.Resource {
 		toModelFunc:       AzureBlobStorageToModel,
 		getIdFunc:         func(m *AzureBlobStorageDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *AzureBlobStorageDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     AzureBlobStorageResourceSchema,
+		schema:            AzureBlobStorageResourceSchema,
 	}
 }
 
@@ -25,7 +25,7 @@ func NewBlackholeDestinationResource() resource.Resource {
 		toModelFunc:       BlackholeDestinationToModel,
 		getIdFunc:         func(m *BlackholeDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *BlackholeDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     BlackholeDestinationResourceSchema,
+		schema:            BlackholeDestinationResourceSchema,
 	}
 }
 
@@ -36,7 +36,7 @@ func NewDatadogLogsDestinationResource() resource.Resource {
 		toModelFunc:       DatadogLogsDestinationToModel,
 		getIdFunc:         func(m *DatadogLogsDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *DatadogLogsDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     DatadogLogsDestinationResourceSchema,
+		schema:            DatadogLogsDestinationResourceSchema,
 	}
 }
 
@@ -47,7 +47,7 @@ func NewDatadogMetricsDestinationResource() resource.Resource {
 		toModelFunc:       DatadogMetricsDestinationToModel,
 		getIdFunc:         func(m *DatadogMetricsDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *DatadogMetricsDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     DatadogMetricsDestinationResourceSchema,
+		schema:            DatadogMetricsDestinationResourceSchema,
 	}
 }
 
@@ -58,7 +58,7 @@ func NewElasticSearchDestinationResource() resource.Resource {
 		toModelFunc:       ElasticSearchDestinationToModel,
 		getIdFunc:         func(m *ElasticSearchDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *ElasticSearchDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     ElasticSearchDestinationResourceSchema,
+		schema:            ElasticSearchDestinationResourceSchema,
 	}
 }
 
@@ -69,7 +69,7 @@ func NewHoneycombLogsDestinationResource() resource.Resource {
 		toModelFunc:       HoneycombLogsToModel,
 		getIdFunc:         func(m *HoneycombLogsDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *HoneycombLogsDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     HoneycombLogsResourceSchema,
+		schema:            HoneycombLogsResourceSchema,
 	}
 }
 
@@ -80,7 +80,7 @@ func NewHttpDestinationResource() resource.Resource {
 		toModelFunc:       HttpDestinationToModel,
 		getIdFunc:         func(m *HttpDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *HttpDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     HttpDestinationResourceSchema,
+		schema:            HttpDestinationResourceSchema,
 	}
 }
 
@@ -91,7 +91,7 @@ func NewKafkaDestinationResource() resource.Resource {
 		toModelFunc:       KafkaDestinationToModel,
 		getIdFunc:         func(m *KafkaDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *KafkaDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     KafkaDestinationResourceSchema,
+		schema:            KafkaDestinationResourceSchema,
 	}
 }
 
@@ -102,7 +102,7 @@ func NewLokiDestinationResource() resource.Resource {
 		toModelFunc:       LokiDestinationToModel,
 		getIdFunc:         func(m *LokiDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *LokiDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     LokiDestinationResourceSchema,
+		schema:            LokiDestinationResourceSchema,
 	}
 }
 
@@ -113,7 +113,7 @@ func NewMezmoDestinationResource() resource.Resource {
 		toModelFunc:       MezmoDestinationToModel,
 		getIdFunc:         func(m *MezmoDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *MezmoDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     MezmoDestinationResourceSchema,
+		schema:            MezmoDestinationResourceSchema,
 	}
 }
 
@@ -124,7 +124,7 @@ func NewNewRelicDestinationResource() resource.Resource {
 		toModelFunc:       NewRelicDestinationToModel,
 		getIdFunc:         func(m *NewRelicDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *NewRelicDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     NewRelicDestinationResourceSchema,
+		schema:            NewRelicDestinationResourceSchema,
 	}
 }
 
@@ -135,7 +135,7 @@ func NewPrometheusRemoteWriteDestinationResource() resource.Resource {
 		toModelFunc:       PrometheusRemoteWriteDestinationToModel,
 		getIdFunc:         func(m *PrometheusRemoteWriteDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *PrometheusRemoteWriteDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     PrometheusRemoteWriteDestinationResourceSchema,
+		schema:            PrometheusRemoteWriteDestinationResourceSchema,
 	}
 }
 
@@ -146,7 +146,7 @@ func NewS3DestinationResource() resource.Resource {
 		toModelFunc:       S3DestinationToModel,
 		getIdFunc:         func(m *S3DestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *S3DestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     S3DestinationResourceSchema,
+		schema:            S3DestinationResourceSchema,
 	}
 }
 
@@ -157,7 +157,7 @@ func NewSplunkHecLogsDestinationResource() resource.Resource {
 		toModelFunc:       SplunkHecLogsDestinationToModel,
 		getIdFunc:         func(m *SplunkHecLogsDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *SplunkHecLogsDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     SplunkHecLogsDestinationResourceSchema,
+		schema:            SplunkHecLogsDestinationResourceSchema,
 	}
 }
 
@@ -168,6 +168,6 @@ func NewGcpCloudStorageDestinationResource() resource.Resource {
 		toModelFunc:       GcpCloudStorageDestinationToModel,
 		getIdFunc:         func(m *GcpCloudStorageDestinationModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *GcpCloudStorageDestinationModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     GcpCloudStorageResourceSchema,
+		schema:            GcpCloudStorageResourceSchema,
 	}
 }

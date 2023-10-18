@@ -25,50 +25,48 @@ type EncryptFieldsProcessorModel struct {
 	EncodeRawBytes Bool   `tfsdk:"encode_raw_bytes" user_config:"true"`
 }
 
-func EncryptFieldsProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Encrypts the value of the provided field",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"field": schema.StringAttribute{
-				Required:    true,
-				Description: "Field to encrypt. The value of the field must be a primitive (string, number, boolean).",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
+var EncryptFieldsProcessorResourceSchema = schema.Schema{
+	Description: "Encrypts the value of the provided field",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"field": schema.StringAttribute{
+			Required:    true,
+			Description: "Field to encrypt. The value of the field must be a primitive (string, number, boolean).",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
 			},
-			"algorithm": schema.StringAttribute{
-				Required:    true,
-				Description: "The encryption algorithm to use on the field",
-				Validators: []validator.String{
-					stringvalidator.OneOf(EncryptionAlgorithms...),
-				},
+		},
+		"algorithm": schema.StringAttribute{
+			Required:    true,
+			Description: "The encryption algorithm to use on the field",
+			Validators: []validator.String{
+				stringvalidator.OneOf(EncryptionAlgorithms...),
 			},
-			"key": schema.StringAttribute{
-				Required:    true,
-				Sensitive:   true,
-				Description: "The encryption key",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(16),
-					stringvalidator.LengthAtMost(32),
-				},
+		},
+		"key": schema.StringAttribute{
+			Required:    true,
+			Sensitive:   true,
+			Description: "The encryption key",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(16),
+				stringvalidator.LengthAtMost(32),
 			},
-			"iv_field": schema.StringAttribute{
-				Required: true,
-				Description: "The field in which to store the generated initialization " +
-					"vector, IV. Each encrypted value will have a unique IV.",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
+		},
+		"iv_field": schema.StringAttribute{
+			Required: true,
+			Description: "The field in which to store the generated initialization " +
+				"vector, IV. Each encrypted value will have a unique IV.",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
 			},
-			"encode_raw_bytes": schema.BoolAttribute{
-				Optional: true,
-				Computed: true,
-				Default:  booldefault.StaticBool(true),
-				Description: "Encode the encrypted value and generated initialization " +
-					"vector as Base64 text",
-			},
-		}),
-	}
+		},
+		"encode_raw_bytes": schema.BoolAttribute{
+			Optional: true,
+			Computed: true,
+			Default:  booldefault.StaticBool(true),
+			Description: "Encode the encrypted value and generated initialization " +
+				"vector as Base64 text",
+		},
+	}),
 }
 
 func EncryptFieldsProcessorFromModel(plan *EncryptFieldsProcessorModel, previousState *EncryptFieldsProcessorModel) (*Processor, diag.Diagnostics) {

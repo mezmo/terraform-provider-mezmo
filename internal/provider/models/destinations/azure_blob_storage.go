@@ -27,42 +27,40 @@ type AzureBlobStorageDestinationModel struct {
 	Prefix              String `tfsdk:"prefix" user_config:"true"`
 }
 
-func AzureBlobStorageResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Publishes events to Azure Blob Storage",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"encoding": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "The encoding to apply to the data",
-				Default:     stringdefault.StaticString("text"),
-				Validators:  []validator.String{stringvalidator.OneOf("json", "text")},
-			},
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "The compression strategy used on the encoded data prior to sending",
-				Default:     stringdefault.StaticString("none"),
-				Validators:  []validator.String{stringvalidator.OneOf("gzip", "none")},
-			},
-			"container_name": schema.StringAttribute{
-				Required:    true,
-				Description: "The name of the container for blob storage",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"connection_string": schema.StringAttribute{
-				Required:    true,
-				Sensitive:   true,
-				Description: "A connection string for the account that contains an access key",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"prefix": schema.StringAttribute{
-				Optional:    true,
-				Description: "A prefix to be applied to all object keys",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-		}, []string{"batch_timeout_secs"}),
-	}
+var AzureBlobStorageResourceSchema = schema.Schema{
+	Description: "Publishes events to Azure Blob Storage",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"encoding": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "The encoding to apply to the data",
+			Default:     stringdefault.StaticString("text"),
+			Validators:  []validator.String{stringvalidator.OneOf("json", "text")},
+		},
+		"compression": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "The compression strategy used on the encoded data prior to sending",
+			Default:     stringdefault.StaticString("none"),
+			Validators:  []validator.String{stringvalidator.OneOf("gzip", "none")},
+		},
+		"container_name": schema.StringAttribute{
+			Required:    true,
+			Description: "The name of the container for blob storage",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"connection_string": schema.StringAttribute{
+			Required:    true,
+			Sensitive:   true,
+			Description: "A connection string for the account that contains an access key",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"prefix": schema.StringAttribute{
+			Optional:    true,
+			Description: "A prefix to be applied to all object keys",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+	}, []string{"batch_timeout_secs"}),
 }
 
 func AzureBlobStorageFromModel(plan *AzureBlobStorageDestinationModel, previousState *AzureBlobStorageDestinationModel) (*Destination, diag.Diagnostics) {
