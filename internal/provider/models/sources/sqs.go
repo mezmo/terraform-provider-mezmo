@@ -24,42 +24,40 @@ type SQSSourceModel struct {
 	Region       String `tfsdk:"region" user_config:"true"`
 }
 
-func SQSSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Collect messages from AWS SQS",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"queue_url": schema.StringAttribute{
-				Required:    true,
-				Description: "The URL of an AWS SQS queue",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(7), // http://
-					stringvalidator.LengthAtMost(128),
+var SQSSourceResourceSchema = schema.Schema{
+	Description: "Collect messages from AWS SQS",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"queue_url": schema.StringAttribute{
+			Required:    true,
+			Description: "The URL of an AWS SQS queue",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(7), // http://
+				stringvalidator.LengthAtMost(128),
+			},
+		},
+		"auth": schema.SingleNestedAttribute{
+			Required:    true,
+			Description: "Configures AWS authentication",
+			Attributes: map[string]schema.Attribute{
+				"access_key_id": schema.StringAttribute{
+					Required:    true,
+					Description: "The AWS access key id",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"secret_access_key": schema.StringAttribute{
+					Required:    true,
+					Sensitive:   true,
+					Description: "The AWS secret access key",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 			},
-			"auth": schema.SingleNestedAttribute{
-				Required:    true,
-				Description: "Configures AWS authentication",
-				Attributes: map[string]schema.Attribute{
-					"access_key_id": schema.StringAttribute{
-						Required:    true,
-						Description: "The AWS access key id",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"secret_access_key": schema.StringAttribute{
-						Required:    true,
-						Sensitive:   true,
-						Description: "The AWS secret access key",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-				},
-			},
-			"region": schema.StringAttribute{
-				Required:    true,
-				Description: "The name of the source's AWS region",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-		}, nil),
-	}
+		},
+		"region": schema.StringAttribute{
+			Required:    true,
+			Description: "The name of the source's AWS region",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+	}, nil),
 }
 
 func SQSSourceFromModel(plan *SQSSourceModel, previousState *SQSSourceModel) (*Source, diag.Diagnostics) {

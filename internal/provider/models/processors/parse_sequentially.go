@@ -29,12 +29,9 @@ type ParseSequentiallyProcessorModel struct {
 	Parsers      List   `tfsdk:"parsers" user_config:"true"`
 }
 
-func ParseSequentiallyProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-
-		Description: "Parse a field using one of a list of ordered parsers. Parsing ends (short-circuits) on the first successful parse.",
-		Attributes:  ExtendBaseAttributes(parse_sequential_schema),
-	}
+var ParseSequentiallyProcessorResourceSchema = schema.Schema{
+	Description: "Parse a field using one of a list of ordered parsers. Parsing ends (short-circuits) on the first successful parse.",
+	Attributes:  ExtendBaseAttributes(parse_sequential_schema),
 }
 
 func ParseSequentiallyProcessorFromModel(plan *ParseSequentiallyProcessorModel, previousState *ParseSequentiallyProcessorModel) (*Processor, diag.Diagnostics) {

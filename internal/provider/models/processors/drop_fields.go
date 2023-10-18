@@ -21,21 +21,19 @@ type DropFieldsProcessorModel struct {
 	Fields       List   `tfsdk:"fields" user_config:"true"`
 }
 
-func DropFieldsProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Remove fields from the events",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"fields": schema.ListAttribute{
-				ElementType: StringType,
-				Required:    true,
-				Description: "A list of fields to be removed",
-				Validators: []validator.List{
-					listvalidator.SizeAtLeast(1),
-					listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-				},
+var DropFieldsProcessorResourceSchema = schema.Schema{
+	Description: "Remove fields from the events",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"fields": schema.ListAttribute{
+			ElementType: StringType,
+			Required:    true,
+			Description: "A list of fields to be removed",
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
 			},
-		}),
-	}
+		},
+	}),
 }
 
 func DropFieldsProcessorFromModel(plan *DropFieldsProcessorModel, previousState *DropFieldsProcessorModel) (*Processor, diag.Diagnostics) {

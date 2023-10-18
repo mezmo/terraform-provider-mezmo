@@ -18,21 +18,19 @@ type DemoSourceModel struct {
 	GenerationId Int64  `tfsdk:"generation_id"`
 }
 
-func DemoSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a demo logs source.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"format": schema.StringAttribute{
-				Required:    true,
-				Description: "The format of the events",
-				Validators: []validator.String{
-					stringvalidator.OneOf(
-						"env_sensor", "financial", "nginx", "json", "apache_common",
-						"apache_error", "bsd_syslog", "syslog", "http_metrics", "generic_metrics"),
-				},
+var DemoSourceResourceSchema = schema.Schema{
+	Description: "Represents a demo logs source.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"format": schema.StringAttribute{
+			Required:    true,
+			Description: "The format of the events",
+			Validators: []validator.String{
+				stringvalidator.OneOf(
+					"env_sensor", "financial", "nginx", "json", "apache_common",
+					"apache_error", "bsd_syslog", "syslog", "http_metrics", "generic_metrics"),
 			},
-		}, nil),
-	}
+		},
+	}, nil),
 }
 
 func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) (*Source, diag.Diagnostics) {

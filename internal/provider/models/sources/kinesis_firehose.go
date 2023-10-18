@@ -24,22 +24,20 @@ type KinesisFirehoseSourceModel struct {
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
-func KinesisFirehoseSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Receive Kinesis Firehose data",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"decoding": schema.StringAttribute{
-				Optional: true,
-				Computed: true,
-				Default:  stringdefault.StaticString("json"),
-				Description: "This specifies what the data format will be after it is base64 decoded. " +
-					"If it is JSON, it will be automatically parsed.",
-				Validators: []validator.String{
-					stringvalidator.OneOf("text", "json"),
-				},
+var KinesisFirehoseSourceResourceSchema = schema.Schema{
+	Description: "Receive Kinesis Firehose data",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"decoding": schema.StringAttribute{
+			Optional: true,
+			Computed: true,
+			Default:  stringdefault.StaticString("json"),
+			Description: "This specifies what the data format will be after it is base64 decoded. " +
+				"If it is JSON, it will be automatically parsed.",
+			Validators: []validator.String{
+				stringvalidator.OneOf("text", "json"),
 			},
-		}, []string{"capture_metadata", "gateway_route_id"}),
-	}
+		},
+	}, []string{"capture_metadata", "gateway_route_id"}),
 }
 
 func KinesisFirehoseSourceFromModel(plan *KinesisFirehoseSourceModel, previousState *KinesisFirehoseSourceModel) (*Source, diag.Diagnostics) {

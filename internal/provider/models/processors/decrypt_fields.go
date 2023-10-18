@@ -25,48 +25,46 @@ type DecryptFieldsProcessorModel struct {
 	DecodeRawBytes Bool   `tfsdk:"decode_raw_bytes" user_config:"true"`
 }
 
-func DecryptFieldsProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Decrypts the value of the provided field",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"field": schema.StringAttribute{
-				Required:    true,
-				Description: "Field to decrypt. The value of the field must be a string",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
+var DecryptFieldsProcessorResourceSchema = schema.Schema{
+	Description: "Decrypts the value of the provided field",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"field": schema.StringAttribute{
+			Required:    true,
+			Description: "Field to decrypt. The value of the field must be a string",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
 			},
-			"algorithm": schema.StringAttribute{
-				Required:    true,
-				Description: "The algorithm with which the data was encrypted",
-				Validators: []validator.String{
-					stringvalidator.OneOf(EncryptionAlgorithms...),
-				},
+		},
+		"algorithm": schema.StringAttribute{
+			Required:    true,
+			Description: "The algorithm with which the data was encrypted",
+			Validators: []validator.String{
+				stringvalidator.OneOf(EncryptionAlgorithms...),
 			},
-			"key": schema.StringAttribute{
-				Required:    true,
-				Sensitive:   true,
-				Description: "The key/secret used to encrypt the value",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(16),
-					stringvalidator.LengthAtMost(32),
-				},
+		},
+		"key": schema.StringAttribute{
+			Required:    true,
+			Sensitive:   true,
+			Description: "The key/secret used to encrypt the value",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(16),
+				stringvalidator.LengthAtMost(32),
 			},
-			"iv_field": schema.StringAttribute{
-				Required:    true,
-				Description: "The field from which to read the initialization vector, IV",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
+		},
+		"iv_field": schema.StringAttribute{
+			Required:    true,
+			Description: "The field from which to read the initialization vector, IV",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
 			},
-			"decode_raw_bytes": schema.BoolAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     booldefault.StaticBool(true),
-				Description: "The field from which to read the initialization vector, IV",
-			},
-		}),
-	}
+		},
+		"decode_raw_bytes": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "The field from which to read the initialization vector, IV",
+		},
+	}),
 }
 
 func DecryptFieldsProcessorFromModel(plan *DecryptFieldsProcessorModel, previousState *DecryptFieldsProcessorModel) (*Processor, diag.Diagnostics) {

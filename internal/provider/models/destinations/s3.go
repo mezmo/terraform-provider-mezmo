@@ -31,60 +31,58 @@ type S3DestinationModel struct {
 	Compression         String `tfsdk:"compression" user_config:"true"`
 }
 
-func S3DestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Publishes events as objects in AWS S3",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"auth": schema.SingleNestedAttribute{
-				Required:    true,
-				Description: "Configures AWS authentication",
-				Attributes: map[string]schema.Attribute{
-					"access_key_id": schema.StringAttribute{
-						Required:    true,
-						Description: "The AWS access key id",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"secret_access_key": schema.StringAttribute{
-						Required:    true,
-						Sensitive:   true,
-						Description: "The AWS secret access key",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
+var S3DestinationResourceSchema = schema.Schema{
+	Description: "Publishes events as objects in AWS S3",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"auth": schema.SingleNestedAttribute{
+			Required:    true,
+			Description: "Configures AWS authentication",
+			Attributes: map[string]schema.Attribute{
+				"access_key_id": schema.StringAttribute{
+					Required:    true,
+					Description: "The AWS access key id",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"secret_access_key": schema.StringAttribute{
+					Required:    true,
+					Sensitive:   true,
+					Description: "The AWS secret access key",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 			},
-			"region": schema.StringAttribute{
-				Required:    true,
-				Description: "The name of the AWS region",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"bucket": schema.StringAttribute{
-				Required:    true,
-				Description: "The S3 bucket name. Do not include a leading s3:// or a trailing /",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"prefix": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "A prefix to apply to all object key names.",
-				Default:     stringdefault.StaticString("/"),
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"encoding": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Description: "The encoding to apply to the data",
-				Default:     stringdefault.StaticString("text"),
-				Validators:  []validator.String{stringvalidator.OneOf("json", "ndjson", "text")},
-			},
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("none"),
-				Description: "The compression format of the S3 objects",
-				Validators:  []validator.String{stringvalidator.OneOf([]string{"gzip", "none"}...)},
-			},
-		}, []string{"batch_timeout_secs"}),
-	}
+		},
+		"region": schema.StringAttribute{
+			Required:    true,
+			Description: "The name of the AWS region",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"bucket": schema.StringAttribute{
+			Required:    true,
+			Description: "The S3 bucket name. Do not include a leading s3:// or a trailing /",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"prefix": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "A prefix to apply to all object key names.",
+			Default:     stringdefault.StaticString("/"),
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"encoding": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "The encoding to apply to the data",
+			Default:     stringdefault.StaticString("text"),
+			Validators:  []validator.String{stringvalidator.OneOf("json", "ndjson", "text")},
+		},
+		"compression": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("none"),
+			Description: "The compression format of the S3 objects",
+			Validators:  []validator.String{stringvalidator.OneOf([]string{"gzip", "none"}...)},
+		},
+	}, []string{"batch_timeout_secs"}),
 }
 
 func S3DestinationFromModel(plan *S3DestinationModel, previousState *S3DestinationModel) (*Destination, diag.Diagnostics) {

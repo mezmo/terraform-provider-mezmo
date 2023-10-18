@@ -26,33 +26,31 @@ type RouteProcessorModel struct {
 
 var RouteProcessorName = "route"
 
-func RouteProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Route data based on whether or not it matches logical comparisons.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"conditionals": schema.ListNestedAttribute{
-				Required:    true,
-				Description: "A list of conditions, each of which has a label and an expression or expression groups.",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: ExtendSchemaAttributes(ParentConditionalAttribute.Attributes, map[string]schema.Attribute{
-						"label": schema.StringAttribute{
-							Required:    true,
-							Description: "A label for the expresion group",
-							Validators: []validator.String{
-								stringvalidator.LengthAtLeast(1),
-								stringvalidator.LengthAtMost(20),
-							},
+var RouteProcessorResourceSchema = schema.Schema{
+	Description: "Route data based on whether or not it matches logical comparisons.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"conditionals": schema.ListNestedAttribute{
+			Required:    true,
+			Description: "A list of conditions, each of which has a label and an expression or expression groups.",
+			NestedObject: schema.NestedAttributeObject{
+				Attributes: ExtendSchemaAttributes(ParentConditionalAttribute.Attributes, map[string]schema.Attribute{
+					"label": schema.StringAttribute{
+						Required:    true,
+						Description: "A label for the expresion group",
+						Validators: []validator.String{
+							stringvalidator.LengthAtLeast(1),
+							stringvalidator.LengthAtMost(20),
 						},
-						"output_name": schema.StringAttribute{
-							Computed: true,
-							Description: "A system generated value to identify the results of this expression. " +
-								"This value should be used when connecting the results to another processor or destination.",
-						},
-					}),
-				},
+					},
+					"output_name": schema.StringAttribute{
+						Computed: true,
+						Description: "A system generated value to identify the results of this expression. " +
+							"This value should be used when connecting the results to another processor or destination.",
+					},
+				}),
 			},
-		}),
-	}
+		},
+	}),
 }
 
 func RouteProcessorFromModel(plan *RouteProcessorModel, previousState *RouteProcessorModel) (*Processor, diag.Diagnostics) {

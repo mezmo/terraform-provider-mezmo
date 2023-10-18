@@ -23,23 +23,21 @@ type HttpSourceModel struct {
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
-func HttpSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents an HTTP source.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"decoding": schema.StringAttribute{
-				Required:    false,
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("json"),
-				Description: "The decoding method for converting frames into data events.",
-				Validators: []validator.String{
-					stringvalidator.OneOf(
-						"bytes", "json", "ndjson"),
-				},
+var HttpSourceResourceSchema = schema.Schema{
+	Description: "Represents an HTTP source.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"decoding": schema.StringAttribute{
+			Required:    false,
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("json"),
+			Description: "The decoding method for converting frames into data events.",
+			Validators: []validator.String{
+				stringvalidator.OneOf(
+					"bytes", "json", "ndjson"),
 			},
-		}, []string{"capture_metadata", "gateway_route_id"}),
-	}
+		},
+	}, []string{"capture_metadata", "gateway_route_id"}),
 }
 
 func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) (*Source, diag.Diagnostics) {

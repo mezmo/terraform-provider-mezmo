@@ -18,11 +18,9 @@ type StringifyProcessorModel struct {
 	GenerationId Int64  `tfsdk:"generation_id"`
 }
 
-func StringifyProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a processor to stringify JSON data.",
-		Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}),
-	}
+var StringifyProcessorResourceSchema = schema.Schema{
+	Description: "Represents a processor to stringify JSON data.",
+	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}),
 }
 
 func StringifyProcessorFromModel(plan *StringifyProcessorModel, previousState *StringifyProcessorModel) (*Processor, diag.Diagnostics) {

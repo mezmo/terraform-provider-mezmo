@@ -19,14 +19,12 @@ type SplunkHecSourceModel struct {
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
-func SplunkHecSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Receive Splunk logs",
-		Attributes: ExtendBaseAttributes(
-			map[string]schema.Attribute{},
-			[]string{"capture_metadata", "gateway_route_id"},
-		),
-	}
+var SplunkHecSourceResourceSchema = schema.Schema{
+	Description: "Receive Splunk logs",
+	Attributes: ExtendBaseAttributes(
+		map[string]schema.Attribute{},
+		[]string{"capture_metadata", "gateway_route_id"},
+	),
 }
 
 func SplunkHecSourceFromModel(plan *SplunkHecSourceModel, previousState *SplunkHecSourceModel) (*Source, diag.Diagnostics) {

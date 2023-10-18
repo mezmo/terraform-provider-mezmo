@@ -30,62 +30,60 @@ type LokiDestinationModel struct {
 	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
-func LokiDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Publish log events to Loki",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"auth": schema.SingleNestedAttribute{
-				Required:    true,
-				Description: "The authentication strategy to use (only basic supported)",
-				Attributes: map[string]schema.Attribute{
-					"strategy": schema.StringAttribute{
-						Required:    true,
-						Description: "The authentication strategy to use (only basic supported)",
-						Validators:  []validator.String{stringvalidator.OneOf("basic")},
-					},
-					"user": schema.StringAttribute{
-						Required:    true,
-						Description: "The basic authentication user",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"password": schema.StringAttribute{
-						Sensitive:   true,
-						Required:    true,
-						Description: "The basic authentication password",
-						Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
+var LokiDestinationResourceSchema = schema.Schema{
+	Description: "Publish log events to Loki",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"auth": schema.SingleNestedAttribute{
+			Required:    true,
+			Description: "The authentication strategy to use (only basic supported)",
+			Attributes: map[string]schema.Attribute{
+				"strategy": schema.StringAttribute{
+					Required:    true,
+					Description: "The authentication strategy to use (only basic supported)",
+					Validators:  []validator.String{stringvalidator.OneOf("basic")},
+				},
+				"user": schema.StringAttribute{
+					Required:    true,
+					Description: "The basic authentication user",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"password": schema.StringAttribute{
+					Sensitive:   true,
+					Required:    true,
+					Description: "The basic authentication password",
+					Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 			},
-			"endpoint": schema.StringAttribute{
-				Required:    true,
-				Description: "The Loki base URL",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"endpoint": schema.StringAttribute{
+			Required:    true,
+			Description: "The Loki base URL",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"encoding": schema.StringAttribute{
+			Required:    true,
+			Description: "Configures how event are encoded",
+			Validators:  []validator.String{stringvalidator.OneOf("json", "text")},
+		},
+		"path": schema.StringAttribute{
+			Optional:    true,
+			Description: "The path appended to the Loki base URL, (defaults to /loki/api/v1/push)",
+			Computed:    true,
+			Default:     stringdefault.StaticString("/loki/api/v1/push"),
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"labels": schema.MapAttribute{
+			Required:    true,
+			ElementType: StringType,
+			Description: "Key/Value pair used to describe Loki data",
+			Validators: []validator.Map{
+				mapvalidator.All(
+					mapvalidator.KeysAre(stringvalidator.LengthAtLeast(1)),
+					mapvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
+				),
 			},
-			"encoding": schema.StringAttribute{
-				Required:    true,
-				Description: "Configures how event are encoded",
-				Validators:  []validator.String{stringvalidator.OneOf("json", "text")},
-			},
-			"path": schema.StringAttribute{
-				Optional:    true,
-				Description: "The path appended to the Loki base URL, (defaults to /loki/api/v1/push)",
-				Computed:    true,
-				Default:     stringdefault.StaticString("/loki/api/v1/push"),
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"labels": schema.MapAttribute{
-				Required:    true,
-				ElementType: StringType,
-				Description: "Key/Value pair used to describe Loki data",
-				Validators: []validator.Map{
-					mapvalidator.All(
-						mapvalidator.KeysAre(stringvalidator.LengthAtLeast(1)),
-						mapvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-					),
-				},
-			},
-		}, nil),
-	}
+		},
+	}, nil),
 }
 
 func LokiFromModel(plan *LokiDestinationModel, previousState *LokiDestinationModel) (*Destination, diag.Diagnostics) {

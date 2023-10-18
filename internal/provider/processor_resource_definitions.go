@@ -14,7 +14,7 @@ func NewDedupeProcessorResource() resource.Resource {
 		toModelFunc:       DedupeProcessorToModel,
 		getIdFunc:         func(m *DedupeProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *DedupeProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     DedupeProcessorResourceSchema,
+		schema:            DedupeProcessorResourceSchema,
 	}
 }
 
@@ -25,7 +25,7 @@ func NewDropFieldsProcessorResource() resource.Resource {
 		toModelFunc:       DropFieldsProcessorToModel,
 		getIdFunc:         func(m *DropFieldsProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *DropFieldsProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     DropFieldsProcessorResourceSchema,
+		schema:            DropFieldsProcessorResourceSchema,
 	}
 }
 
@@ -36,7 +36,7 @@ func NewFlattenFieldsProcessorResource() resource.Resource {
 		toModelFunc:       FlattenFieldsProcessorToModel,
 		getIdFunc:         func(m *FlattenFieldsProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *FlattenFieldsProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     FlattenFieldsProcessorResourceSchema,
+		schema:            FlattenFieldsProcessorResourceSchema,
 	}
 }
 
@@ -47,7 +47,7 @@ func NewMapFieldsProcessorResource() resource.Resource {
 		toModelFunc:       MapFieldsProcessorToModel,
 		getIdFunc:         func(m *MapFieldsProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *MapFieldsProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     MapFieldsProcessorResourceSchema,
+		schema:            MapFieldsProcessorResourceSchema,
 	}
 }
 
@@ -58,7 +58,7 @@ func NewSampleProcessorResource() resource.Resource {
 		toModelFunc:       SampleProcessorToModel,
 		getIdFunc:         func(m *SampleProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *SampleProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     SampleProcessorResourceSchema,
+		schema:            SampleProcessorResourceSchema,
 	}
 }
 
@@ -69,7 +69,7 @@ func NewStringifyProcessorResource() resource.Resource {
 		toModelFunc:       StringifyProcessorToModel,
 		getIdFunc:         func(m *StringifyProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *StringifyProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     StringifyProcessorResourceSchema,
+		schema:            StringifyProcessorResourceSchema,
 	}
 }
 
@@ -80,7 +80,7 @@ func NewScriptExecutionProcessorResource() resource.Resource {
 		toModelFunc:       ScriptExecutionProcessorToModel,
 		getIdFunc:         func(m *ScriptExecutionProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *ScriptExecutionProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     ScriptExecutionProcessorResourceSchema,
+		schema:            ScriptExecutionProcessorResourceSchema,
 	}
 }
 
@@ -91,7 +91,7 @@ func NewUnrollProcessorResource() resource.Resource {
 		toModelFunc:       UnrollProcessorToModel,
 		getIdFunc:         func(m *UnrollProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *UnrollProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     UnrollProcessorResourceSchema,
+		schema:            UnrollProcessorResourceSchema,
 	}
 }
 
@@ -102,7 +102,7 @@ func NewCompactFieldsProcessorResource() resource.Resource {
 		toModelFunc:       CompactFieldsProcessorToModel,
 		getIdFunc:         func(m *CompactFieldsProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *CompactFieldsProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     CompactFieldsProcessorResourceSchema,
+		schema:            CompactFieldsProcessorResourceSchema,
 	}
 }
 
@@ -113,7 +113,7 @@ func NewDecryptFieldsProcessorResource() resource.Resource {
 		toModelFunc:       DecryptFieldsProcessorToModel,
 		getIdFunc:         func(m *DecryptFieldsProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *DecryptFieldsProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     DecryptFieldsProcessorResourceSchema,
+		schema:            DecryptFieldsProcessorResourceSchema,
 	}
 }
 
@@ -124,7 +124,7 @@ func NewEncryptFieldsProcessorResource() resource.Resource {
 		toModelFunc:       EncryptFieldsProcessorToModel,
 		getIdFunc:         func(m *EncryptFieldsProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *EncryptFieldsProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     EncryptFieldsProcessorResourceSchema,
+		schema:            EncryptFieldsProcessorResourceSchema,
 	}
 }
 
@@ -135,7 +135,7 @@ func NewParseProcessorResource() resource.Resource {
 		toModelFunc:       ParseProcessorToModel,
 		getIdFunc:         func(m *ParseProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *ParseProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     ParseProcessorResourceSchema,
+		schema:            ParseProcessorResourceSchema,
 	}
 }
 
@@ -146,7 +146,7 @@ func NewReduceProcessorResource() resource.Resource {
 		toModelFunc:       ReduceProcessorToModel,
 		getIdFunc:         func(m *ReduceProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *ReduceProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     ReduceProcessorResourceSchema,
+		schema:            ReduceProcessorResourceSchema,
 	}
 }
 
@@ -157,7 +157,7 @@ func NewRouteProcessorResource() resource.Resource {
 		toModelFunc:       RouteProcessorToModel,
 		getIdFunc:         func(m *RouteProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *RouteProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     RouteProcessorResourceSchema,
+		schema:            RouteProcessorResourceSchema,
 	}
 }
 
@@ -168,6 +168,6 @@ func NewParseSequentiallyProcessorResource() resource.Resource {
 		toModelFunc:       ParseSequentiallyProcessorToModel,
 		getIdFunc:         func(m *ParseSequentiallyProcessorModel) basetypes.StringValue { return m.Id },
 		getPipelineIdFunc: func(m *ParseSequentiallyProcessorModel) basetypes.StringValue { return m.PipelineId },
-		getSchemaFunc:     ParseSequentiallyProcessorResourceSchema,
+		schema:            ParseSequentiallyProcessorResourceSchema,
 	}
 }

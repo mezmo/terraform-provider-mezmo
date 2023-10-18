@@ -24,30 +24,28 @@ type FlattenFieldsProcessorModel struct {
 	Delimiter    String `tfsdk:"delimiter" user_config:"true"`
 }
 
-func FlattenFieldsProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Flattens the object or array value of a field into a single-level representation.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"fields": schema.ListAttribute{
-				ElementType: StringType,
-				Optional:    true,
-				Description: "A list of nested fields containing a value to flatten. When empty or omitted, the entire event will be flattened.",
-				Validators: []validator.List{
-					listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-				},
+var FlattenFieldsProcessorResourceSchema = schema.Schema{
+	Description: "Flattens the object or array value of a field into a single-level representation.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"fields": schema.ListAttribute{
+			ElementType: StringType,
+			Optional:    true,
+			Description: "A list of nested fields containing a value to flatten. When empty or omitted, the entire event will be flattened.",
+			Validators: []validator.List{
+				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
 			},
-			"delimiter": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Description: "The separator to use between flattened field names",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-					stringvalidator.LengthAtMost(1),
-				},
-				Default: stringdefault.StaticString("_"),
+		},
+		"delimiter": schema.StringAttribute{
+			Computed:    true,
+			Optional:    true,
+			Description: "The separator to use between flattened field names",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+				stringvalidator.LengthAtMost(1),
 			},
-		}),
-	}
+			Default: stringdefault.StaticString("_"),
+		},
+	}),
 }
 
 func FlattenFieldsProcessorFromModel(plan *FlattenFieldsProcessorModel, previousState *FlattenFieldsProcessorModel) (*Processor, diag.Diagnostics) {

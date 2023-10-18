@@ -34,11 +34,9 @@ type ParseProcessorModel struct {
 	TimestampOptions Object `tfsdk:"timestamp_parser_options" user_config:"true"`
 }
 
-func ParseProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Parse a specified field using the chosen parser",
-		Attributes:  ExtendBaseAttributes(parse_schema),
-	}
+var ParseProcessorResourceSchema = schema.Schema{
+	Description: "Parse a specified field using the chosen parser",
+	Attributes:  ExtendBaseAttributes(parse_schema),
 }
 
 func ParseProcessorFromModel(plan *ParseProcessorModel, previousState *ParseProcessorModel) (*Processor, diag.Diagnostics) {

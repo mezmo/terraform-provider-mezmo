@@ -29,74 +29,72 @@ type HttpDestinationModel struct {
 	AckEnabled   BoolValue   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
-func HttpDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents an HTTP destination.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"uri": schema.StringAttribute{
-				Required: true,
-				Description: "The full URI to make HTTP requests to. This should include the " +
-					"protocol and host, but can also include the port, path, and any other valid " +
-					"part of a URI.",
-				Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"encoding": schema.StringAttribute{
-				Optional:    true,
-				Description: "The encoding to apply to the data",
-				Computed:    true,
-				Default:     stringdefault.StaticString("text"),
-				Validators:  []validator.String{stringvalidator.OneOf("json", "ndjson", "text")},
-			},
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Description: "The compression strategy used on the encoded data prior to sending",
-				Computed:    true,
-				Default:     stringdefault.StaticString("none"),
-				Validators:  []validator.String{stringvalidator.OneOf("gzip", "none")},
-			},
-			"auth": schema.SingleNestedAttribute{
-				Optional:    true,
-				Description: "Configures HTTP authentication",
-				Attributes: map[string]schema.Attribute{
-					"strategy": schema.StringAttribute{
-						Required:   true,
-						Validators: []validator.String{stringvalidator.OneOf("basic", "bearer")},
-					},
-					"user": schema.StringAttribute{
-						Optional:   true,
-						Computed:   true,
-						Default:    stringdefault.StaticString(""),
-						Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"password": schema.StringAttribute{
-						Sensitive:  true,
-						Optional:   true,
-						Computed:   true,
-						Default:    stringdefault.StaticString(""),
-						Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
-					"token": schema.StringAttribute{
-						Sensitive:  true,
-						Optional:   true,
-						Computed:   true,
-						Default:    stringdefault.StaticString(""),
-						Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
-					},
+var HttpDestinationResourceSchema = schema.Schema{
+	Description: "Represents an HTTP destination.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"uri": schema.StringAttribute{
+			Required: true,
+			Description: "The full URI to make HTTP requests to. This should include the " +
+				"protocol and host, but can also include the port, path, and any other valid " +
+				"part of a URI.",
+			Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"encoding": schema.StringAttribute{
+			Optional:    true,
+			Description: "The encoding to apply to the data",
+			Computed:    true,
+			Default:     stringdefault.StaticString("text"),
+			Validators:  []validator.String{stringvalidator.OneOf("json", "ndjson", "text")},
+		},
+		"compression": schema.StringAttribute{
+			Optional:    true,
+			Description: "The compression strategy used on the encoded data prior to sending",
+			Computed:    true,
+			Default:     stringdefault.StaticString("none"),
+			Validators:  []validator.String{stringvalidator.OneOf("gzip", "none")},
+		},
+		"auth": schema.SingleNestedAttribute{
+			Optional:    true,
+			Description: "Configures HTTP authentication",
+			Attributes: map[string]schema.Attribute{
+				"strategy": schema.StringAttribute{
+					Required:   true,
+					Validators: []validator.String{stringvalidator.OneOf("basic", "bearer")},
+				},
+				"user": schema.StringAttribute{
+					Optional:   true,
+					Computed:   true,
+					Default:    stringdefault.StaticString(""),
+					Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"password": schema.StringAttribute{
+					Sensitive:  true,
+					Optional:   true,
+					Computed:   true,
+					Default:    stringdefault.StaticString(""),
+					Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+				},
+				"token": schema.StringAttribute{
+					Sensitive:  true,
+					Optional:   true,
+					Computed:   true,
+					Default:    stringdefault.StaticString(""),
+					Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 			},
-			"headers": schema.MapAttribute{
-				Optional:    true,
-				Description: "A key/value object describing a header name and its value",
-				ElementType: StringType{},
-				Validators: []validator.Map{
-					mapvalidator.All(
-						mapvalidator.KeysAre(stringvalidator.LengthAtLeast(1)),
-						mapvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-					),
-				},
+		},
+		"headers": schema.MapAttribute{
+			Optional:    true,
+			Description: "A key/value object describing a header name and its value",
+			ElementType: StringType{},
+			Validators: []validator.Map{
+				mapvalidator.All(
+					mapvalidator.KeysAre(stringvalidator.LengthAtLeast(1)),
+					mapvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
+				),
 			},
-		}, nil),
-	}
+		},
+	}, nil),
 }
 
 func HttpDestinationFromModel(plan *HttpDestinationModel, previousState *HttpDestinationModel) (*Destination, diag.Diagnostics) {

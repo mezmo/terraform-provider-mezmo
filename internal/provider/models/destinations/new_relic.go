@@ -24,31 +24,29 @@ type NewRelicDestinationModel struct {
 	LicenseKey   String `tfsdk:"license_key" user_config:"true"`
 }
 
-func NewRelicDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a NewRelic destination.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"api": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("logs"),
-				Description: "New Relic API endpoint type",
-				Validators:  []validator.String{stringvalidator.OneOf("logs", "metrics")},
-			},
-			"account_id": schema.StringAttribute{
-				Required:    true,
-				Sensitive:   true,
-				Description: "New Relic Account ID",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-			"license_key": schema.StringAttribute{
-				Required:    true,
-				Sensitive:   true,
-				Description: "New Relic License Key",
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-			},
-		}, nil),
-	}
+var NewRelicDestinationResourceSchema = schema.Schema{
+	Description: "Represents a NewRelic destination.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"api": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("logs"),
+			Description: "New Relic API endpoint type",
+			Validators:  []validator.String{stringvalidator.OneOf("logs", "metrics")},
+		},
+		"account_id": schema.StringAttribute{
+			Required:    true,
+			Sensitive:   true,
+			Description: "New Relic Account ID",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"license_key": schema.StringAttribute{
+			Required:    true,
+			Sensitive:   true,
+			Description: "New Relic License Key",
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+	}, nil),
 }
 
 func NewRelicDestinationFromModel(plan *NewRelicDestinationModel, previousState *NewRelicDestinationModel) (*Destination, diag.Diagnostics) {

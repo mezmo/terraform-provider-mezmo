@@ -22,25 +22,23 @@ type UnrollProcessorModel struct {
 	ValuesOnly   Bool   `tfsdk:"values_only" user_config:"true"`
 }
 
-func UnrollProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Takes an array of events and emits them all as individual events",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"field": schema.StringAttribute{
-				Required:    true,
-				Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
-				Description: "The field name that contains an array of events",
-			},
-			"values_only": schema.BoolAttribute{
-				Optional: true,
-				Computed: true,
-				Default:  booldefault.StaticBool(true),
-				Description: "When enabled, the values from the specified array field will be emitted as " +
-					"new events. Otherwise, the original event will be duplicated for each value " +
-					"in the array field, with the unrolled value present in the field specified.",
-			},
-		}),
-	}
+var UnrollProcessorResourceSchema = schema.Schema{
+	Description: "Takes an array of events and emits them all as individual events",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"field": schema.StringAttribute{
+			Required:    true,
+			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+			Description: "The field name that contains an array of events",
+		},
+		"values_only": schema.BoolAttribute{
+			Optional: true,
+			Computed: true,
+			Default:  booldefault.StaticBool(true),
+			Description: "When enabled, the values from the specified array field will be emitted as " +
+				"new events. Otherwise, the original event will be duplicated for each value " +
+				"in the array field, with the unrolled value present in the field specified.",
+		},
+	}),
 }
 
 func UnrollProcessorFromModel(plan *UnrollProcessorModel, previousState *UnrollProcessorModel) (*Processor, diag.Diagnostics) {

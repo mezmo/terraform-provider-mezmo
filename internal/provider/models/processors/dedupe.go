@@ -26,42 +26,40 @@ type DedupeProcessorModel struct {
 	ComparisonType String `tfsdk:"comparison_type" user_config:"true"`
 }
 
-func DedupeProcessorResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Remove duplicates from the data stream",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"fields": schema.ListAttribute{
-				ElementType: StringType,
-				Required:    true,
-				Description: "A list of fields on which to base deduping",
-				Validators: []validator.List{
-					listvalidator.SizeAtLeast(1),
-					listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
-				},
+var DedupeProcessorResourceSchema = schema.Schema{
+	Description: "Remove duplicates from the data stream",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"fields": schema.ListAttribute{
+			ElementType: StringType,
+			Required:    true,
+			Description: "A list of fields on which to base deduping",
+			Validators: []validator.List{
+				listvalidator.SizeAtLeast(1),
+				listvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
 			},
-			"number_of_events": schema.Int64Attribute{
-				Computed:    true,
-				Optional:    true,
-				Description: "Number of events to compare across",
-				Validators: []validator.Int64{
-					int64validator.AtLeast(2),
-					int64validator.AtMost(5000),
-				},
-				Default: int64default.StaticInt64(5000),
+		},
+		"number_of_events": schema.Int64Attribute{
+			Computed:    true,
+			Optional:    true,
+			Description: "Number of events to compare across",
+			Validators: []validator.Int64{
+				int64validator.AtLeast(2),
+				int64validator.AtMost(5000),
 			},
-			"comparison_type": schema.StringAttribute{
-				Computed: true,
-				Optional: true,
-				Description: "When set to \"Match\" (default), it only compares across the fields which are" +
-					" specified by the user. When set to \"Ignore\", it compares everything but the fields" +
-					" specified by the user",
-				Default: stringdefault.StaticString("Match"),
-				Validators: []validator.String{
-					stringvalidator.OneOf("Ignore", "Match"),
-				},
+			Default: int64default.StaticInt64(5000),
+		},
+		"comparison_type": schema.StringAttribute{
+			Computed: true,
+			Optional: true,
+			Description: "When set to \"Match\" (default), it only compares across the fields which are" +
+				" specified by the user. When set to \"Ignore\", it compares everything but the fields" +
+				" specified by the user",
+			Default: stringdefault.StaticString("Match"),
+			Validators: []validator.String{
+				stringvalidator.OneOf("Ignore", "Match"),
 			},
-		}),
-	}
+		},
+	}),
 }
 
 func DedupeProcessorFromModel(plan *DedupeProcessorModel, previousState *DedupeProcessorModel) (*Processor, diag.Diagnostics) {

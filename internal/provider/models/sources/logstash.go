@@ -23,19 +23,17 @@ type LogStashSourceModel struct {
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
-func LogStashSourceResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Receive Logstash data",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"format": schema.StringAttribute{
-				Computed:    true,
-				Optional:    true,
-				Default:     stringdefault.StaticString("json"),
-				Description: "The format of the logstash data",
-				Validators:  []validator.String{stringvalidator.OneOf("json", "text")},
-			},
-		}, []string{"capture_metadata", "gateway_route_id"}),
-	}
+var LogStashSourceResourceSchema = schema.Schema{
+	Description: "Receive Logstash data",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"format": schema.StringAttribute{
+			Computed:    true,
+			Optional:    true,
+			Default:     stringdefault.StaticString("json"),
+			Description: "The format of the logstash data",
+			Validators:  []validator.String{stringvalidator.OneOf("json", "text")},
+		},
+	}, []string{"capture_metadata", "gateway_route_id"}),
 }
 
 func LogStashSourceFromModel(plan *LogStashSourceModel, previousState *LogStashSourceModel) (*Source, diag.Diagnostics) {

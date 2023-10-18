@@ -34,106 +34,104 @@ type KafkaDestinationModel struct {
 	AckEnabled    Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
-func KafkaDestinationResourceSchema() schema.Schema {
-	return schema.Schema{
-		Description: "Represents a Kafka destination.",
-		Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-			"encoding": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("text"),
-				Description: "The encoding to apply to the data.",
-				Validators: []validator.String{
-					stringvalidator.OneOf("json", "text"),
-				},
+var KafkaDestinationResourceSchema = schema.Schema{
+	Description: "Represents a Kafka destination.",
+	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"encoding": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("text"),
+			Description: "The encoding to apply to the data.",
+			Validators: []validator.String{
+				stringvalidator.OneOf("json", "text"),
 			},
-			"compression": schema.StringAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     stringdefault.StaticString("none"),
-				Description: "The compression strategy used on the encoded data prior to sending.",
-				Validators: []validator.String{
-					stringvalidator.OneOf("gzip", "lz4", "snappy", "zstd", "none"),
-				},
+		},
+		"compression": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("none"),
+			Description: "The compression strategy used on the encoded data prior to sending.",
+			Validators: []validator.String{
+				stringvalidator.OneOf("gzip", "lz4", "snappy", "zstd", "none"),
 			},
-			"event_key_field": schema.StringAttribute{
-				Optional:    true,
-				Description: "The field in the log whose value is used as Kafka's event key.",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
+		},
+		"event_key_field": schema.StringAttribute{
+			Optional:    true,
+			Description: "The field in the log whose value is used as Kafka's event key.",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
 			},
-			"brokers": schema.ListNestedAttribute{
-				Required:    true,
-				Description: "The Kafka brokers to connect to.",
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"host": schema.StringAttribute{
-							Required:    true,
-							Description: "The host of the Kafka broker.",
-							Validators: []validator.String{
-								stringvalidator.LengthAtLeast(1),
-								stringvalidator.LengthAtMost(255),
-							},
-						},
-						"port": schema.Int64Attribute{
-							Required:    true,
-							Description: "The port of the Kafka broker.",
-							Validators: []validator.Int64{
-								int64validator.Between(1, 65535),
-							},
-						},
-					},
-				},
-				Validators: []validator.List{
-					listvalidator.UniqueValues(),
-					listvalidator.SizeAtLeast(1),
-				},
-			},
-			"topic": schema.StringAttribute{
-				Required:    true,
-				Description: "The name of the topic to publish to.",
-				Validators: []validator.String{
-					stringvalidator.LengthAtLeast(1),
-				},
-			},
-			"tls_enabled": schema.BoolAttribute{
-				Optional:    true,
-				Computed:    true,
-				Default:     booldefault.StaticBool(true),
-				Description: "Whether to use TLS when connecting to Kafka.",
-			},
-			"sasl": schema.SingleNestedAttribute{
-				Optional:    true,
-				Description: "The SASL configuration to use when connecting to Kafka.",
+		},
+		"brokers": schema.ListNestedAttribute{
+			Required:    true,
+			Description: "The Kafka brokers to connect to.",
+			NestedObject: schema.NestedAttributeObject{
 				Attributes: map[string]schema.Attribute{
-					"mechanism": schema.StringAttribute{
-						Optional:    true,
-						Computed:    true,
-						Description: "The SASL mechanism to use when connecting to Kafka.",
-						Validators: []validator.String{
-							stringvalidator.OneOf("PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"),
-						},
-					},
-					"username": schema.StringAttribute{
+					"host": schema.StringAttribute{
 						Required:    true,
-						Description: "The SASL username to use when connecting to Kafka.",
+						Description: "The host of the Kafka broker.",
 						Validators: []validator.String{
 							stringvalidator.LengthAtLeast(1),
+							stringvalidator.LengthAtMost(255),
 						},
 					},
-					"password": schema.StringAttribute{
+					"port": schema.Int64Attribute{
 						Required:    true,
-						Sensitive:   true,
-						Description: "The SASL password to use when connecting to Kafka.",
-						Validators: []validator.String{
-							stringvalidator.LengthAtLeast(1),
+						Description: "The port of the Kafka broker.",
+						Validators: []validator.Int64{
+							int64validator.Between(1, 65535),
 						},
 					},
 				},
 			},
-		}, nil),
-	}
+			Validators: []validator.List{
+				listvalidator.UniqueValues(),
+				listvalidator.SizeAtLeast(1),
+			},
+		},
+		"topic": schema.StringAttribute{
+			Required:    true,
+			Description: "The name of the topic to publish to.",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
+		},
+		"tls_enabled": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "Whether to use TLS when connecting to Kafka.",
+		},
+		"sasl": schema.SingleNestedAttribute{
+			Optional:    true,
+			Description: "The SASL configuration to use when connecting to Kafka.",
+			Attributes: map[string]schema.Attribute{
+				"mechanism": schema.StringAttribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "The SASL mechanism to use when connecting to Kafka.",
+					Validators: []validator.String{
+						stringvalidator.OneOf("PLAIN", "SCRAM-SHA-256", "SCRAM-SHA-512"),
+					},
+				},
+				"username": schema.StringAttribute{
+					Required:    true,
+					Description: "The SASL username to use when connecting to Kafka.",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+					},
+				},
+				"password": schema.StringAttribute{
+					Required:    true,
+					Sensitive:   true,
+					Description: "The SASL password to use when connecting to Kafka.",
+					Validators: []validator.String{
+						stringvalidator.LengthAtLeast(1),
+					},
+				},
+			},
+		},
+	}, nil),
 }
 
 func KafkaDestinationFromModel(plan *KafkaDestinationModel, previousState *KafkaDestinationModel) (*Destination, diag.Diagnostics) {
