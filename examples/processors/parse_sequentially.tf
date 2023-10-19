@@ -22,7 +22,7 @@ resource "mezmo_http_source" "curl" {
   decoding    = "json"
 }
 
-resource "mezmo_parse_processor" "processor1" {
+resource "mezmo_parse_sequentially_processor" "processor1" {
   pipeline_id  = mezmo_pipeline.pipeline1.id
   title        = "Apache parser"
   description  = "Parse logs"
@@ -53,7 +53,7 @@ resource "mezmo_logs_destination" "destination1" {
   pipeline_id   = mezmo_pipeline.pipeline1.id
   title         = "My destination"
   description   = "Send logs to Mezmo Log Analysis"
-  inputs        = [mezmo_route_processor.processor1.parsers.0.output_name]
+  inputs        = [mezmo_parse_sequentially_processor.processor1.parsers.0.output_name]
   ingestion_key = var.my_ingestion_key
 }
 
@@ -62,20 +62,12 @@ resource "mezmo_blackhole_destination" "destination2" {
   title        = "My destination"
   description  = "Trash the data without acking"
   acks_enabled = false
-  inputs       = [mezmo_route_processor.processor1.parsers.1.output_name]
-}
-
-resource "mezmo_blackhole_destination" "destination2" {
-  pipeline_id  = mezmo_pipeline.pipeline1.id
-  title        = "My destination"
-  description  = "Trash the data without acking"
-  acks_enabled = false
-  inputs       = [mezmo_route_processor.processor1.parsers.1.output_name]
+  inputs       = [mezmo_parse_sequentially_processor.processor1.parsers.1.output_name]
 }
 
 resource "mezmo_http_destination" "destination3" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "Http desintation"
   description = "Send data to an HTTP destination"
-  inputs      = [mezmo_route_processor.processor1.parsers.2.output_name]
+  inputs      = [mezmo_parse_sequentially_processor.processor1.parsers.2.output_name]
 }

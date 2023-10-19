@@ -1,0 +1,45 @@
+{
+  "id": "563d2374-63ae-11ee-abe2-26dab184329f",
+  "title": "route processor title",
+  "description": "route processor description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 3,
+  "type": "route",
+  "deploy_type": "saas",
+  "user_config": {
+    "conditionals": [
+      {
+        "label": "Error logs",
+        "conditional": {
+          "expressions": [
+            {
+              "field": ".status",
+              "value": 300,
+              "str_operator": "greater_or_equal"
+            }
+          ],
+          "logical_operation": "OR"
+        },
+        "_output_name": "805821a7"
+      }
+    ]
+  },
+  "inputs": [
+    "12d94f50-6c68-11ee-bdee-6671faf7df66"
+  ],
+  "outputs": [
+    {
+      "id": "563d2374-63ae-11ee-abe2-26dab184329f._unmatched",
+      "label": "Unmatched"
+    },
+    {
+      "id": "563d2374-63ae-11ee-abe2-26dab184329f.805821a7",
+      "label": "Error logs"
+    },
+    {
+      "id": "563d2374-63ae-11ee-abe2-26dab184329f.c6b6ebe5",
+      "label": "App info logs"
+    }
+  ]
+}

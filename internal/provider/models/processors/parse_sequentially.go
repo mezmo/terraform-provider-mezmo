@@ -167,9 +167,17 @@ func (plan *ParseSequentiallyProcessorModel) setParsers(api_parsers []map[string
 		parsers = append(parsers, parser_item)
 	}
 
-	if len(parsers) > 0 {
-		plan.Parsers = basetypes.NewListValueMust(plan.Parsers.ElementType(context.Background()), parsers)
+	if len(parsers) == 0 {
+		return
 	}
+	elemType := plan.Parsers.ElementType(context.Background())
+	// used by ConvertToTerraformModel method
+	// when hydrating without a terraform state, the list element type is nil
+	if elemType == nil {
+		listType := ParseSequentiallyProcessorResourceSchema.Attributes["parsers"].GetType()
+		elemType = listType.(basetypes.ListType).ElementType()
+	}
+	plan.Parsers = basetypes.NewListValueMust(elemType, parsers)
 }
 
 // convert parser entry in API response to map of Terraform values

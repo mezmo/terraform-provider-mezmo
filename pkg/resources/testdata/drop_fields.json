@@ -1,0 +1,23 @@
+{
+  "id": "b1a1f3e8-6e2b-11ee-9268-6671faf7df66",
+  "title": "remove title",
+  "description": "remove description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 1,
+  "type": "drop-fields",
+  "deploy_type": "saas",
+  "user_config": {
+      "fields": [
+          ".errors",
+          ".warnings"
+      ]
+  },
+  "inputs": ["7b212506-23cb-11ed-b300-4ef12c27e273"],
+  "outputs": [
+      {
+          "id": "b1a1f3e8-6e2b-11ee-9268-6671faf7df66",
+          "label": "Default"
+      }
+  ]
+}

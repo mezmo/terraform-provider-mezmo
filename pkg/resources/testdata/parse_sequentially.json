@@ -1,0 +1,51 @@
+{
+  "id": "9040df3a-63ad-11ee-956d-26dab184329f",
+  "title": "parse sequentially processor title",
+  "description": "parse sequentially processor description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 3,
+  "type": "parse-sequentially",
+  "deploy_type": "saas",
+  "user_config": {
+    "field": ".",
+    "parsers": [
+      {
+        "label": "Apache Error",
+        "parser": "parse_apache_log",
+        "options": {
+          "format": "error",
+          "timestamp_format": "%d/%b/%Y:%T %z"
+        },
+        "_output_name": "36d9714483c9745012cd14f9380335ac"
+      },
+      {
+        "label": "Nginx Combined",
+        "parser": "parse_nginx_log",
+        "options": {
+          "format": "combined",
+          "timestamp_format": "%d/%b/%Y:%T %z"
+        },
+        "_output_name": "5db52e644356529da4e34663969833b9"
+      }
+    ],
+    "target_field": ""
+  },
+  "inputs": [
+    "110ec7da-5c7e-11ee-bffb-26dab184329f"
+  ],
+  "outputs": [
+    {
+      "id": "9040df3a-63ad-11ee-956d-26dab184329f._unmatched",
+      "label": "Unmatched"
+    },
+    {
+      "id": "9040df3a-63ad-11ee-956d-26dab184329f.36d9714483c9745012cd14f9380335ac",
+      "label": "Apache Error"
+    },
+    {
+      "id": "9040df3a-63ad-11ee-956d-26dab184329f.5db52e644356529da4e34663969833b9",
+      "label": "Nginx Combined"
+    }
+  ]
+}

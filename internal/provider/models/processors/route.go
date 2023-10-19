@@ -87,7 +87,15 @@ func RouteProcessorToModel(plan *RouteProcessorModel, component *Processor) {
 
 	conditionals, ok := component.UserConfig["conditionals"].([]any)
 	if ok {
-		list_value, diag := conditionalsToModel(conditionals, plan.Conditionals.ElementType(context.Background()))
+		elemType := plan.Conditionals.ElementType(context.Background())
+		if elemType == nil {
+			// used by ConvertToTerraformModel method
+			// when hydrating without a terraform state, the list element type is nil
+			listType := RouteProcessorResourceSchema.Attributes["conditionals"].GetType()
+			elemType = listType.(basetypes.ListType).ElementType()
+		}
+
+		list_value, diag := conditionalsToModel(conditionals, elemType)
 
 		if !diag.HasError() {
 			plan.Conditionals = list_value
