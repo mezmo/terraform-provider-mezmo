@@ -2,7 +2,6 @@ package resources
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"reflect"
 
@@ -31,7 +30,7 @@ func ConvertibleResources() ([]ConvertibleResourceDef, error) {
 		tfRes := tfResFn()
 		cRes, ok := tfRes.(ConvertibleResourceDef)
 		if !ok {
-			err := errors.New(fmt.Sprintf("terraform resource %T does not implement ConvertibleResourceDef", tfRes))
+			err := fmt.Errorf("terraform resource %T does not implement ConvertibleResourceDef", tfRes)
 			return nil, err
 		}
 		convertibleRes[i] = cRes

@@ -146,41 +146,46 @@ func (plan *ParseProcessorModel) setOptions(options map[string]any) {
 	}
 
 	parser := plan.Parser.ValueString()
+
+	switch parser {
+	case VRL_PARSER_APACHE:
+		plan.ApacheOptions = optionsToModel(parser, options)
+	case VRL_PARSER_CEF:
+		plan.CefOptions = optionsToModel(parser, options)
+	case VRL_PARSER_CSV:
+		plan.CsvOptions = optionsToModel(parser, options)
+	case VRL_PARSER_GROK:
+		plan.GrokOptions = optionsToModel(parser, options)
+	case VRL_PARSER_KEY_VALUE:
+		plan.KeyValueOptions = optionsToModel(parser, options)
+	case VRL_PARSER_NGINX:
+		plan.NginxOptions = optionsToModel(parser, options)
+	case VRL_PARSER_REGEX:
+		plan.RegexOptions = optionsToModel(parser, options)
+	case VRL_PARSER_TIMESTAMP:
+		plan.TimestampOptions = optionsToModel(parser, options)
+	}
+}
+
+func optionsToModel(parser string, options map[string]any) basetypes.ObjectValue {
 	optional_fields, ok := OPTIONAL_FIELDS_BY_PARSER[parser]
 
 	if !ok {
 		optional_fields = []string{}
 	}
 
-	switch parser {
-	case VRL_PARSER_APACHE:
-		plan.ApacheOptions = optionsToModel(plan.ApacheOptions, options, optional_fields)
-	case VRL_PARSER_CEF:
-		plan.CefOptions = optionsToModel(plan.CefOptions, options, optional_fields)
-	case VRL_PARSER_CSV:
-		plan.CsvOptions = optionsToModel(plan.CsvOptions, options, optional_fields)
-	case VRL_PARSER_GROK:
-		plan.GrokOptions = optionsToModel(plan.GrokOptions, options, optional_fields)
-	case VRL_PARSER_KEY_VALUE:
-		plan.KeyValueOptions = optionsToModel(plan.KeyValueOptions, options, optional_fields)
-	case VRL_PARSER_NGINX:
-		plan.NginxOptions = optionsToModel(plan.NginxOptions, options, optional_fields)
-	case VRL_PARSER_REGEX:
-		plan.RegexOptions = optionsToModel(plan.RegexOptions, options, optional_fields)
-	case VRL_PARSER_TIMESTAMP:
-		plan.TimestampOptions = optionsToModel(plan.TimestampOptions, options, optional_fields)
+	options_key := optionsKeyForParser(parser)
+	option_attrs, ok := ParseProcessorResourceSchema.Attributes[options_key].(schema.SingleNestedAttribute)
+	if !ok {
+		return basetypes.NewObjectNull(nil)
 	}
-}
+	attr_types := ToAttrTypes(option_attrs.Attributes)
 
-func optionsToModel(obj basetypes.ObjectValue, options map[string]any, optional_fields []string) basetypes.ObjectValue {
-	attr_types := obj.AttributeTypes(context.Background())
-
-	if len(options) > 0 {
-		values := MapAnyFillMissingValues(attr_types, options, optional_fields)
-		new_options := basetypes.NewObjectValueMust(attr_types, values)
-
-		return new_options
+	if attr_types == nil || len(options) == 0 {
+		return basetypes.NewObjectNull(nil)
 	}
 
-	return basetypes.NewObjectNull(attr_types)
+	values := MapAnyFillMissingValues(attr_types, options, optional_fields)
+	new_options := basetypes.NewObjectValueMust(attr_types, values)
+	return new_options
 }

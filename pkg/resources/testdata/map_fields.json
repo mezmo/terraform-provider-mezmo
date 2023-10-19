@@ -1,0 +1,33 @@
+{
+  "id": "9d4b677a-6e2c-11ee-a476-6671faf7df66",
+  "title": "map title",
+  "description": "map description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 0,
+  "type": "map-fields",
+  "deploy_type": "saas",
+  "user_config": {
+      "mappings": [
+          {
+              "drop_source": true,
+              "source_field": ".firstname",
+              "target_field": ".fname",
+              "overwrite_target": false
+          },
+          {
+              "drop_source": true,
+              "source_field": ".lastname",
+              "target_field": ".lname",
+              "overwrite_target": true
+          }
+      ]
+  },
+  "inputs": ["7b212506-23cb-11ed-b300-4ef12c27e273"],
+  "outputs": [
+      {
+          "id": "9d4b677a-6e2c-11ee-a476-6671faf7df66",
+          "label": "Default"
+      }
+  ]
+}

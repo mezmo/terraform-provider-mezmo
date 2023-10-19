@@ -1,0 +1,73 @@
+{
+  "id": "857b5780-6e2d-11ee-b813-6671faf7df66",
+  "title": "reduce title",
+  "description": "reduce description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 1,
+  "type": "reduce",
+  "deploy_type": "saas",
+  "user_config": {
+      "group_by": [
+          ".error.level",
+          ".user.email"
+      ],
+      "duration_ms": 30000,
+      "date_formats": [
+          {
+              "field": ".log_date",
+              "format": "%Y-%m-%dT%H:%M:%S"
+          }
+      ],
+      "flush_condition": {
+          "when": "starts_when",
+          "conditional": {
+              "expressions": [
+                  {
+                      "field": ".level",
+                      "value": "299",
+                      "str_operator": "greater"
+                  },
+                  {
+                      "field": ".app",
+                      "value": "main",
+                      "str_operator": "contains"
+                  },
+                  {
+                      "expressions": [
+                          {
+                              "field": ".host",
+                              "value": "https",
+                              "str_operator": "starts_with"
+                          },
+                          {
+                              "field": ".region",
+                              "value": "us",
+                              "str_operator": "equal"
+                          }
+                      ],
+                      "logical_operation": "AND"
+                  }
+              ],
+              "logical_operation": "OR"
+          }
+      },
+      "merge_strategies": [
+          {
+              "field": ".errors",
+              "strategy": "flat_unique"
+          },
+          {
+              "field": ".users",
+              "strategy": "concat_raw"
+          }
+      ]
+  },
+  "inputs": ["7b212506-23cb-11ed-b300-4ef12c27e273"],
+  "outputs": [
+      {
+          "id": "857b5780-6e2d-11ee-b813-6671faf7df66",
+          "label": "Default"
+      }
+  ]
+}

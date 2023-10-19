@@ -1,0 +1,26 @@
+{
+  "id": "ccceff16-6e2c-11ee-80ec-6671faf7df66",
+  "title": "parse title",
+  "description": "parse description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 0,
+  "type": "parse",
+  "deploy_type": "saas",
+  "user_config": {
+      "field": ".",
+      "parser": "parse_nginx_log",
+      "options": {
+          "format": "error",
+          "timestamp_format": "%Y-%m-%dT%H:%M:%SZ"
+      },
+      "target_field": ".parsed"
+  },
+  "inputs": ["7b212506-23cb-11ed-b300-4ef12c27e273"],
+  "outputs": [
+      {
+          "id": "ccceff16-6e2c-11ee-80ec-6671faf7df66",
+          "label": "Default"
+      }
+  ]
+}
