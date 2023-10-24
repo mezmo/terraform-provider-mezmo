@@ -1,0 +1,30 @@
+{
+  "id": "b8071802-63af-11ee-aee9-26dab184329f",
+  "title": "kafka sink title",
+  "description": "kafka sink description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 3,
+  "type": "kafka",
+  "deploy_type": "saas",
+  "user_config": {
+    "ack_enabled": false,
+    "encoding": "json",
+    "compression": "gzip",
+    "event_key_field": "event",
+    "brokers": [
+      {"host": "localhost", "port": 3000} 
+    ],
+    "topic": "topic name",
+    "group_id": "log_messages",
+    "tls_enabled": false,
+    "sasl_enabled": true,
+    "sasl_username": "user",
+    "sasl_password": "pass",
+    "sasl_mechanism": "PLAIN"
+  },
+  "inputs": [
+    "ad6ebb62-63ae-11ee-9b45-26dab184329f",
+    "79551faa-6c6a-11ee-be81-6671faf7df66"
+  ]
+}

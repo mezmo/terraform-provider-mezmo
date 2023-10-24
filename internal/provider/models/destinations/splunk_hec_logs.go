@@ -175,23 +175,33 @@ func splunkValueTypeFromModel(
 	}
 }
 
-func splunkValueTypeToModel(planObj *Object, component *Destination, configName string) Object {
-	m, _ := component.UserConfig[configName].(map[string]any)
-	types := planObj.AttributeTypes(context.Background())
-	if len(m) > 0 && m["value_type"] != "none" {
+func splunkValueTypeToModel(planObj *Object, userConfig map[string]any, schemaFieldName string) Object {
+	attrTypes := splunkValueTypeAttrTypes(planObj, schemaFieldName)
+	if len(userConfig) > 0 && userConfig["value_type"] != "none" {
 		planMap := map[string]attr.Value{
 			"field": StringNull(),
 			"value": StringNull(),
 		}
-		if m["value_type"] == "field" {
-			planMap["field"] = StringValue(m["value"].(string))
-		} else if m["value_type"] == "value" {
-			planMap["value"] = StringValue(m["value"].(string))
+		if userConfig["value_type"] == "field" {
+			planMap["field"] = StringValue(userConfig["value"].(string))
+		} else if userConfig["value_type"] == "value" {
+			planMap["value"] = StringValue(userConfig["value"].(string))
 		}
-		return basetypes.NewObjectValueMust(types, planMap)
+		return basetypes.NewObjectValueMust(attrTypes, planMap)
 	}
 
-	return ObjectNull(types)
+	return ObjectNull(attrTypes)
+}
+
+func splunkValueTypeAttrTypes(planObj *Object, schemaFieldName string) map[string]attr.Type {
+	attrTypes := planObj.AttributeTypes(context.Background())
+	if len(attrTypes) == 0 {
+		configSchema, ok := SplunkHecLogsDestinationResourceSchema.Attributes[schemaFieldName]
+		if ok {
+			attrTypes = configSchema.GetType().(basetypes.ObjectType).AttrTypes
+		}
+	}
+	return attrTypes
 }
 
 func SplunkHecLogsDestinationToModel(plan *SplunkHecLogsDestinationModel, component *Destination) {
@@ -212,7 +222,10 @@ func SplunkHecLogsDestinationToModel(plan *SplunkHecLogsDestinationModel, compon
 	plan.TlsVerifyCertificate = BoolValue(component.UserConfig["tls_verify_certificate"].(bool))
 	plan.HostField = StringValue(component.UserConfig["host_field"].(string))
 	plan.TimestampField = StringValue(component.UserConfig["timestamp_field"].(string))
-	plan.Source = splunkValueTypeToModel(&plan.Source, component, "source")
-	plan.SourceType = splunkValueTypeToModel(&plan.SourceType, component, "sourcetype")
-	plan.Index = splunkValueTypeToModel(&plan.Index, component, "index")
+	sourceData, _ := component.UserConfig["source"].(map[string]any)
+	sourceTypeData, _ := component.UserConfig["sourcetype"].(map[string]any)
+	indexData, _ := component.UserConfig["index"].(map[string]any)
+	plan.Source = splunkValueTypeToModel(&plan.Source, sourceData, "source")
+	plan.SourceType = splunkValueTypeToModel(&plan.SourceType, sourceTypeData, "source_type")
+	plan.Index = splunkValueTypeToModel(&plan.Index, indexData, "index")
 }

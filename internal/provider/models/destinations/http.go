@@ -182,8 +182,11 @@ func HttpDestinationToModel(plan *HttpDestinationModel, component *Destination) 
 	auth, _ := component.UserConfig["auth"].(map[string]any)
 	if len(auth) > 0 {
 		if auth["strategy"] != "none" && auth["strategy"] != "" {
-			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = NewObjectValueMust(types, MapAnyToMapValues(auth))
+			objT := plan.Auth.AttributeTypes(context.Background())
+			if len(objT) == 0 {
+				objT = HttpDestinationResourceSchema.Attributes["auth"].GetType().(ObjectType).AttrTypes
+			}
+			plan.Auth = NewObjectValueMust(objT, MapAnyToMapValues(auth))
 		}
 	}
 
@@ -197,7 +200,11 @@ func HttpDestinationToModel(plan *HttpDestinationModel, component *Destination) 
 				value := obj["header_value"].(string)
 				headerMap[key] = value
 			}
-			plan.Headers = NewMapValueMust(plan.Headers.ElementType(nil), MapAnyToMapValues(headerMap))
+			elType := plan.Headers.ElementType(nil)
+			if elType == nil {
+				elType = HttpDestinationResourceSchema.Attributes["headers"].GetType().(MapType).ElemType
+			}
+			plan.Headers = NewMapValueMust(elType, MapAnyToMapValues(headerMap))
 		}
 	}
 }

@@ -1,0 +1,13 @@
+{
+  "id": "0bf994e6-5c7e-11ee-b816-26dab122222f",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "title": "fluent source",
+  "description": "fluent description",
+  "type": "fluent",
+  "generation_id": 0,
+  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab122222f",
+  "user_config": {
+    "decoding": "bytes",
+    "capture_metadata": true
+  }
+}

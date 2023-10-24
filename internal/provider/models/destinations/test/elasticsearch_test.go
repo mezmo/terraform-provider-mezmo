@@ -72,7 +72,7 @@ func TestElasticSearchDestinationResource(t *testing.T) {
 						description = "my destination description"
 						inputs      = [mezmo_http_source.my_source.id]
 						pipeline_id = mezmo_pipeline.test_parent.id
-						endpoints   = ["https://example.com"]
+						endpoints   = ["https://google.com"]
 						auth = {
 							strategy = "basic"
 							user     = "user1"
@@ -92,7 +92,7 @@ func TestElasticSearchDestinationResource(t *testing.T) {
 						"ack_enabled":   "true",
 						"inputs.#":      "1",
 						"endpoints.#":   "1",
-						"endpoints.0":   "https://example.com",
+						"endpoints.0":   "https://google.com",
 						"auth.strategy": "basic",
 						"auth.user":     "user1",
 						"auth.password": "pass1",

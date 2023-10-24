@@ -108,8 +108,11 @@ func SQSSourceToModel(plan *SQSSourceModel, component *Source) {
 	if component.UserConfig["auth"] != nil {
 		values, _ := component.UserConfig["auth"].(map[string]any)
 		if len(values) > 0 {
-			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, modelutils.MapAnyToMapValues(values))
+			objT := plan.Auth.AttributeTypes(context.Background())
+			if len(objT) == 0 {
+				objT = SQSSourceResourceSchema.Attributes["auth"].GetType().(basetypes.ObjectType).AttrTypes
+			}
+			plan.Auth = basetypes.NewObjectValueMust(objT, modelutils.MapAnyToMapValues(values))
 		}
 	}
 

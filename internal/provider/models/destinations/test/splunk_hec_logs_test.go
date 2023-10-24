@@ -19,7 +19,7 @@ func TestSplunkHecLogsDestinationResource(t *testing.T) {
 				Config: GetProviderConfig() + `
 					resource "mezmo_splunk_hec_logs_destination" "my_destination" {
 						inputs   = ["abc"]
-						endpoint = "http://example.com"
+						endpoint = "http://google.com"
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"token\" is required"),
 			},
@@ -36,7 +36,7 @@ func TestSplunkHecLogsDestinationResource(t *testing.T) {
 					resource "mezmo_splunk_hec_logs_destination" "my_destination" {
 						inputs      = ["abc"]
 						pipeline_id = "2ee4d436-466a-11ee-be56-0242ac120002"
-						endpoint    = "http://example.com"
+						endpoint    = "http://google.com"
 						token       = "my_token"
 						source      = {}
 					}`,
@@ -47,7 +47,7 @@ func TestSplunkHecLogsDestinationResource(t *testing.T) {
 					resource "mezmo_splunk_hec_logs_destination" "my_destination" {
 						inputs      = ["abc"]
 						pipeline_id = "2ee4d436-466a-11ee-be56-0242ac120002"
-						endpoint    = "http://example.com"
+						endpoint    = "http://google.com"
 						token       = "my_token"
 						source_type = {}
 					}`,
@@ -58,7 +58,7 @@ func TestSplunkHecLogsDestinationResource(t *testing.T) {
 					resource "mezmo_splunk_hec_logs_destination" "my_destination" {
 						inputs      = ["abc"]
 						pipeline_id = "2ee4d436-466a-11ee-be56-0242ac120002"
-						endpoint    = "http://example.com"
+						endpoint    = "http://google.com"
 						token       = "my_token"
 						index       = {}
 					}`,
@@ -78,7 +78,7 @@ func TestSplunkHecLogsDestinationResource(t *testing.T) {
 						title = "My destination"
 						description = "my destination description"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						endpoint    = "https://example.com"
+						endpoint    = "https://google.com"
 						token       = "my_token"
 					}
 					`,
@@ -93,7 +93,7 @@ func TestSplunkHecLogsDestinationResource(t *testing.T) {
 						"generation_id":          "0",
 						"ack_enabled":            "true",
 						"inputs.#":               "0",
-						"endpoint":               "https://example.com",
+						"endpoint":               "https://google.com",
 						"token":                  "my_token",
 						"compression":            "none",
 						"tls_verify_certificate": "true",

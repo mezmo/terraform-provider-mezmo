@@ -1,0 +1,38 @@
+{
+  "id": "b8071802-63af-11ee-aee9-26dab184329f",
+  "title": "mezmo sink title",
+  "description": "mezmo sink description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 3,
+  "type": "mezmo",
+  "deploy_type": "saas",
+  "user_config": {
+    "ack_enabled": true,
+    "mezmo_host": "http://app.mezmo.local",
+    "ingestion_key": "abc123",
+    "query": {
+      "hostname": "{{ .host }}",
+      "ip": "{{metadata.query.ip}}",
+      "mac": "{{metadata.query.mac}}",
+      "tags": [
+        "{{metadata.query.tags}}",
+        "{{.message_field}}",
+        "pipeline"
+      ]
+    },
+    "message": {
+      "scheme": "Explicit field selection",
+      "line": "line: {{.thing_one}} - {{.thing_two}}",
+      "app": "{{metadata.query.app}}",
+      "file": "{{._file}}",
+      "meta_field": "._meta",
+      "timestamp_field": "._ts",
+      "env": "{{._env}}"
+    }
+  },
+  "inputs": [
+    "ad6ebb62-63ae-11ee-9b45-26dab184329f",
+    "79551faa-6c6a-11ee-be81-6671faf7df66"
+  ]
+}

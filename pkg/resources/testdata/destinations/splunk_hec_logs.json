@@ -1,0 +1,35 @@
+{
+  "id": "b8071802-63af-11ee-aee9-26dab184329f",
+  "title": "splunk-hec-logs sink title",
+  "description": "splunk-hec-logs sink description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 3,
+  "type": "splunk-hec-logs",
+  "deploy_type": "saas",
+  "user_config": {
+    "ack_enabled": false,
+    "compression": "gzip",
+    "url": "http://splunk-hec.dev",
+    "token": "token",
+    "tls_verify_certificate": true,
+    "host_field": ".metadata.host",
+    "timestamp_field": ".metadata.timestamp",
+    "source": {
+      "value_type": "field",
+      "value": "field value"
+    },
+    "sourcetype": {
+      "value_type": "value",
+      "value": "assigned value"
+    },
+    "index": {
+      "value_type": "field",
+      "value": "index value"
+    }
+  },
+  "inputs": [
+    "ad6ebb62-63ae-11ee-9b45-26dab184329f",
+    "79551faa-6c6a-11ee-be81-6671faf7df66"
+  ]
+}

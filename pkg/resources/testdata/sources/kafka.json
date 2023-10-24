@@ -1,0 +1,22 @@
+{
+  "id": "0bf994e6-5c7e-11ee-b816-26dab444444f",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "title": "kafka source",
+  "description": "kafka description",
+  "type": "kafka",
+  "generation_id": 0,
+  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab444444f",
+  "user_config": {
+    "decoding_codec": "json",
+    "brokers": [
+      {"host": "localhost", "port": 3000}
+    ],
+    "topics": ["first", "second"],
+    "group_id": "group_2",
+    "tls_enabled": false,
+    "sasl_enabled": true,
+    "sasl_mechanism": "PLAIN",
+    "sasl_username": "user",
+    "sasl_password": "pass"
+  }
+}

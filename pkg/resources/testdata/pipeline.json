@@ -1,0 +1,18 @@
+{
+  "id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "partition_id": "gen0",
+  "title": "New Pipeline",
+  "origin": "ui",
+  "deploy_type": "saas",
+  "config": {},
+  "created_at": "2023-09-26T15:04:53.159Z",
+  "updated_at": "2023-10-16T21:25:27.163Z",
+  "published_at": "2023-10-16T21:25:45.250Z",
+  "published_revision_id": "9125503c-6c6a-11ee-91e4-6671faf7df66",
+  "deployed_revision_id": "9125503c-6c6a-11ee-91e4-6671faf7df66",
+  "loaded_revision_id": "9125503c-6c6a-11ee-91e4-6671faf7df66",
+  "processing_status": "enabled",
+  "has_pending_actions": false,
+  "has_changes": false
+}

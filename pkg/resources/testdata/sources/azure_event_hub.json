@@ -1,0 +1,16 @@
+{
+  "id": "0bf994e6-5c7e-11ee-b816-26dab177888f",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "title": "azure event hub source",
+  "description": "azure event hub description",
+  "type": "azure-event-hub",
+  "generation_id": 0,
+  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab177888f",
+  "user_config": {
+    "decoding_codec": "json",
+    "connection_string": "some-connection-string",
+    "namespace": "new namespace",
+    "group_id": "new group id",
+    "topics": ["foo", "bar"]
+  }
+}

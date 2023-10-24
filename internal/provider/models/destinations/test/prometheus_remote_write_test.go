@@ -95,7 +95,7 @@ func TestPrometheusDestinationResource(t *testing.T) {
 						description = "my destination description"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_http_source.my_source.id]
-						endpoint = "https://example.com"
+						endpoint = "https://google.com"
 					}
 					`,
 				Check: resource.ComposeTestCheckFunc(
@@ -110,7 +110,7 @@ func TestPrometheusDestinationResource(t *testing.T) {
 						"ack_enabled":   "true",
 						"inputs.#":      "1",
 						"inputs.0":      "#mezmo_http_source.my_source.id",
-						"endpoint":      "https://example.com",
+						"endpoint":      "https://google.com",
 					}),
 				),
 			},
@@ -123,7 +123,7 @@ func TestPrometheusDestinationResource(t *testing.T) {
 						description = "my destination description"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_http_source.my_source.id]
-						endpoint = "https://example2.com"
+						endpoint = "https://google.com"
 						auth = {
 							strategy = "basic"
 							user = "my_user"
@@ -143,7 +143,7 @@ func TestPrometheusDestinationResource(t *testing.T) {
 						"ack_enabled":   "true",
 						"inputs.#":      "1",
 						"inputs.0":      "#mezmo_http_source.my_source.id",
-						"endpoint":      "https://example2.com",
+						"endpoint":      "https://google.com",
 						"auth.strategy": "basic",
 						"auth.user":     "my_user",
 						"auth.password": "my_password",
@@ -159,7 +159,7 @@ func TestPrometheusDestinationResource(t *testing.T) {
 						description = "my destination description"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_http_source.my_source.id]
-						endpoint = "https://example2.com"
+						endpoint = "https://google.com"
 						auth = {
 							strategy = "bearer"
 							token = "my_token"
@@ -178,7 +178,7 @@ func TestPrometheusDestinationResource(t *testing.T) {
 						"ack_enabled":   "true",
 						"inputs.#":      "1",
 						"inputs.0":      "#mezmo_http_source.my_source.id",
-						"endpoint":      "https://example2.com",
+						"endpoint":      "https://google.com",
 						"auth.strategy": "bearer",
 						"auth.token":    "my_token",
 					}),
