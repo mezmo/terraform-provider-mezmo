@@ -241,9 +241,11 @@ func MezmoDestinationToModel(plan *MezmoDestinationModel, component *Destination
 			}
 			SetOptionalAttributeStringFromMap(plan_map, component_map, "ip", "mac")
 
-			plan.Query = basetypes.NewObjectValueMust(
-				plan.Query.AttributeTypes(context.Background()),
-				plan_map)
+			attrTypes := plan.Query.AttributeTypes(context.Background())
+			if len(attrTypes) == 0 {
+				attrTypes = MezmoDestinationResourceSchema.Attributes["query"].GetType().(basetypes.ObjectType).AttrTypes
+			}
+			plan.Query = basetypes.NewObjectValueMust(attrTypes, plan_map)
 		}
 	}
 
@@ -268,8 +270,12 @@ func MezmoDestinationToModel(plan *MezmoDestinationModel, component *Destination
 			}
 		}
 		if has_explicit_options {
+			attrTypes := plan.ExplicitSchemeOptions.AttributeTypes(context.Background())
+			if len(attrTypes) == 0 {
+				attrTypes = MezmoDestinationResourceSchema.Attributes["explicit_scheme_options"].GetType().(basetypes.ObjectType).AttrTypes
+			}
 			plan.ExplicitSchemeOptions = basetypes.NewObjectValueMust(
-				plan.ExplicitSchemeOptions.AttributeTypes(context.Background()),
+				attrTypes,
 				plan_map)
 		}
 	}

@@ -1,0 +1,44 @@
+{
+  "id": "b8071802-63af-11ee-aee9-26dab184329f",
+  "title": "http sink title",
+  "description": "http sink description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 3,
+  "type": "http",
+  "deploy_type": "saas",
+  "user_config": {
+    "uri": "https://webhook.site/7cb82b87-5135-4cf5-bdf5-75f16b86b79d",
+    "auth": {
+      "user": "",
+      "token": "",
+      "password": "",
+      "strategy": "none"
+    },
+    "encoding": "text",
+    "ack_enabled": true,
+    "compression": "none",
+    "advanced_options": {
+      "proxy": {
+        "enabled": false
+      },
+      "rate_limiting": {
+        "duration_secs": 1
+      }
+    },
+    "headers": [
+      {
+          "header_name": "username",
+          "header_value": "app client"
+      },
+      {
+          "header_name": "foo",
+          "header_value": "bar"
+      }
+    ]
+  },
+  "inputs": [
+    "ad6ebb62-63ae-11ee-9b45-26dab184329f",
+    "79551faa-6c6a-11ee-be81-6671faf7df66"
+  ]
+}

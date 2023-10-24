@@ -134,8 +134,11 @@ func S3DestinationToModel(plan *S3DestinationModel, component *Destination) {
 
 	values, _ := component.UserConfig["auth"].(map[string]any)
 	if len(values) > 0 {
-		types := plan.Auth.AttributeTypes(context.Background())
-		plan.Auth = basetypes.NewObjectValueMust(types, MapAnyToMapValues(values))
+		attrTypes := plan.Auth.AttributeTypes(context.Background())
+		if len(attrTypes) == 0 {
+			attrTypes = S3DestinationResourceSchema.Attributes["auth"].GetType().(basetypes.ObjectType).AttrTypes
+		}
+		plan.Auth = basetypes.NewObjectValueMust(attrTypes, MapAnyToMapValues(values))
 	}
 
 	plan.Region = StringValue(component.UserConfig["region"].(string))

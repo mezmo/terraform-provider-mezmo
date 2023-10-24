@@ -144,9 +144,13 @@ func GcpCloudStorageDestinationToModel(plan *GcpCloudStorageDestinationModel, co
 	plan.Bucket = StringValue(component.UserConfig["bucket"].(string))
 	plan.BatchTimeoutSeconds = Int64Value(int64(component.UserConfig["batch_timeout_secs"].(float64)))
 
+	authAttrTypes := plan.Auth.AttributeTypes(context.Background())
+	if len(authAttrTypes) == 0 {
+		authAttrTypes = GcpCloudStorageResourceSchema.Attributes["auth"].GetType().(basetypes.ObjectType).AttrTypes
+	}
 	authType, _ := component.UserConfig["auth"].(string)
 	plan.Auth = basetypes.NewObjectValueMust(
-		plan.Auth.AttributeTypes(context.Background()),
+		authAttrTypes,
 		map[string]attr.Value{
 			"type":  StringValue(authType),
 			"value": StringValue(component.UserConfig[authType].(string)),

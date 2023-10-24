@@ -134,8 +134,14 @@ func PrometheusRemoteWriteDestinationToModel(plan *PrometheusRemoteWriteDestinat
 	auth, _ := component.UserConfig["auth"].(map[string]any)
 	if len(auth) > 0 {
 		if auth["strategy"] != "none" && auth["strategy"] != "" {
-			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, MapAnyToMapValues(auth))
+			attrTypes := plan.Auth.AttributeTypes(context.Background())
+			authValues := MapAnyToMapValues(auth)
+			// handle ConvertToTerraformModel calls
+			if len(attrTypes) == 0 {
+				attrTypes = PrometheusRemoteWriteDestinationResourceSchema.Attributes["auth"].GetType().(basetypes.ObjectType).AttrTypes
+				authValues = MapAnyFillMissingValues(attrTypes, auth, MapKeys(attrTypes))
+			}
+			plan.Auth = basetypes.NewObjectValueMust(attrTypes, authValues)
 		}
 	}
 }

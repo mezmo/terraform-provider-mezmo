@@ -1,0 +1,12 @@
+{
+  "id": "0bf994e6-5c7e-11ee-b816-26dab177777f",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "title": "agent source",
+  "description": "agent description",
+  "type": "mezmo-agent",
+  "generation_id": 0,
+  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab177777f",
+  "user_config": {
+    "capture_metadata": true
+  }
+}

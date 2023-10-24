@@ -1,0 +1,23 @@
+{
+  "id": "79551faa-6c6a-11ee-be81-6671faf7df66",
+  "title": "decrypt fields processor title",
+  "description": "decrypt fields processor description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 1,
+  "type": "unroll",
+  "deploy_type": "saas",
+  "user_config": {
+    "field": ".messages",
+    "values_only": true
+  },
+  "inputs": [
+    "563d2374-63ae-11ee-abe2-26dab184329f.805821a7"
+  ],
+  "outputs": [
+    {
+      "id": "79551faa-6c6a-11ee-be81-6671faf7df66",
+      "label": "Default"
+    }
+  ]
+}

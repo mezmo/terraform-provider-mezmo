@@ -140,8 +140,11 @@ func SampleProcessorToModel(plan *SampleProcessorModel, component *Processor) {
 					panic("Unexpected type for value in always_include field")
 				}
 			}
-			types := plan.AlwaysInclude.AttributeTypes(context.Background())
-			plan.AlwaysInclude = basetypes.NewObjectValueMust(types, plan_map)
+			objT := plan.AlwaysInclude.AttributeTypes(context.Background())
+			if len(objT) == 0 {
+				objT = SampleProcessorResourceSchema.Attributes["always_include"].GetType().(basetypes.ObjectType).AttrTypes
+			}
+			plan.AlwaysInclude = basetypes.NewObjectValueMust(objT, plan_map)
 		}
 	}
 }

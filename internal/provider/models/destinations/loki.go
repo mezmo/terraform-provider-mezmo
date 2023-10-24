@@ -141,8 +141,14 @@ func LokiDestinationToModel(plan *LokiDestinationModel, component *Destination) 
 	if component.UserConfig["auth"] != nil {
 		values, _ := component.UserConfig["auth"].(map[string]any)
 		if len(values) > 0 {
-			types := plan.Auth.AttributeTypes(context.Background())
-			plan.Auth = basetypes.NewObjectValueMust(types, MapAnyToMapValues(values))
+			authAttrTypes := plan.Auth.AttributeTypes(context.Background())
+			if len(authAttrTypes) == 0 {
+				authAttrTypes = LokiDestinationResourceSchema.Attributes["auth"].GetType().(basetypes.ObjectType).AttrTypes
+			}
+			plan.Auth = basetypes.NewObjectValueMust(
+				authAttrTypes,
+				MapAnyFillMissingValues(authAttrTypes, values, MapKeys(authAttrTypes)),
+			)
 		}
 	}
 	if component.UserConfig["encoding"] != nil {
@@ -159,7 +165,11 @@ func LokiDestinationToModel(plan *LokiDestinationModel, component *Destination) 
 				value := obj["label_value"].(string)
 				labelMap[key] = value
 			}
-			plan.Labels = basetypes.NewMapValueMust(plan.Labels.ElementType(nil), MapAnyToMapValues(labelMap))
+			labelType := plan.Labels.ElementType(context.Background())
+			if labelType == nil {
+				labelType = LokiDestinationResourceSchema.Attributes["labels"].GetType().(basetypes.MapType).ElemType
+			}
+			plan.Labels = basetypes.NewMapValueMust(labelType, MapAnyToMapValues(labelMap))
 		}
 	}
 }

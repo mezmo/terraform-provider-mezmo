@@ -1,21 +1,14 @@
 {
   "id": "79551faa-6c6a-11ee-be81-6671faf7df66",
-  "title": "compact fields processor title",
-  "description": "compact fields processor description",
+  "title": "decrypt fields processor title",
+  "description": "decrypt fields processor description",
   "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
   "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
   "generation_id": 1,
-  "type": "compact-fields",
+  "type": "js-script",
   "deploy_type": "saas",
   "user_config": {
-    "fields": [
-      ".raw",
-      ".options"
-    ],
-    "options": {
-      "compact_array": true,
-      "compact_object": true
-    }
+    "script": "function processEvent(e) {\n if (e.skip()) {\n return null \n} return e }"
   },
   "inputs": [
     "563d2374-63ae-11ee-abe2-26dab184329f.805821a7"

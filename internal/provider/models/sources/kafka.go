@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
@@ -178,7 +179,11 @@ func KafkaSourceToModel(plan *KafkaSourceModel, component *Source) {
 		plan.Description = StringValue(component.Description)
 	}
 
-	plan.Brokers = modelutils.BrokersToModelList(plan.Brokers.ElementType(context.Background()), component.UserConfig["brokers"].([]interface{}))
+	elemType := plan.Brokers.ElementType(context.Background())
+	if elemType == nil {
+		elemType = KafkaSourceResourceSchema.Attributes["brokers"].GetType().(basetypes.ListType).ElemType
+	}
+	plan.Brokers = modelutils.BrokersToModelList(elemType, component.UserConfig["brokers"].([]interface{}))
 	plan.Topics, _ = ListValueFrom(context.Background(), StringType, component.UserConfig["topics"])
 	plan.GroupId = StringValue(component.UserConfig["group_id"].(string))
 	plan.TLSEnabled = BoolValue(component.UserConfig["tls_enabled"].(bool))
@@ -186,7 +191,11 @@ func KafkaSourceToModel(plan *KafkaSourceModel, component *Source) {
 	if component.UserConfig["sasl_enabled"] != nil {
 		sasl_enabled, _ := component.UserConfig["sasl_enabled"].(bool)
 		if sasl_enabled {
-			plan.SASL = modelutils.KafkaDestinationSASLToModel(plan.SASL.AttributeTypes(context.Background()), component.UserConfig)
+			planType := plan.SASL.AttributeTypes(context.Background())
+			if len(planType) == 0 {
+				planType = KafkaSourceResourceSchema.Attributes["sasl"].GetType().(basetypes.ObjectType).AttributeTypes()
+			}
+			plan.SASL = modelutils.KafkaDestinationSASLToModel(planType, component.UserConfig)
 		}
 	}
 

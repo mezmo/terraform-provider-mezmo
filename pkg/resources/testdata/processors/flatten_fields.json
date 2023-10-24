@@ -1,24 +1,25 @@
 {
-  "id": "4b3de882-6e2b-11ee-98fa-6671faf7df66",
-  "title": "dedupe title",
-  "description": "dedupe description",
+  "id": "6f26af30-6e2c-11ee-bed9-6671faf7df66",
+  "title": "flatten title",
+  "description": "flatten description",
   "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
   "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
   "generation_id": 0,
-  "type": "dedupe",
+  "type": "flatten-fields",
   "deploy_type": "saas",
   "user_config": {
       "fields": [
-          ".foo",
-          ".bar"
+          ".list",
+          ".map"
       ],
-      "comparison_type": "Match",
-      "number_of_events": 5000
+      "options": {
+          "delimiter": ","
+      }
   },
   "inputs": ["7b212506-23cb-11ed-b300-4ef12c27e273"],
   "outputs": [
       {
-          "id": "4b3de882-6e2b-11ee-98fa-6671faf7df66",
+          "id": "6f26af30-6e2c-11ee-bed9-6671faf7df66",
           "label": "Default"
       }
   ]

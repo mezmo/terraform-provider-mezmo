@@ -198,7 +198,11 @@ func KafkaDestinationToModel(plan *KafkaDestinationModel, component *Destination
 	}
 
 	plan.Inputs = modelutils.SliceToStringListValue(component.Inputs)
-	plan.Brokers = modelutils.BrokersToModelList(plan.Brokers.ElementType(context.Background()), component.UserConfig["brokers"].([]interface{}))
+	brokerAttrTypes := plan.Brokers.ElementType(context.Background())
+	if brokerAttrTypes == nil {
+		brokerAttrTypes = KafkaDestinationResourceSchema.Attributes["brokers"].GetType().(basetypes.ListType).ElemType
+	}
+	plan.Brokers = modelutils.BrokersToModelList(brokerAttrTypes, component.UserConfig["brokers"].([]interface{}))
 	plan.Encoding = StringValue(component.UserConfig["encoding"].(string))
 	plan.Compression = StringValue(component.UserConfig["compression"].(string))
 	plan.Topic = StringValue(component.UserConfig["topic"].(string))
@@ -212,7 +216,11 @@ func KafkaDestinationToModel(plan *KafkaDestinationModel, component *Destination
 	if component.UserConfig["sasl_enabled"] != nil {
 		sasl_enabled, _ := component.UserConfig["sasl_enabled"].(bool)
 		if sasl_enabled {
-			plan.SASL = modelutils.KafkaDestinationSASLToModel(plan.SASL.AttributeTypes(context.Background()), component.UserConfig)
+			saslAttrTypes := plan.SASL.AttributeTypes(context.Background())
+			if len(saslAttrTypes) == 0 {
+				saslAttrTypes = KafkaDestinationResourceSchema.Attributes["sasl"].GetType().(basetypes.ObjectType).AttrTypes
+			}
+			plan.SASL = modelutils.KafkaDestinationSASLToModel(saslAttrTypes, component.UserConfig)
 		}
 	}
 }

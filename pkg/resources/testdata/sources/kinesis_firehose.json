@@ -1,0 +1,13 @@
+{
+  "id": "0bf994e6-5c7e-11ee-b816-26dab000000f",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "title": "firehose source",
+  "description": "firehose description",
+  "type": "kinesis-firehose",
+  "generation_id": 0,
+  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab000000f",
+  "user_config": {
+    "format": "json",
+    "capture_metadata": true
+  }
+}

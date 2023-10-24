@@ -176,8 +176,14 @@ func ElasticSearchDestinationToModel(plan *ElasticSearchDestinationModel, compon
 	plan.Index = StringValue(component.UserConfig["index"].(string))
 	auth, _ := component.UserConfig["auth"].(map[string]any)
 	if len(auth) > 0 {
-		types := plan.Auth.AttributeTypes(context.Background())
-		plan.Auth = basetypes.NewObjectValueMust(types, MapAnyToMapValues(auth))
+		attrTypes := plan.Auth.AttributeTypes(context.Background())
+		authValues := MapAnyToMapValues(auth)
+		// handles ConvertToTerraformModel calls
+		if len(attrTypes) == 0 {
+			attrTypes = ElasticSearchDestinationResourceSchema.Attributes["auth"].GetType().(basetypes.ObjectType).AttrTypes
+			authValues = MapAnyFillMissingValues(attrTypes, auth, MapKeys(attrTypes))
+		}
+		plan.Auth = basetypes.NewObjectValueMust(attrTypes, authValues)
 	}
 
 	if component.UserConfig["pipeline"] != nil {
