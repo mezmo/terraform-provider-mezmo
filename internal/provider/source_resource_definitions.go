@@ -160,3 +160,14 @@ func NewWebhookSourceResource() resource.Resource {
 		schema:            WebhookSourceResourceSchema,
 	}
 }
+
+func NewDatadogSourceResource() resource.Resource {
+	return &SourceResource[DatadogSourceModel]{
+		typeName:          "datadog",
+		fromModelFunc:     DatadogSourceFromModel,
+		toModelFunc:       DatadogSourceToModel,
+		getIdFunc:         func(m *DatadogSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *DatadogSourceModel) basetypes.StringValue { return m.PipelineId },
+		schema:            DatadogSourceResourceSchema,
+	}
+}

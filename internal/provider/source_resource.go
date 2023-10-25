@@ -18,6 +18,7 @@ import (
 type SourceModel interface {
 	AgentSourceModel |
 		AzureEventHubSourceModel |
+		DatadogSourceModel |
 		DemoSourceModel |
 		FluentSourceModel |
 		HttpSourceModel |
