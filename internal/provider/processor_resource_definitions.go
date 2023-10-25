@@ -171,3 +171,14 @@ func NewParseSequentiallyProcessorResource() resource.Resource {
 		schema:            ParseSequentiallyProcessorResourceSchema,
 	}
 }
+
+func NewMetricsTagCardinalityLimitProcessorResource() resource.Resource {
+	return &ProcessorResource[MetricsTagCardinalityLimitProcessorModel]{
+		typeName:          MetricsTagCardinalityLimitProcessorName,
+		fromModelFunc:     MetricsTagCardinalityLimitProcessorFromModel,
+		toModelFunc:       MetricsTagCardinalityLimitProcessorToModel,
+		getIdFunc:         func(m *MetricsTagCardinalityLimitProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *MetricsTagCardinalityLimitProcessorModel) basetypes.StringValue { return m.PipelineId },
+		schema:            MetricsTagCardinalityLimitProcessorResourceSchema,
+	}
+}

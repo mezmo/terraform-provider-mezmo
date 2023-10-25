@@ -1,18 +1,18 @@
 {
   "id": "79551faa-6c6a-11ee-be81-6671faf7df66",
-  "title": "encrypt fields processor title",
-  "description": "encrypt fields processor description",
+  "title": "metrics tag cardinality limit processor title",
+  "description": "metrics tag cardinality limit processor description",
   "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
   "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
   "generation_id": 1,
-  "type": "encrypt-fields",
+  "type": "metrics-tag-cardinality-limit",
   "deploy_type": "saas",
   "user_config": {
-    "field": ".app",
-    "algorithm": "AES-256-CFB",
-    "key": "some thing super long",
-    "iv_field": ".iv",
-    "encode_raw_bytes": true
+    "tags": ["include_tag"],
+    "exclude_tags": ["exclude_tag"],
+    "action": "drop_event",
+    "mode": "probabalistic",
+    "value_limit": 50
   },
   "inputs": [
     "563d2374-63ae-11ee-abe2-26dab184329f.805821a7"
