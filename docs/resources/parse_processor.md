@@ -118,5 +118,3 @@ Required:
 Optional:
 
 - `custom_format` (String) Custom timestamp format, according to strftime, for log entries.
-
-

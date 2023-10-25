@@ -31,5 +31,3 @@ Takes an array of events and emits them all as individual events
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the processor
-
-

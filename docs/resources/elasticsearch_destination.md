@@ -50,5 +50,3 @@ Optional:
 - `region` (String) The AWS Region
 - `secret_access_key` (String, Sensitive) The AWS secret access key
 - `user` (String) The username for basic authentication
-
-

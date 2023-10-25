@@ -31,5 +31,3 @@ Receive data from Fluentd or Fluent Bit
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the source component
-
-

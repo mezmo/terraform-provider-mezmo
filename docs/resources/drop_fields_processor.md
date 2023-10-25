@@ -30,5 +30,3 @@ Remove fields from the events
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the processor
-
-

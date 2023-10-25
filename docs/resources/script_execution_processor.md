@@ -30,5 +30,3 @@ Use JavaScript to reshape and transform your data You can combine multiple actio
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the processor
-
-

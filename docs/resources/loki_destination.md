@@ -44,5 +44,3 @@ Required:
 - `password` (String, Sensitive) The basic authentication password
 - `strategy` (String) The authentication strategy to use (only basic supported)
 - `user` (String) The basic authentication user
-
-

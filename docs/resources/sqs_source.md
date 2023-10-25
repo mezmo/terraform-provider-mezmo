@@ -39,5 +39,3 @@ Required:
 
 - `access_key_id` (String) The AWS access key id
 - `secret_access_key` (String, Sensitive) The AWS secret access key
-
-

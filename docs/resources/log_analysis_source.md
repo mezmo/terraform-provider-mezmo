@@ -28,5 +28,3 @@ Receive data directly from your Mezmo Log Analysis account
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the source component
-
-

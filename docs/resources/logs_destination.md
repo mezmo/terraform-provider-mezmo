@@ -58,5 +58,3 @@ Optional:
 - `ip` (String) IP address template to attach to logs
 - `mac` (String) MAC address template to attach to logs
 - `tags` (List of String) List of tag strings or templates to attach to logs
-
-
