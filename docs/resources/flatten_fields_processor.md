@@ -31,5 +31,3 @@ Flattens the object or array value of a field into a single-level representation
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the processor
-
-

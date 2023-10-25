@@ -32,5 +32,3 @@ Publishes metric events to Datadog
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the destination
-
-

@@ -48,5 +48,3 @@ Optional:
 - `password` (String, Sensitive)
 - `token` (String, Sensitive)
 - `user` (String)
-
-

@@ -34,5 +34,3 @@ Decrypts the value of the provided field
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the processor
-
-

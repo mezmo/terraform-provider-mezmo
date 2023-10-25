@@ -29,5 +29,3 @@ Represents a processor to stringify JSON data.
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the processor
-
-

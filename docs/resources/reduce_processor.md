@@ -230,5 +230,3 @@ Required:
 
 - `field` (String) This is a root-level path property to apply a merge strategy to its value
 - `strategy` (String) The merge strategy to be used for the specified property
-
-

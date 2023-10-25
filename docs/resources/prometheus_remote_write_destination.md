@@ -45,5 +45,3 @@ Optional:
 - `password` (String, Sensitive) The password to use for basic authentication
 - `token` (String, Sensitive) The token to use for bearer auth strategy
 - `user` (String) The username for basic authentication
-
-

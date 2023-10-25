@@ -44,5 +44,3 @@ Required:
 
 - `type` (String) The type of authentication to use.
 - `value` (String, Sensitive) Authentication secret value.
-
-

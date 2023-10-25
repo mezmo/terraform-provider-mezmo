@@ -30,5 +30,3 @@ Receive Splunk logs
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the source component
-
-

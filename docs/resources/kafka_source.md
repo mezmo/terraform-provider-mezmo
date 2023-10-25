@@ -55,5 +55,3 @@ Required:
 Optional:
 
 - `mechanism` (String) The SASL mechanism to use when connecting to Kafka.
-
-
