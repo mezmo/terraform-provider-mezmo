@@ -149,3 +149,14 @@ func NewLogAnalysisSourceResource() resource.Resource {
 		schema:            LogAnalysisSourceResourceSchema,
 	}
 }
+
+func NewWebhookSourceResource() resource.Resource {
+	return &SourceResource[WebhookSourceModel]{
+		typeName:          "webhook",
+		fromModelFunc:     WebhookSourceFromModel,
+		toModelFunc:       WebhookSourceToModel,
+		getIdFunc:         func(m *WebhookSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *WebhookSourceModel) basetypes.StringValue { return m.PipelineId },
+		schema:            WebhookSourceResourceSchema,
+	}
+}

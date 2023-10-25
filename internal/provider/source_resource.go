@@ -28,7 +28,8 @@ type SourceModel interface {
 		PrometheusRemoteWriteSourceModel |
 		S3SourceModel |
 		SplunkHecSourceModel |
-		SQSSourceModel
+		SQSSourceModel |
+		WebhookSourceModel
 }
 
 type SourceResource[T SourceModel] struct {
