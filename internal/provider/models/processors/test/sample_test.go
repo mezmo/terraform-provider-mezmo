@@ -40,6 +40,19 @@ func TestSampleProcessor(t *testing.T) {
 					}`,
 				ExpectError: regexp.MustCompile("Inappropriate value for attribute \"always_include\""),
 			},
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_sample_processor" "my_processor" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						always_include = {
+							field = ".my_field"
+							operator = "equal"
+							value_number = "3587"
+							case_sensitive = false
+						}
+					}`,
+				ExpectError: regexp.MustCompile("(?s)Attribute \"always_include.value_string\" must be specified when.*\"always_include.case_sensitive\" is specified"),
+			},
 
 			// Create with defaults
 			{
@@ -92,6 +105,7 @@ func TestSampleProcessor(t *testing.T) {
 					}),
 				),
 			},
+
 			// Update fields: add value_number
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -122,6 +136,7 @@ func TestSampleProcessor(t *testing.T) {
 					}),
 				),
 			},
+
 			// Update fields: add value_string
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -139,16 +154,50 @@ func TestSampleProcessor(t *testing.T) {
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_sample_processor.my_processor", map[string]any{
-						"pipeline_id":                 "#mezmo_pipeline.test_parent.id",
-						"title":                       "new title",
-						"description":                 "new desc",
-						"generation_id":               "3",
-						"inputs.#":                    "1",
-						"inputs.0":                    "#mezmo_http_source.my_source.id",
-						"rate":                        "678",
-						"always_include.field":        ".my_field",
-						"always_include.operator":     "contains",
-						"always_include.value_string": "my text",
+						"pipeline_id":                   "#mezmo_pipeline.test_parent.id",
+						"title":                         "new title",
+						"description":                   "new desc",
+						"generation_id":                 "3",
+						"inputs.#":                      "1",
+						"inputs.0":                      "#mezmo_http_source.my_source.id",
+						"rate":                          "678",
+						"always_include.field":          ".my_field",
+						"always_include.operator":       "contains",
+						"always_include.value_string":   "my text",
+						"always_include.case_sensitive": "true",
+					}),
+				),
+			},
+
+			// Update fields: change case sensitivity
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_sample_processor" "my_processor" {
+						title = "new title"
+						description = "new desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs = [mezmo_http_source.my_source.id]
+						rate = 678
+						always_include = {
+							field = ".my_field"
+							operator = "starts_with"
+							value_string = "BEGIN"
+							case_sensitive = false
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_sample_processor.my_processor", map[string]any{
+						"pipeline_id":                   "#mezmo_pipeline.test_parent.id",
+						"title":                         "new title",
+						"description":                   "new desc",
+						"generation_id":                 "4",
+						"inputs.#":                      "1",
+						"inputs.0":                      "#mezmo_http_source.my_source.id",
+						"rate":                          "678",
+						"always_include.field":          ".my_field",
+						"always_include.operator":       "starts_with",
+						"always_include.value_string":   "BEGIN",
+						"always_include.case_sensitive": "false",
 					}),
 				),
 			},
