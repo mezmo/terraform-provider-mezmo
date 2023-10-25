@@ -3,10 +3,12 @@ package processors
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/boolvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -68,6 +70,18 @@ var SampleProcessorResourceSchema = schema.Schema{
 					Optional:    true,
 					Description: "The operand to compare the field value with, when the value is a number",
 				},
+				"case_sensitive": schema.BoolAttribute{
+					Optional: true,
+					Computed: true,
+					// Default:     booldefault.StaticBool(true),
+					Description: "Perform case sensitive comparison?",
+					Validators: []validator.Bool{
+						boolvalidator.AlsoRequires(
+							path.MatchRelative().AtParent().AtName("operator"),
+							path.MatchRelative().AtParent().AtName("value_string"),
+						),
+					},
+				},
 			},
 		},
 	}),
@@ -104,6 +118,11 @@ func SampleProcessorFromModel(plan *SampleProcessorModel, previousState *SampleP
 			component_map["value"] = GetAttributeValue[Float64](plan_map, "value_number").ValueFloat64()
 		}
 
+		op := component_map["str_operator"]
+		if op == "equal" || op == "no_equal" || op == "starts_with" || op == "ends_with" {
+			component_map["case_sensitive"] = GetAttributeValue[Bool](plan_map, "case_sensitive").ValueBool()
+		}
+
 		component.UserConfig["always_include"] = component_map
 	}
 
@@ -129,6 +148,7 @@ func SampleProcessorToModel(plan *SampleProcessorModel, component *Processor) {
 			plan_map["operator"] = StringValue(component_map["str_operator"].(string))
 			plan_map["value_number"] = Float64Null()
 			plan_map["value_string"] = StringNull()
+			plan_map["case_sensitive"] = BoolNull()
 			if value, ok := component_map["value"]; ok {
 				if valueString, ok := value.(string); ok {
 					if valueString != "" {
@@ -139,6 +159,9 @@ func SampleProcessorToModel(plan *SampleProcessorModel, component *Processor) {
 				} else {
 					panic("Unexpected type for value in always_include field")
 				}
+			}
+			if case_sensitive, ok := component_map["case_sensitive"]; ok {
+				plan_map["case_sensitive"] = BoolValue(case_sensitive.(bool))
 			}
 			objT := plan.AlwaysInclude.AttributeTypes(context.Background())
 			if len(objT) == 0 {

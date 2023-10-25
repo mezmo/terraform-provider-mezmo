@@ -11,8 +11,9 @@
     "rate": 100,
     "always_include": {
       "field": ".status",
-      "str_operator": "greater_or_equal",
-      "value": 200
+      "str_operator": "starts_with",
+      "value": "OK",
+      "case_sensitive": false
     }
   },
   "inputs": [
