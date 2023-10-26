@@ -182,3 +182,14 @@ func NewMetricsTagCardinalityLimitProcessorResource() resource.Resource {
 		schema:            MetricsTagCardinalityLimitProcessorResourceSchema,
 	}
 }
+
+func NewEventToMetricProcessorResource() resource.Resource {
+	return &ProcessorResource[EventToMetricProcessorModel]{
+		typeName:          "event_to_metric",
+		fromModelFunc:     EventToMetricProcessorFromModel,
+		toModelFunc:       EventToMetricProcessorToModel,
+		getIdFunc:         func(m *EventToMetricProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *EventToMetricProcessorModel) basetypes.StringValue { return m.PipelineId },
+		schema:            EventToMetricProcessorResourceSchema,
+	}
+}
