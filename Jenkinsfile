@@ -79,6 +79,10 @@ pipeline {
         }
       }
       steps {
+        script {
+          currentBuild.description = "SANITY=${env.SANITY_BUILD}"
+        }
+      
         sh 'FILES_TO_FORMAT=$(gofmt -l .) && echo -e "Files with formatting errors: $FILES_TO_FORMAT" && [ -z "$FILES_TO_FORMAT" ]'
       }
     }
