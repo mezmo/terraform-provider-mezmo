@@ -9,6 +9,7 @@ import (
 )
 
 func TestDatadogMetricsDestinationResource(t *testing.T) {
+	const cacheKey = "datadog_metrics_destination_resource"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
@@ -61,7 +62,7 @@ func TestDatadogMetricsDestinationResource(t *testing.T) {
 
 			// Test defaults
 			{
-				Config: SetCachedConfig("http_destination_resources", `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "pipeline"
 					}
@@ -93,7 +94,7 @@ func TestDatadogMetricsDestinationResource(t *testing.T) {
 
 			// Update all fields
 			{
-				Config: GetCachedConfig("http_destination_resources") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_datadog_metrics_destination" "my_destination" {
 						title = "new title"
 						description = "new metrics description"
