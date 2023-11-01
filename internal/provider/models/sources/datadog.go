@@ -9,6 +9,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const DATADOG_SOURCE_NODE_NAME = "mezmo-datadog-source"
+const DATADOG_SOURCE_TYPE_NAME = "datadog"
+
 type DatadogSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -29,7 +32,7 @@ func DatadogSourceFromModel(plan *DatadogSourceModel, previousState *DatadogSour
 
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "mezmo-datadog-source",
+			Type:        DATADOG_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

@@ -27,7 +27,8 @@ type MetricsTagCardinalityLimitProcessorModel struct {
 	Mode         StringValue `tfsdk:"mode" user_config:"true"`
 }
 
-var MetricsTagCardinalityLimitProcessorName = "metrics_tag_cardinality_limit"
+const METRICS_TAG_CARDINALITY_LIMIT_PROCESSOR_TYPE_NAME = "metrics_tag_cardinality_limit"
+const METRICS_TAG_LIMIT_PROCESSOR_NODE_NAME = "metrics-tag-cardinality-limit"
 
 var MetricsTagCardinalityLimitProcessorResourceSchema = schema.Schema{
 	Description: "Limits the cardinality of metric events by either dropping events " +

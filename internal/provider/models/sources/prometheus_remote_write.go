@@ -9,6 +9,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const PROMETHEUS_REMOTE_WRITE_SOURCE_TYPE_NAME = "prometheus_remote_write"
+const PROMETHEUS_REMOTE_WRITE_SOURCE_NODE_NAME = "prometheus-remote-write"
+
 type PrometheusRemoteWriteSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -29,7 +32,7 @@ func PrometheusRemoteWriteSourceFromModel(plan *PrometheusRemoteWriteSourceModel
 
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "prometheus-remote-write",
+			Type:        PROMETHEUS_REMOTE_WRITE_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

@@ -13,6 +13,9 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const SQS_SOURCE_TYPE_NAME = "sqs"
+const SQS_SOURCE_NODE_NAME = SQS_SOURCE_TYPE_NAME
+
 type SQSSourceModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -67,7 +70,7 @@ func SQSSourceFromModel(plan *SQSSourceModel, previousState *SQSSourceModel) (*S
 	auth_secret_access_key, _ := auth["secret_access_key"].(basetypes.StringValue)
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "sqs",
+			Type:        SQS_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

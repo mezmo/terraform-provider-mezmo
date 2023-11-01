@@ -12,6 +12,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const AZURE_EVENT_HUB_SOURCE_TYPE_NAME = "azure_event_hub"
+const AZURE_EVENT_HUB_SOURCE_NODE_NAME = "azure-event-hub"
+
 type AzureEventHubSourceModel struct {
 	Id               String `tfsdk:"id"`
 	PipelineId       String `tfsdk:"pipeline_id"`
@@ -82,7 +85,7 @@ func AzureEventHubSourceFromModel(plan *AzureEventHubSourceModel, previousState 
 
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "azure-event-hub",
+			Type:        AZURE_EVENT_HUB_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

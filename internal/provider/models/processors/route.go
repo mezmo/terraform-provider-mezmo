@@ -24,7 +24,8 @@ type RouteProcessorModel struct {
 	Conditionals List   `tfsdk:"conditionals" user_config:"true"`
 }
 
-var RouteProcessorName = "route"
+const ROUTE_PROCESSOR_TYPE_NAME = "route"
+const ROUTE_PROCESSOR_NODE_NAME = ROUTE_PROCESSOR_TYPE_NAME
 
 var RouteProcessorResourceSchema = schema.Schema{
 	Description: "Route data based on whether or not it matches logical comparisons.",
@@ -57,7 +58,7 @@ func RouteProcessorFromModel(plan *RouteProcessorModel, previousState *RouteProc
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        RouteProcessorName,
+			Type:        ROUTE_PROCESSOR_TYPE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 		},

@@ -15,6 +15,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const GCP_CLOUD_STORAGE_DESTINATION_TYPE_NAME = "gcp_cloud_storage"
+const GCP_CLOUD_STORAGE_DESTINATION_NODE_NAME = "gcp-cloud-storage"
+
 type GcpCloudStorageDestinationModel struct {
 	Id                  String `tfsdk:"id"`
 	PipelineId          String `tfsdk:"pipeline_id"`
@@ -96,7 +99,7 @@ func GcpCloudStorageDestinationFromModel(plan *GcpCloudStorageDestinationModel, 
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "gcp-cloud-storage",
+			Type:        GCP_CLOUD_STORAGE_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

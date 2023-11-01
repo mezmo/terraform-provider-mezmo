@@ -15,6 +15,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const ELASTICSEARCH_DESTINATION_TYPE_NAME = "elasticsearch"
+const ELASTICSEARCH_DESTINATION_NODE_NAME = ELASTICSEARCH_DESTINATION_TYPE_NAME
+
 type ElasticSearchDestinationModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -117,7 +120,7 @@ func ElasticSearchDestinationFromModel(plan *ElasticSearchDestinationModel, prev
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "elasticsearch",
+			Type:        ELASTICSEARCH_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

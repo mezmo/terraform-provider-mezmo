@@ -63,15 +63,15 @@ func TestConvertToTerraformModel(t *testing.T) {
 func loadResources(t *testing.T) map[string]*reflect.Value {
 	resList := make(map[string]*reflect.Value)
 	pipeline := reflect.ValueOf(*loadJsonFile[PipelineApiModel](t, testdataPath, "pipeline.json"))
-	resList["pipeline"] = &pipeline
+	resList["mezmo_pipeline"] = &pipeline
 	addToMap(t, resList, loadDirFiles[ProcessorApiModel](t, processorsPath, func(filename string) string {
-		return fmt.Sprintf("%s_processor", filename)
+		return fmt.Sprintf("mezmo_%s_processor", filename)
 	}))
 	addToMap(t, resList, loadDirFiles[SourceApiModel](t, sourcesPath, func(filename string) string {
-		return fmt.Sprintf("%s_source", filename)
+		return fmt.Sprintf("mezmo_%s_source", filename)
 	}))
 	addToMap(t, resList, loadDirFiles[DestinationApiModel](t, destinationsPath, func(filename string) string {
-		return fmt.Sprintf("%s_destination", filename)
+		return fmt.Sprintf("mezmo_%s_destination", filename)
 	}))
 	return resList
 }
@@ -140,20 +140,4 @@ func TestConvertibleResources(t *testing.T) {
 			)
 		}
 	}
-}
-
-func findConvertibleResource(t *testing.T, resourceTypeName string) ConvertibleResourceDef {
-	t.Helper()
-	convResources, err := ConvertibleResources()
-	if err != nil {
-		t.Fatal("no convertible resources found")
-	}
-
-	for _, res := range convResources {
-		if res.TypeName() == resourceTypeName {
-			return res
-		}
-	}
-	t.Fatalf("resource %s not found", resourceTypeName)
-	return nil
 }

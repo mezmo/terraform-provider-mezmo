@@ -17,6 +17,9 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const KAFKA_DESTINATION_TYPE_NAME = "kafka"
+const KAFKA_DESTINATION_NODE_NAME = KAFKA_DESTINATION_TYPE_NAME
+
 type KafkaDestinationModel struct {
 	Id            String `tfsdk:"id"`
 	PipelineId    String `tfsdk:"pipeline_id"`
@@ -139,7 +142,7 @@ func KafkaDestinationFromModel(plan *KafkaDestinationModel, previousState *Kafka
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "kafka",
+			Type:        KAFKA_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

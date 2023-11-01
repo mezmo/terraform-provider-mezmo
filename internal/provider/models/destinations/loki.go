@@ -15,6 +15,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const LOKI_DESTINATION_TYPE_NAME = "loki"
+const LOKI_DESTINATION_NODE_NAME = "loki"
+
 type LokiDestinationModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -90,7 +93,7 @@ func LokiFromModel(plan *LokiDestinationModel, previousState *LokiDestinationMod
 	dd := diag.Diagnostics{}
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "loki",
+			Type:        LOKI_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

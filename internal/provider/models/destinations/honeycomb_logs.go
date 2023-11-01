@@ -10,6 +10,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const HONEYCOMB_LOGS_DESTINATION_TYPE_NAME = "honeycomb_logs"
+const HONEYCOMB_LOGS_DESTINATION_NODE_NAME = "honeycomb-logs"
+
 type HoneycombLogsDestinationModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -44,7 +47,7 @@ func HoneycombLogsFromModel(plan *HoneycombLogsDestinationModel, previousState *
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "honeycomb-logs",
+			Type:        HONEYCOMB_LOGS_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

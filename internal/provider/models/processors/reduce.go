@@ -17,6 +17,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const REDUCE_PROCESSOR_NODE_NAME = "reduce"
+const REDUCE_PROCESSOR_TYPE_NAME = REDUCE_PROCESSOR_NODE_NAME
+
 type ReduceProcessorModel struct {
 	Id              StringValue `tfsdk:"id"`
 	PipelineId      StringValue `tfsdk:"pipeline_id"`
@@ -126,7 +129,7 @@ func ReduceProcessorFromModel(plan *ReduceProcessorModel, previousState *ReduceP
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "reduce",
+			Type:        REDUCE_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

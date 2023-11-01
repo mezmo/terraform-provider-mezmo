@@ -14,6 +14,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const HTTP_DESTINATION_TYPE_NAME = "http"
+const HTTP_DESTINATION_NODE_NAME = HTTP_DESTINATION_TYPE_NAME
+
 type HttpDestinationModel struct {
 	Id           StringValue `tfsdk:"id"`
 	PipelineId   StringValue `tfsdk:"pipeline_id"`
@@ -102,7 +105,7 @@ func HttpDestinationFromModel(plan *HttpDestinationModel, previousState *HttpDes
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "http",
+			Type:        HTTP_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

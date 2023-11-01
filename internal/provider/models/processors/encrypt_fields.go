@@ -11,6 +11,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const ENCRYPT_FIELDS_PROCESSOR_NODE_NAME = "encrypt-fields"
+const ENCRYPT_FIELDS_PROCESSOR_TYPE_NAME = "encrypt_fields"
+
 type EncryptFieldsProcessorModel struct {
 	Id             String `tfsdk:"id"`
 	PipelineId     String `tfsdk:"pipeline_id"`
@@ -73,7 +76,7 @@ func EncryptFieldsProcessorFromModel(plan *EncryptFieldsProcessorModel, previous
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "encrypt-fields",
+			Type:        ENCRYPT_FIELDS_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

@@ -13,6 +13,9 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const FLATTEN_FIELDS_PROCESSOR_NODE_NAME = "flatten-fields"
+const FLATTEN_FIELDS_PROCESSOR_TYPE_NAME = "flatten_fields"
+
 type FlattenFieldsProcessorModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -52,7 +55,7 @@ func FlattenFieldsProcessorFromModel(plan *FlattenFieldsProcessorModel, previous
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "flatten-fields",
+			Type:        FLATTEN_FIELDS_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig:  make(map[string]any),

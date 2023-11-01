@@ -7,6 +7,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const LOG_ANALYSIS_SOURCE_TYPE_NAME = "log_analysis"
+const LOG_ANALYSIS_SOURCE_NODE_NAME = "log-analysis"
+
 type LogAnalysisSourceModel struct {
 	Id           StringValue `tfsdk:"id"`
 	PipelineId   StringValue `tfsdk:"pipeline_id"`
@@ -24,7 +27,7 @@ func LogAnalysisSourceFromModel(plan *LogAnalysisSourceModel, previousState *Log
 	dd := diag.Diagnostics{}
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "log-analysis",
+			Type:        LOG_ANALYSIS_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig:  map[string]any{},

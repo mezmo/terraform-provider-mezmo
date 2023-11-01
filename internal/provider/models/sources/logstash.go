@@ -12,6 +12,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const LOGSTASH_SOURCE_TYPE_NAME = "logstash"
+const LOGSTASH_SOURCE_NODE_NAME = LOGSTASH_SOURCE_TYPE_NAME
+
 type LogStashSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -41,7 +44,7 @@ func LogStashSourceFromModel(plan *LogStashSourceModel, previousState *LogStashS
 
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "logstash",
+			Type:        LOGSTASH_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

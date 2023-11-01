@@ -9,6 +9,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const AGENT_SOURCE_TYPE_NAME = "agent"
+const AGENT_SOURCE_NODE_NAME = "mezmo-agent"
+
 type AgentSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -29,7 +32,7 @@ func AgentSourceFromModel(plan *AgentSourceModel, previousState *AgentSourceMode
 
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "mezmo-agent",
+			Type:        AGENT_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

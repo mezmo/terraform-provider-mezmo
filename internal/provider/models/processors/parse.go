@@ -14,6 +14,9 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+const PARSE_PROCESSOR_NODE_NAME = "parse"
+const PARSE_PROCESSOR_TYPE_NAME = PARSE_PROCESSOR_NODE_NAME
+
 type ParseProcessorModel struct {
 	Id               String `tfsdk:"id"`
 	PipelineId       String `tfsdk:"pipeline_id"`
@@ -44,7 +47,7 @@ func ParseProcessorFromModel(plan *ParseProcessorModel, previousState *ParseProc
 	parser := plan.Parser.ValueString()
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "parse",
+			Type:        PARSE_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

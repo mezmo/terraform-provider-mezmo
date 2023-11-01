@@ -17,6 +17,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const SPLUNK_HEC_LOGS_DESTINATION_TYPE_NAME = "splunk_hec_logs"
+const SPLUNK_HEC_LOGS_DESTINATION_NODE_NAME = "splunk-hec-logs"
+
 type SplunkHecLogsDestinationModel struct {
 	Id                   String `tfsdk:"id"`
 	PipelineId           String `tfsdk:"pipeline_id"`
@@ -120,7 +123,7 @@ func SplunkHecLogsDestinationFromModel(plan *SplunkHecLogsDestinationModel, prev
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "splunk-hec-logs",
+			Type:        SPLUNK_HEC_LOGS_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

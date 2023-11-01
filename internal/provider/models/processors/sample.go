@@ -18,6 +18,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const SAMPLE_PROCESSOR_NODE_NAME = "sample"
+const SAMPLE_PROCESSOR_TYPE_NAME = SAMPLE_PROCESSOR_NODE_NAME
+
 type SampleProcessorModel struct {
 	Id            String `tfsdk:"id"`
 	PipelineId    String `tfsdk:"pipeline_id"`
@@ -91,7 +94,7 @@ func SampleProcessorFromModel(plan *SampleProcessorModel, previousState *SampleP
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "sample",
+			Type:        SAMPLE_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

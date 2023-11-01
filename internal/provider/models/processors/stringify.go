@@ -9,6 +9,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const STRINGIFY_PROCESSOR_NODE_NAME = "stringify"
+const STRINGIFY_PROCESSOR_TYPE_NAME = STRINGIFY_PROCESSOR_NODE_NAME
+
 type StringifyProcessorModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -27,7 +30,7 @@ func StringifyProcessorFromModel(plan *StringifyProcessorModel, previousState *S
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "stringify",
+			Type:        STRINGIFY_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig:  make(map[string]any),

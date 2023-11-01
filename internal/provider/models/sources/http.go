@@ -12,6 +12,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const HTTP_SOURCE_TYPE_NAME = "http"
+const HTTP_SOURCE_NODE_NAME = HTTP_SOURCE_TYPE_NAME
+
 type HttpSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -45,7 +48,7 @@ func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) 
 
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "http",
+			Type:        HTTP_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

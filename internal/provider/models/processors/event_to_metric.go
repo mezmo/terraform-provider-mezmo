@@ -16,6 +16,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const EVENT_TO_METRIC_PROCESSOR_NODE_NAME = "event-to-metric"
+const EVENT_TO_METRIC_PROCESSOR_TYPE_NAME = "event_to_metric"
+
 type EventToMetricProcessorModel struct {
 	Id             StringValue  `tfsdk:"id"`
 	PipelineId     StringValue  `tfsdk:"pipeline_id"`
@@ -141,7 +144,7 @@ func EventToMetricProcessorFromModel(plan *EventToMetricProcessorModel, previous
 	dd := diag.Diagnostics{}
 	component := &Processor{
 		BaseNode: BaseNode{
-			Type:        "event-to-metric",
+			Type:        EVENT_TO_METRIC_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{
