@@ -68,7 +68,7 @@ func TestAgentSourceResource(t *testing.T) {
 			},
 			// Supply gateway_route_id
 			{
-				Config: SetCachedConfig("Supply gateway_route_id", `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "parent pipeline"
 					}
@@ -98,7 +98,7 @@ func TestAgentSourceResource(t *testing.T) {
 			},
 			// Updating gateway_route_id is not allowed
 			{
-				Config: GetCachedConfig("Supply gateway_route_id") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_agent_source" "shared_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "A new title"
@@ -108,7 +108,7 @@ func TestAgentSourceResource(t *testing.T) {
 			},
 			// gateway_route_id can be specified if it's the same value
 			{
-				Config: GetCachedConfig("Supply gateway_route_id") + `
+				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_agent_source" "shared_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "Updated title again"
