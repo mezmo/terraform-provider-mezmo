@@ -16,6 +16,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const MEZMO_DESTINATION_TYPE_NAME = "logs"
+const MEZMO_DESTINATION_NODE_NAME = "mezmo"
+
 type MezmoDestinationModel struct {
 	Id                    String `tfsdk:"id"`
 	PipelineId            String `tfsdk:"pipeline_id"`
@@ -162,7 +165,7 @@ func MezmoDestinationFromModel(plan *MezmoDestinationModel, previousState *Mezmo
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "mezmo",
+			Type:        MEZMO_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

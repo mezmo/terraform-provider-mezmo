@@ -20,6 +20,8 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const PROVIDER_TYPE_NAME = "mezmo"
+
 var _ provider.Provider = &MezmoProvider{}
 
 // MezmoProvider defines the provider implementation.
@@ -35,7 +37,7 @@ type MezmoProviderModel struct {
 }
 
 func (p *MezmoProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "mezmo"
+	resp.TypeName = PROVIDER_TYPE_NAME
 	resp.Version = p.version
 }
 

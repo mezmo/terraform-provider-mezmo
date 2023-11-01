@@ -17,6 +17,9 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const KAFKA_SOURCE_TYPE_NAME = "kafka"
+const KAFKA_SOURCE_NODE_NAME = KAFKA_SOURCE_TYPE_NAME
+
 type KafkaSourceModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -137,7 +140,7 @@ func KafkaSourceFromModel(plan *KafkaSourceModel, previousState *KafkaSourceMode
 
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "kafka",
+			Type:        KAFKA_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

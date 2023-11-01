@@ -10,6 +10,9 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const DATADOG_METRICS_DESTINATION_TYPE_NAME = "datadog_metrics"
+const DATADOG_METRICS_DESTINATION_NODE_NAME = "datadog-metrics"
+
 type DatadogMetricsDestinationModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -43,7 +46,7 @@ func DatadogMetricsFromModel(plan *DatadogMetricsDestinationModel, previousState
 	dd := diag.Diagnostics{}
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "datadog-metrics",
+			Type:        DATADOG_METRICS_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

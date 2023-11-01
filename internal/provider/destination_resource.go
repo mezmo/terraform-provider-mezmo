@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
@@ -34,8 +35,10 @@ type DestinationModel interface {
 }
 
 type DestinationResource[T DestinationModel] struct {
-	client            Client
-	typeName          string // The name to use as part of the terraform resource name: mezmo_{typeName}_destination
+	client   Client
+	typeName string // The name to use as part of the terraform resource name: mezmo_{typeName}_destination
+	// type of the corresponding pipeline service node
+	nodeName          string
 	fromModelFunc     destinationFromModelFunc[T]
 	toModelFunc       destinationToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
@@ -44,7 +47,14 @@ type DestinationResource[T DestinationModel] struct {
 }
 
 func (r *DestinationResource[T]) TypeName() string {
-	return r.typeName + "_destination"
+	return fmt.Sprintf("%s_%s_destination", PROVIDER_TYPE_NAME, r.typeName)
+}
+
+func (r *DestinationResource[T]) NodeType() string {
+	// conversion to underscore and appending suffix
+	// disambiguates resources with similar node types
+	// example: http sink and http source
+	return strings.ReplaceAll(r.nodeName, "-", "_") + "_destination"
 }
 
 func (r *DestinationResource[T]) TerraformSchema() schema.Schema {
@@ -145,8 +155,8 @@ func (r *DestinationResource[T]) Delete(ctx context.Context, req resource.Delete
 }
 
 // Metadata implements resource.Resource.
-func (r *DestinationResource[T]) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + r.TypeName()
+func (r *DestinationResource[T]) Metadata(_ context.Context, _ resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = r.TypeName()
 }
 
 // Read implements resource.Resource.

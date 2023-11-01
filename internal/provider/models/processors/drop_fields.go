@@ -11,6 +11,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const DROP_FIELDS_PROCESSOR_NODE_NAME = "drop-fields"
+const DROP_FIELDS_PROCESSOR_TYPE_NAME = "drop_fields"
+
 type DropFieldsProcessorModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -40,7 +43,7 @@ func DropFieldsProcessorFromModel(plan *DropFieldsProcessorModel, previousState 
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "drop-fields",
+			Type:        DROP_FIELDS_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

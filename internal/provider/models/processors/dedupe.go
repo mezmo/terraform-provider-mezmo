@@ -14,6 +14,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const DEDUPE_PROCESSOR_NODE_NAME = "dedupe"
+const DEDUPE_PROCESSOR_TYPE_NAME = DEDUPE_PROCESSOR_NODE_NAME
+
 type DedupeProcessorModel struct {
 	Id             String `tfsdk:"id"`
 	PipelineId     String `tfsdk:"pipeline_id"`
@@ -66,7 +69,7 @@ func DedupeProcessorFromModel(plan *DedupeProcessorModel, previousState *DedupeP
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "dedupe",
+			Type:        DEDUPE_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig:  make(map[string]any),

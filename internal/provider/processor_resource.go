@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
@@ -36,8 +37,10 @@ type ProcessorModel interface {
 }
 
 type ProcessorResource[T ProcessorModel] struct {
-	client            Client
-	typeName          string // The name to use as part of the terraform resource name: mezmo_{typeName}_processor
+	client   Client
+	typeName string // The name to use as part of the terraform resource name: mezmo_{typeName}_processor
+	// the corresponding pipeline service node type
+	nodeName          string
 	fromModelFunc     processorFromModelFunc[T]
 	toModelFunc       processorToModelFunc[T]
 	getIdFunc         idGetterFunc[T]
@@ -46,7 +49,14 @@ type ProcessorResource[T ProcessorModel] struct {
 }
 
 func (r *ProcessorResource[T]) TypeName() string {
-	return r.typeName + "_processor"
+	return fmt.Sprintf("%s_%s_processor", PROVIDER_TYPE_NAME, r.typeName)
+}
+
+func (r *ProcessorResource[T]) NodeType() string {
+	// conversion to underscore and appending suffix
+	// disambiguates resources with similar node types
+	// example: http sink and http source
+	return strings.ReplaceAll(r.nodeName, "-", "_") + "_processor"
 }
 
 func (r *ProcessorResource[T]) TerraformSchema() schema.Schema {
@@ -147,8 +157,8 @@ func (r *ProcessorResource[T]) Delete(ctx context.Context, req resource.DeleteRe
 }
 
 // Metadata implements resource.Resource.
-func (r *ProcessorResource[T]) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + r.TypeName()
+func (r *ProcessorResource[T]) Metadata(_ context.Context, _ resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = r.TypeName()
 }
 
 // Read implements resource.Resource.

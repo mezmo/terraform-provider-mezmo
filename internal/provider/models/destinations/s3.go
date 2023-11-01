@@ -14,6 +14,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const S3_DESTINATION_TYPE_NAME = "s3"
+const S3_DESTINATION_NODE_NAME = S3_DESTINATION_TYPE_NAME
+
 type S3DestinationModel struct {
 	Id                  String `tfsdk:"id"`
 	PipelineId          String `tfsdk:"pipeline_id"`
@@ -91,7 +94,7 @@ func S3DestinationFromModel(plan *S3DestinationModel, previousState *S3Destinati
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "s3",
+			Type:        S3_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

@@ -11,6 +11,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const AZURE_BLOB_STORAGE_DESTINATION_TYPE_NAME = "azure_blob_storage"
+const AZURE_BLOB_STORAGE_DESTINATION_NODE_NAME = "azure-blob-storage"
+
 type AzureBlobStorageDestinationModel struct {
 	Id                  String `tfsdk:"id"`
 	PipelineId          String `tfsdk:"pipeline_id"`
@@ -68,7 +71,7 @@ func AzureBlobStorageFromModel(plan *AzureBlobStorageDestinationModel, previousS
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "azure-blob-storage",
+			Type:        AZURE_BLOB_STORAGE_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

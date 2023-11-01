@@ -85,7 +85,7 @@ func TestFluentSource(t *testing.T) {
 					resource "mezmo_pipeline" "test_parent" {
 						title = "parent pipeline"
 					}
-					resource "mezmo_http_source" "parent_source" {
+					resource "mezmo_fluent_source" "parent_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my http title"
 						description = "my http description"
@@ -94,7 +94,7 @@ func TestFluentSource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "A shared source"
 						description = "This source provides gateway_route_id"
-						gateway_route_id = mezmo_http_source.parent_source.gateway_route_id
+						gateway_route_id = mezmo_fluent_source.parent_source.gateway_route_id
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
@@ -106,7 +106,7 @@ func TestFluentSource(t *testing.T) {
 						"generation_id":    "0",
 						"decoding":         "json",
 						"capture_metadata": "false",
-						"gateway_route_id": "#mezmo_http_source.parent_source.gateway_route_id",
+						"gateway_route_id": "#mezmo_fluent_source.parent_source.gateway_route_id",
 					}),
 				),
 			},
@@ -127,13 +127,13 @@ func TestFluentSource(t *testing.T) {
 					resource "mezmo_fluent_source" "shared_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "Updated title"
-						gateway_route_id = mezmo_http_source.parent_source.gateway_route_id
+						gateway_route_id = mezmo_fluent_source.parent_source.gateway_route_id
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_fluent_source.shared_source", map[string]any{
 						"title":            "Updated title",
 						"generation_id":    "1",
-						"gateway_route_id": "#mezmo_http_source.parent_source.gateway_route_id",
+						"gateway_route_id": "#mezmo_fluent_source.parent_source.gateway_route_id",
 					}),
 				),
 			},

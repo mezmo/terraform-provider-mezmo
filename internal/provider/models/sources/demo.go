@@ -9,6 +9,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const DEMO_SOURCE_NODE_NAME = "demo-logs"
+const DEMO_SOURCE_TYPE_NAME = "demo"
+
 type DemoSourceModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -37,7 +40,7 @@ func DemoSourceFromModel(plan *DemoSourceModel, previousState *DemoSourceModel) 
 	dd := diag.Diagnostics{}
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "demo-logs",
+			Type:        DEMO_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig:  map[string]any{"format": plan.Format.ValueString()},

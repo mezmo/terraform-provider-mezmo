@@ -9,7 +9,8 @@ import (
 
 func NewDedupeProcessorResource() resource.Resource {
 	return &ProcessorResource[DedupeProcessorModel]{
-		typeName:          "dedupe",
+		typeName:          DEDUPE_PROCESSOR_TYPE_NAME,
+		nodeName:          DEDUPE_PROCESSOR_NODE_NAME,
 		fromModelFunc:     DedupeProcessorFromModel,
 		toModelFunc:       DedupeProcessorToModel,
 		getIdFunc:         func(m *DedupeProcessorModel) basetypes.StringValue { return m.Id },
@@ -20,7 +21,8 @@ func NewDedupeProcessorResource() resource.Resource {
 
 func NewDropFieldsProcessorResource() resource.Resource {
 	return &ProcessorResource[DropFieldsProcessorModel]{
-		typeName:          "drop_fields",
+		typeName:          DROP_FIELDS_PROCESSOR_TYPE_NAME,
+		nodeName:          DROP_FIELDS_PROCESSOR_NODE_NAME,
 		fromModelFunc:     DropFieldsProcessorFromModel,
 		toModelFunc:       DropFieldsProcessorToModel,
 		getIdFunc:         func(m *DropFieldsProcessorModel) basetypes.StringValue { return m.Id },
@@ -31,7 +33,8 @@ func NewDropFieldsProcessorResource() resource.Resource {
 
 func NewFlattenFieldsProcessorResource() resource.Resource {
 	return &ProcessorResource[FlattenFieldsProcessorModel]{
-		typeName:          "flatten_fields",
+		typeName:          FLATTEN_FIELDS_PROCESSOR_TYPE_NAME,
+		nodeName:          FLATTEN_FIELDS_PROCESSOR_NODE_NAME,
 		fromModelFunc:     FlattenFieldsProcessorFromModel,
 		toModelFunc:       FlattenFieldsProcessorToModel,
 		getIdFunc:         func(m *FlattenFieldsProcessorModel) basetypes.StringValue { return m.Id },
@@ -42,7 +45,8 @@ func NewFlattenFieldsProcessorResource() resource.Resource {
 
 func NewMapFieldsProcessorResource() resource.Resource {
 	return &ProcessorResource[MapFieldsProcessorModel]{
-		typeName:          "map_fields",
+		typeName:          MAP_FIELDS_PROCESSOR_TYPE_NAME,
+		nodeName:          MAP_FIELDS_PROCESSOR_NODE_NAME,
 		fromModelFunc:     MapFieldsProcessorFromModel,
 		toModelFunc:       MapFieldsProcessorToModel,
 		getIdFunc:         func(m *MapFieldsProcessorModel) basetypes.StringValue { return m.Id },
@@ -53,7 +57,8 @@ func NewMapFieldsProcessorResource() resource.Resource {
 
 func NewSampleProcessorResource() resource.Resource {
 	return &ProcessorResource[SampleProcessorModel]{
-		typeName:          "sample",
+		typeName:          SAMPLE_PROCESSOR_TYPE_NAME,
+		nodeName:          SAMPLE_PROCESSOR_NODE_NAME,
 		fromModelFunc:     SampleProcessorFromModel,
 		toModelFunc:       SampleProcessorToModel,
 		getIdFunc:         func(m *SampleProcessorModel) basetypes.StringValue { return m.Id },
@@ -64,7 +69,8 @@ func NewSampleProcessorResource() resource.Resource {
 
 func NewStringifyProcessorResource() resource.Resource {
 	return &ProcessorResource[StringifyProcessorModel]{
-		typeName:          "stringify",
+		typeName:          STRINGIFY_PROCESSOR_TYPE_NAME,
+		nodeName:          STRINGIFY_PROCESSOR_NODE_NAME,
 		fromModelFunc:     StringifyProcessorFromModel,
 		toModelFunc:       StringifyProcessorToModel,
 		getIdFunc:         func(m *StringifyProcessorModel) basetypes.StringValue { return m.Id },
@@ -75,7 +81,8 @@ func NewStringifyProcessorResource() resource.Resource {
 
 func NewScriptExecutionProcessorResource() resource.Resource {
 	return &ProcessorResource[ScriptExecutionProcessorModel]{
-		typeName:          "script_execution",
+		typeName:          SCRIPT_EXECUTION_PROCESSOR_TYPE_NAME,
+		nodeName:          SCRIPT_EXECUTION_PROCESSOR_NODE_NAME,
 		fromModelFunc:     ScriptExecutionProcessorFromModel,
 		toModelFunc:       ScriptExecutionProcessorToModel,
 		getIdFunc:         func(m *ScriptExecutionProcessorModel) basetypes.StringValue { return m.Id },
@@ -86,7 +93,8 @@ func NewScriptExecutionProcessorResource() resource.Resource {
 
 func NewUnrollProcessorResource() resource.Resource {
 	return &ProcessorResource[UnrollProcessorModel]{
-		typeName:          "unroll",
+		typeName:          UNROLL_PROCESSOR_TYPE_NAME,
+		nodeName:          UNROLL_PROCESSOR_NODE_NAME,
 		fromModelFunc:     UnrollProcessorFromModel,
 		toModelFunc:       UnrollProcessorToModel,
 		getIdFunc:         func(m *UnrollProcessorModel) basetypes.StringValue { return m.Id },
@@ -97,7 +105,8 @@ func NewUnrollProcessorResource() resource.Resource {
 
 func NewCompactFieldsProcessorResource() resource.Resource {
 	return &ProcessorResource[CompactFieldsProcessorModel]{
-		typeName:          "compact_fields",
+		typeName:          COMPACT_FIELDS_PROCESSOR_TYPE_NAME,
+		nodeName:          COMPACT_FIELDS_PROCESSOR_NODE_NAME,
 		fromModelFunc:     CompactFieldsProcessorFromModel,
 		toModelFunc:       CompactFieldsProcessorToModel,
 		getIdFunc:         func(m *CompactFieldsProcessorModel) basetypes.StringValue { return m.Id },
@@ -108,7 +117,8 @@ func NewCompactFieldsProcessorResource() resource.Resource {
 
 func NewDecryptFieldsProcessorResource() resource.Resource {
 	return &ProcessorResource[DecryptFieldsProcessorModel]{
-		typeName:          "decrypt_fields",
+		typeName:          DECRYPT_FIELDS_PROCESSOR_TYPE_NAME,
+		nodeName:          DECRYPT_FIELDS_PROCESSOR_NODE_NAME,
 		fromModelFunc:     DecryptFieldsProcessorFromModel,
 		toModelFunc:       DecryptFieldsProcessorToModel,
 		getIdFunc:         func(m *DecryptFieldsProcessorModel) basetypes.StringValue { return m.Id },
@@ -119,7 +129,8 @@ func NewDecryptFieldsProcessorResource() resource.Resource {
 
 func NewEncryptFieldsProcessorResource() resource.Resource {
 	return &ProcessorResource[EncryptFieldsProcessorModel]{
-		typeName:          "encrypt_fields",
+		typeName:          ENCRYPT_FIELDS_PROCESSOR_TYPE_NAME,
+		nodeName:          ENCRYPT_FIELDS_PROCESSOR_NODE_NAME,
 		fromModelFunc:     EncryptFieldsProcessorFromModel,
 		toModelFunc:       EncryptFieldsProcessorToModel,
 		getIdFunc:         func(m *EncryptFieldsProcessorModel) basetypes.StringValue { return m.Id },
@@ -130,7 +141,8 @@ func NewEncryptFieldsProcessorResource() resource.Resource {
 
 func NewParseProcessorResource() resource.Resource {
 	return &ProcessorResource[ParseProcessorModel]{
-		typeName:          "parse",
+		typeName:          PARSE_PROCESSOR_TYPE_NAME,
+		nodeName:          PARSE_PROCESSOR_NODE_NAME,
 		fromModelFunc:     ParseProcessorFromModel,
 		toModelFunc:       ParseProcessorToModel,
 		getIdFunc:         func(m *ParseProcessorModel) basetypes.StringValue { return m.Id },
@@ -141,7 +153,8 @@ func NewParseProcessorResource() resource.Resource {
 
 func NewReduceProcessorResource() resource.Resource {
 	return &ProcessorResource[ReduceProcessorModel]{
-		typeName:          "reduce",
+		typeName:          REDUCE_PROCESSOR_TYPE_NAME,
+		nodeName:          REDUCE_PROCESSOR_NODE_NAME,
 		fromModelFunc:     ReduceProcessorFromModel,
 		toModelFunc:       ReduceProcessorToModel,
 		getIdFunc:         func(m *ReduceProcessorModel) basetypes.StringValue { return m.Id },
@@ -152,7 +165,8 @@ func NewReduceProcessorResource() resource.Resource {
 
 func NewRouteProcessorResource() resource.Resource {
 	return &ProcessorResource[RouteProcessorModel]{
-		typeName:          RouteProcessorName,
+		typeName:          ROUTE_PROCESSOR_TYPE_NAME,
+		nodeName:          ROUTE_PROCESSOR_NODE_NAME,
 		fromModelFunc:     RouteProcessorFromModel,
 		toModelFunc:       RouteProcessorToModel,
 		getIdFunc:         func(m *RouteProcessorModel) basetypes.StringValue { return m.Id },
@@ -163,7 +177,8 @@ func NewRouteProcessorResource() resource.Resource {
 
 func NewParseSequentiallyProcessorResource() resource.Resource {
 	return &ProcessorResource[ParseSequentiallyProcessorModel]{
-		typeName:          ParseSequentiallyProcessorName,
+		typeName:          PARSE_SEQUENTIALLY_PROCESSOR_TYPE_NAME,
+		nodeName:          PARSE_SEQUENTIALLY_PROCESSOR_NODE_NAME,
 		fromModelFunc:     ParseSequentiallyProcessorFromModel,
 		toModelFunc:       ParseSequentiallyProcessorToModel,
 		getIdFunc:         func(m *ParseSequentiallyProcessorModel) basetypes.StringValue { return m.Id },
@@ -174,7 +189,8 @@ func NewParseSequentiallyProcessorResource() resource.Resource {
 
 func NewMetricsTagCardinalityLimitProcessorResource() resource.Resource {
 	return &ProcessorResource[MetricsTagCardinalityLimitProcessorModel]{
-		typeName:          MetricsTagCardinalityLimitProcessorName,
+		typeName:          METRICS_TAG_CARDINALITY_LIMIT_PROCESSOR_TYPE_NAME,
+		nodeName:          METRICS_TAG_LIMIT_PROCESSOR_NODE_NAME,
 		fromModelFunc:     MetricsTagCardinalityLimitProcessorFromModel,
 		toModelFunc:       MetricsTagCardinalityLimitProcessorToModel,
 		getIdFunc:         func(m *MetricsTagCardinalityLimitProcessorModel) basetypes.StringValue { return m.Id },
@@ -185,7 +201,8 @@ func NewMetricsTagCardinalityLimitProcessorResource() resource.Resource {
 
 func NewEventToMetricProcessorResource() resource.Resource {
 	return &ProcessorResource[EventToMetricProcessorModel]{
-		typeName:          "event_to_metric",
+		typeName:          EVENT_TO_METRIC_PROCESSOR_TYPE_NAME,
+		nodeName:          EVENT_TO_METRIC_PROCESSOR_NODE_NAME,
 		fromModelFunc:     EventToMetricProcessorFromModel,
 		toModelFunc:       EventToMetricProcessorToModel,
 		getIdFunc:         func(m *EventToMetricProcessorModel) basetypes.StringValue { return m.Id },

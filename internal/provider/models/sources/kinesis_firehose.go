@@ -13,6 +13,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const KINESIS_FIREHOSE_SOURCE_TYPE_NAME = "kinesis_firehose"
+const KINESIS_FIREHOSE_SOURCE_NODE_NAME = "kinesis-firehose"
+
 type KinesisFirehoseSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -44,7 +47,7 @@ func KinesisFirehoseSourceFromModel(plan *KinesisFirehoseSourceModel, previousSt
 	dd := diag.Diagnostics{}
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "kinesis-firehose",
+			Type:        KINESIS_FIREHOSE_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

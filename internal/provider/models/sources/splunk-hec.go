@@ -9,6 +9,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const SPLUNK_HEC_SOURCE_TYPE_NAME = "splunk_hec"
+const SPLUNK_HEC_SOURCE_NODE_NAME = "splunk-hec"
+
 type SplunkHecSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -31,7 +34,7 @@ func SplunkHecSourceFromModel(plan *SplunkHecSourceModel, previousState *SplunkH
 	dd := diag.Diagnostics{}
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "splunk-hec",
+			Type:        SPLUNK_HEC_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

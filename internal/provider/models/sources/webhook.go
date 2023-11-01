@@ -11,6 +11,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const WEBHOOK_SOURCE_TYPE_NAME = "webhook"
+const WEBHOOK_SOURCE_NODE_NAME = WEBHOOK_SOURCE_TYPE_NAME
+
 type WebhookSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -42,7 +45,7 @@ func WebhookSourceFromModel(plan *WebhookSourceModel, previousState *WebhookSour
 
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "webhook",
+			Type:        WEBHOOK_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

@@ -15,7 +15,8 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var ParseSequentiallyProcessorName = "parse_sequentially"
+const PARSE_SEQUENTIALLY_PROCESSOR_TYPE_NAME = "parse_sequentially"
+const PARSE_SEQUENTIALLY_PROCESSOR_NODE_NAME = "parse-sequentially"
 
 type ParseSequentiallyProcessorModel struct {
 	Id           String `tfsdk:"id"`
@@ -38,7 +39,7 @@ func ParseSequentiallyProcessorFromModel(plan *ParseSequentiallyProcessorModel, 
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "parse-sequentially",
+			Type:        PARSE_SEQUENTIALLY_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

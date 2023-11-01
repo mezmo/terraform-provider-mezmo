@@ -9,6 +9,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const BLACKHOLE_DESTINATION_NODE_NAME = "blackhole"
+const BLACKHOLE_DESTINATION_TYPE_NAME = BLACKHOLE_DESTINATION_NODE_NAME
+
 type BlackholeDestinationModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -28,7 +31,7 @@ func BlackholeDestinationFromModel(plan *BlackholeDestinationModel, previousStat
 	dd := diag.Diagnostics{}
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "blackhole",
+			Type:        BLACKHOLE_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

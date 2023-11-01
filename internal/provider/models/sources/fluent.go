@@ -12,6 +12,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
 
+const FLUENT_SOURCE_TYPE_NAME = "fluent"
+const FLUENT_SOURCE_NODE_NAME = FLUENT_SOURCE_TYPE_NAME
+
 type FluentSourceModel struct {
 	Id              String `tfsdk:"id"`
 	PipelineId      String `tfsdk:"pipeline_id"`
@@ -45,7 +48,7 @@ func FluentSourceFromModel(plan *FluentSourceModel, previousState *FluentSourceM
 	dd := diag.Diagnostics{}
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "fluent",
+			Type:        FLUENT_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

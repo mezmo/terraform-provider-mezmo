@@ -9,7 +9,8 @@ import (
 
 func NewAzureBlobStorageDestinationResource() resource.Resource {
 	return &DestinationResource[AzureBlobStorageDestinationModel]{
-		typeName:          "azure_blob_storage",
+		typeName:          AZURE_BLOB_STORAGE_DESTINATION_TYPE_NAME,
+		nodeName:          AZURE_BLOB_STORAGE_DESTINATION_NODE_NAME,
 		fromModelFunc:     AzureBlobStorageFromModel,
 		toModelFunc:       AzureBlobStorageToModel,
 		getIdFunc:         func(m *AzureBlobStorageDestinationModel) basetypes.StringValue { return m.Id },
@@ -20,7 +21,8 @@ func NewAzureBlobStorageDestinationResource() resource.Resource {
 
 func NewBlackholeDestinationResource() resource.Resource {
 	return &DestinationResource[BlackholeDestinationModel]{
-		typeName:          "blackhole",
+		typeName:          BLACKHOLE_DESTINATION_TYPE_NAME,
+		nodeName:          BLACKHOLE_DESTINATION_NODE_NAME,
 		fromModelFunc:     BlackholeDestinationFromModel,
 		toModelFunc:       BlackholeDestinationToModel,
 		getIdFunc:         func(m *BlackholeDestinationModel) basetypes.StringValue { return m.Id },
@@ -31,7 +33,8 @@ func NewBlackholeDestinationResource() resource.Resource {
 
 func NewDatadogLogsDestinationResource() resource.Resource {
 	return &DestinationResource[DatadogLogsDestinationModel]{
-		typeName:          "datadog_logs",
+		typeName:          DATADOG_LOGS_DESTINATION_TYPE_NAME,
+		nodeName:          DATADOG_LOGS_DESTINATION_NODE_NAME,
 		fromModelFunc:     DatadogLogsFromModel,
 		toModelFunc:       DatadogLogsDestinationToModel,
 		getIdFunc:         func(m *DatadogLogsDestinationModel) basetypes.StringValue { return m.Id },
@@ -42,7 +45,8 @@ func NewDatadogLogsDestinationResource() resource.Resource {
 
 func NewDatadogMetricsDestinationResource() resource.Resource {
 	return &DestinationResource[DatadogMetricsDestinationModel]{
-		typeName:          "datadog_metrics",
+		typeName:          DATADOG_METRICS_DESTINATION_TYPE_NAME,
+		nodeName:          DATADOG_METRICS_DESTINATION_NODE_NAME,
 		fromModelFunc:     DatadogMetricsFromModel,
 		toModelFunc:       DatadogMetricsDestinationToModel,
 		getIdFunc:         func(m *DatadogMetricsDestinationModel) basetypes.StringValue { return m.Id },
@@ -53,7 +57,8 @@ func NewDatadogMetricsDestinationResource() resource.Resource {
 
 func NewElasticSearchDestinationResource() resource.Resource {
 	return &DestinationResource[ElasticSearchDestinationModel]{
-		typeName:          "elasticsearch",
+		typeName:          ELASTICSEARCH_DESTINATION_TYPE_NAME,
+		nodeName:          ELASTICSEARCH_DESTINATION_NODE_NAME,
 		fromModelFunc:     ElasticSearchDestinationFromModel,
 		toModelFunc:       ElasticSearchDestinationToModel,
 		getIdFunc:         func(m *ElasticSearchDestinationModel) basetypes.StringValue { return m.Id },
@@ -64,7 +69,8 @@ func NewElasticSearchDestinationResource() resource.Resource {
 
 func NewHoneycombLogsDestinationResource() resource.Resource {
 	return &DestinationResource[HoneycombLogsDestinationModel]{
-		typeName:          "honeycomb_logs",
+		typeName:          HONEYCOMB_LOGS_DESTINATION_TYPE_NAME,
+		nodeName:          HONEYCOMB_LOGS_DESTINATION_NODE_NAME,
 		fromModelFunc:     HoneycombLogsFromModel,
 		toModelFunc:       HoneycombLogsToModel,
 		getIdFunc:         func(m *HoneycombLogsDestinationModel) basetypes.StringValue { return m.Id },
@@ -75,7 +81,8 @@ func NewHoneycombLogsDestinationResource() resource.Resource {
 
 func NewHttpDestinationResource() resource.Resource {
 	return &DestinationResource[HttpDestinationModel]{
-		typeName:          "http",
+		typeName:          HTTP_DESTINATION_TYPE_NAME,
+		nodeName:          HTTP_DESTINATION_NODE_NAME,
 		fromModelFunc:     HttpDestinationFromModel,
 		toModelFunc:       HttpDestinationToModel,
 		getIdFunc:         func(m *HttpDestinationModel) basetypes.StringValue { return m.Id },
@@ -86,7 +93,8 @@ func NewHttpDestinationResource() resource.Resource {
 
 func NewKafkaDestinationResource() resource.Resource {
 	return &DestinationResource[KafkaDestinationModel]{
-		typeName:          "kafka",
+		typeName:          KAFKA_DESTINATION_TYPE_NAME,
+		nodeName:          KAFKA_DESTINATION_NODE_NAME,
 		fromModelFunc:     KafkaDestinationFromModel,
 		toModelFunc:       KafkaDestinationToModel,
 		getIdFunc:         func(m *KafkaDestinationModel) basetypes.StringValue { return m.Id },
@@ -97,7 +105,8 @@ func NewKafkaDestinationResource() resource.Resource {
 
 func NewLokiDestinationResource() resource.Resource {
 	return &DestinationResource[LokiDestinationModel]{
-		typeName:          "loki",
+		typeName:          LOKI_DESTINATION_TYPE_NAME,
+		nodeName:          LOKI_DESTINATION_NODE_NAME,
 		fromModelFunc:     LokiFromModel,
 		toModelFunc:       LokiDestinationToModel,
 		getIdFunc:         func(m *LokiDestinationModel) basetypes.StringValue { return m.Id },
@@ -108,7 +117,8 @@ func NewLokiDestinationResource() resource.Resource {
 
 func NewMezmoDestinationResource() resource.Resource {
 	return &DestinationResource[MezmoDestinationModel]{
-		typeName:          "logs",
+		typeName:          MEZMO_DESTINATION_TYPE_NAME,
+		nodeName:          MEZMO_DESTINATION_NODE_NAME,
 		fromModelFunc:     MezmoDestinationFromModel,
 		toModelFunc:       MezmoDestinationToModel,
 		getIdFunc:         func(m *MezmoDestinationModel) basetypes.StringValue { return m.Id },
@@ -119,7 +129,8 @@ func NewMezmoDestinationResource() resource.Resource {
 
 func NewNewRelicDestinationResource() resource.Resource {
 	return &DestinationResource[NewRelicDestinationModel]{
-		typeName:          "new_relic",
+		typeName:          NEWRELIC_DESTINATION_TYPE_NAME,
+		nodeName:          NEWRELIC_DESTINATION_NODE_NAME,
 		fromModelFunc:     NewRelicDestinationFromModel,
 		toModelFunc:       NewRelicDestinationToModel,
 		getIdFunc:         func(m *NewRelicDestinationModel) basetypes.StringValue { return m.Id },
@@ -130,7 +141,8 @@ func NewNewRelicDestinationResource() resource.Resource {
 
 func NewPrometheusRemoteWriteDestinationResource() resource.Resource {
 	return &DestinationResource[PrometheusRemoteWriteDestinationModel]{
-		typeName:          "prometheus_remote_write",
+		typeName:          PROMETHEUS_REMOTE_WRITE_DESTINATION_TYPE_NAME,
+		nodeName:          PROMETHEUS_REMOTE_WRITE_DESTINATION_NODE_NAME,
 		fromModelFunc:     PrometheusRemoteWriteDestinationFromModel,
 		toModelFunc:       PrometheusRemoteWriteDestinationToModel,
 		getIdFunc:         func(m *PrometheusRemoteWriteDestinationModel) basetypes.StringValue { return m.Id },
@@ -141,7 +153,8 @@ func NewPrometheusRemoteWriteDestinationResource() resource.Resource {
 
 func NewS3DestinationResource() resource.Resource {
 	return &DestinationResource[S3DestinationModel]{
-		typeName:          "s3",
+		typeName:          S3_DESTINATION_TYPE_NAME,
+		nodeName:          S3_DESTINATION_NODE_NAME,
 		fromModelFunc:     S3DestinationFromModel,
 		toModelFunc:       S3DestinationToModel,
 		getIdFunc:         func(m *S3DestinationModel) basetypes.StringValue { return m.Id },
@@ -152,7 +165,8 @@ func NewS3DestinationResource() resource.Resource {
 
 func NewSplunkHecLogsDestinationResource() resource.Resource {
 	return &DestinationResource[SplunkHecLogsDestinationModel]{
-		typeName:          "splunk_hec_logs",
+		typeName:          SPLUNK_HEC_LOGS_DESTINATION_TYPE_NAME,
+		nodeName:          SPLUNK_HEC_LOGS_DESTINATION_NODE_NAME,
 		fromModelFunc:     SplunkHecLogsDestinationFromModel,
 		toModelFunc:       SplunkHecLogsDestinationToModel,
 		getIdFunc:         func(m *SplunkHecLogsDestinationModel) basetypes.StringValue { return m.Id },
@@ -163,7 +177,8 @@ func NewSplunkHecLogsDestinationResource() resource.Resource {
 
 func NewGcpCloudStorageDestinationResource() resource.Resource {
 	return &DestinationResource[GcpCloudStorageDestinationModel]{
-		typeName:          "gcp_cloud_storage",
+		typeName:          GCP_CLOUD_STORAGE_DESTINATION_TYPE_NAME,
+		nodeName:          GCP_CLOUD_STORAGE_DESTINATION_NODE_NAME,
 		fromModelFunc:     GcpCloudStorageDestinationFromModel,
 		toModelFunc:       GcpCloudStorageDestinationToModel,
 		getIdFunc:         func(m *GcpCloudStorageDestinationModel) basetypes.StringValue { return m.Id },

@@ -15,6 +15,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const S3_SOURCE_TYPE_NAME = "s3"
+const S3_SOURCE_NODE_NAME = S3_SOURCE_TYPE_NAME
+
 type S3SourceModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -72,7 +75,7 @@ func S3SourceFromModel(plan *S3SourceModel, previousState *S3SourceModel) (*Sour
 	auth := plan.Auth.Attributes()
 	component := Source{
 		BaseNode: BaseNode{
-			Type:        "s3",
+			Type:        S3_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{

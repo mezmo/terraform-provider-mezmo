@@ -14,6 +14,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const MAP_FIELDS_PROCESSOR_NODE_NAME = "map-fields"
+const MAP_FIELDS_PROCESSOR_TYPE_NAME = "map_fields"
+
 type MapFieldsProcessorModel struct {
 	Id           StringValue `tfsdk:"id"`
 	PipelineId   StringValue `tfsdk:"pipeline_id"`
@@ -81,7 +84,7 @@ func MapFieldsProcessorFromModel(plan *MapFieldsProcessorModel, previousState *M
 	dd := diag.Diagnostics{}
 	component := &Processor{
 		BaseNode: BaseNode{
-			Type:        "map-fields",
+			Type:        MAP_FIELDS_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig:  map[string]any{},

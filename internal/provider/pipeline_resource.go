@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"reflect"
+
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -27,6 +28,10 @@ type PipelineResource struct {
 }
 
 func (r *PipelineResource) TypeName() string {
+	return PROVIDER_TYPE_NAME + "_pipeline"
+}
+
+func (r *PipelineResource) NodeType() string {
 	return "pipeline"
 }
 
@@ -116,8 +121,8 @@ func (r *PipelineResource) Delete(ctx context.Context, req resource.DeleteReques
 }
 
 // Metadata implements resource.Resource.
-func (*PipelineResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_pipeline"
+func (r *PipelineResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = r.TypeName()
 }
 
 // Read implements resource.Resource.

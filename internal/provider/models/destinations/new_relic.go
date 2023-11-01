@@ -11,6 +11,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const NEWRELIC_DESTINATION_TYPE_NAME = "new_relic"
+const NEWRELIC_DESTINATION_NODE_NAME = "new-relic"
+
 type NewRelicDestinationModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -54,7 +57,7 @@ func NewRelicDestinationFromModel(plan *NewRelicDestinationModel, previousState 
 
 	component := Destination{
 		BaseNode: BaseNode{
-			Type:        "new-relic",
+			Type:        NEWRELIC_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),

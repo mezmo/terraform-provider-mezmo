@@ -11,6 +11,9 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
+const UNROLL_PROCESSOR_NODE_NAME = "unroll"
+const UNROLL_PROCESSOR_TYPE_NAME = UNROLL_PROCESSOR_NODE_NAME
+
 type UnrollProcessorModel struct {
 	Id           String `tfsdk:"id"`
 	PipelineId   String `tfsdk:"pipeline_id"`
@@ -45,7 +48,7 @@ func UnrollProcessorFromModel(plan *UnrollProcessorModel, previousState *UnrollP
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
-			Type:        "unroll",
+			Type:        UNROLL_PROCESSOR_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),
