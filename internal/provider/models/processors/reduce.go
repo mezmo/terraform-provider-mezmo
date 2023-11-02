@@ -290,16 +290,17 @@ func ReduceProcessorToModel(plan *ReduceProcessorModel, component *Processor) {
 
 	if component.UserConfig["flush_condition"] != nil {
 		flushCondition := component.UserConfig["flush_condition"].(map[string]any)
-
-		conditional := unwindConditionalToModel(flushCondition["conditional"].(map[string]any))
-
-		plan.FlushCondition = NewObjectValueMust(map[string]attr.Type{
-			"when":        StringType{},
-			"conditional": conditional.Type(context.Background()),
-		}, map[string]attr.Value{
-			"when":        NewStringValue(flushCondition["when"].(string)),
-			"conditional": conditional,
-		})
+		whenValue := flushCondition["when"].(string)
+		if whenValue == "starts_when" || whenValue == "ends_when" {
+			conditional := unwindConditionalToModel(flushCondition["conditional"].(map[string]any))
+			plan.FlushCondition = NewObjectValueMust(map[string]attr.Type{
+				"when":        StringType{},
+				"conditional": conditional.Type(context.Background()),
+			}, map[string]attr.Value{
+				"when":        NewStringValue(whenValue),
+				"conditional": conditional,
+			})
+		}
 	}
 }
 
