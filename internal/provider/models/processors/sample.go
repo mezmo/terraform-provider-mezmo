@@ -144,33 +144,43 @@ func SampleProcessorToModel(plan *SampleProcessorModel, component *Processor) {
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.Rate = Int64Value(int64(component.UserConfig["rate"].(float64)))
 	if component.UserConfig["always_include"] != nil {
-		component_map, _ := component.UserConfig["always_include"].(map[string]any)
-		if len(component_map) > 0 {
-			plan_map := make(map[string]attr.Value)
-			plan_map["field"] = StringValue(component_map["field"].(string))
-			plan_map["operator"] = StringValue(component_map["str_operator"].(string))
-			plan_map["value_number"] = Float64Null()
-			plan_map["value_string"] = StringNull()
-			plan_map["case_sensitive"] = BoolNull()
-			if value, ok := component_map["value"]; ok {
-				if valueString, ok := value.(string); ok {
-					if valueString != "" {
-						plan_map["value_string"] = StringValue(valueString)
-					}
-				} else if valueNumber, ok := value.(float64); ok {
-					plan_map["value_number"] = Float64Value(valueNumber)
-				} else {
-					panic("Unexpected type for value in always_include field")
-				}
-			}
-			if case_sensitive, ok := component_map["case_sensitive"]; ok {
-				plan_map["case_sensitive"] = BoolValue(case_sensitive.(bool))
-			}
-			objT := plan.AlwaysInclude.AttributeTypes(context.Background())
-			if len(objT) == 0 {
-				objT = SampleProcessorResourceSchema.Attributes["always_include"].GetType().(basetypes.ObjectType).AttrTypes
-			}
-			plan.AlwaysInclude = basetypes.NewObjectValueMust(objT, plan_map)
+		alwaysIncludeObj, _ := component.UserConfig["always_include"].(map[string]any)
+		fieldVal, fieldOk := alwaysIncludeObj["field"]
+		if !fieldOk {
+			return
 		}
+
+		strOperatorVal, strOperatorOk := alwaysIncludeObj["str_operator"]
+		if !strOperatorOk {
+			return
+		}
+
+		plan_map := make(map[string]attr.Value)
+		plan_map["field"] = StringValue(fieldVal.(string))
+		plan_map["operator"] = StringValue(strOperatorVal.(string))
+		plan_map["value_number"] = Float64Null()
+		plan_map["value_string"] = StringNull()
+		plan_map["case_sensitive"] = BoolNull()
+		if value, ok := alwaysIncludeObj["value"]; ok {
+			if valueString, ok := value.(string); ok {
+				if valueString != "" {
+					plan_map["value_string"] = StringValue(valueString)
+				}
+			} else if valueNumber, ok := value.(float64); ok {
+				plan_map["value_number"] = Float64Value(valueNumber)
+			} else {
+				panic("Unexpected type for value in always_include field")
+			}
+		}
+		if case_sensitive, ok := alwaysIncludeObj["case_sensitive"]; ok {
+			plan_map["case_sensitive"] = BoolValue(case_sensitive.(bool))
+		}
+		objT := plan.AlwaysInclude.AttributeTypes(context.Background())
+		if len(objT) == 0 {
+			objT = SampleProcessorResourceSchema.Attributes["always_include"].GetType().(basetypes.ObjectType).AttrTypes
+		}
+		plan.AlwaysInclude = basetypes.NewObjectValueMust(objT, plan_map)
+
 	}
+
 }
