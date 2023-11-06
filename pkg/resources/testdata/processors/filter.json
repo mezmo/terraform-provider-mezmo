@@ -1,0 +1,32 @@
+{
+  "id": "6f26af30-6e2c-11ee-bed9-6671faf7df66",
+  "title": "filter title",
+  "description": "filter description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 0,
+  "type": "filter",
+  "deploy_type": "saas",
+  "user_config": {
+      "action": "allow",
+      "conditional": {
+        "expressions": [
+          {"field": ".level", "str_operator": "equal", "value": "error"},
+          {
+            "expressions": [
+              {"field": ".status", "str_operator": "greater_or_equal", "value": 299},
+              {"field": ".app_name", "str_operator": "contains", "value": "kube"}
+            ],
+            "logical_operation": "OR"
+          }
+        ]
+      }
+  },
+  "inputs": ["7b212506-23cb-11ed-b300-4ef12c27e273"],
+  "outputs": [
+      {
+          "id": "6f26af30-6e2c-11ee-bed9-6671faf7df66",
+          "label": "Default"
+      }
+  ]
+}
