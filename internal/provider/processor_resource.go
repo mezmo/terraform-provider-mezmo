@@ -23,6 +23,7 @@ type ProcessorModel interface {
 		DropFieldsProcessorModel |
 		EncryptFieldsProcessorModel |
 		EventToMetricProcessorModel |
+		FilterProcessorModel |
 		FlattenFieldsProcessorModel |
 		MapFieldsProcessorModel |
 		MetricsTagCardinalityLimitProcessorModel |

@@ -210,3 +210,15 @@ func NewEventToMetricProcessorResource() resource.Resource {
 		schema:            EventToMetricProcessorResourceSchema,
 	}
 }
+
+func NewFilterProcessorResource() resource.Resource {
+	return &ProcessorResource[FilterProcessorModel]{
+		typeName:          FILTER_PROCESSOR_TYPE_NAME,
+		nodeName:          FILTER_PROCESSOR_NODE_NAME,
+		fromModelFunc:     FilterProcessorFromModel,
+		toModelFunc:       FilterProcessorToModel,
+		getIdFunc:         func(m *FilterProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *FilterProcessorModel) basetypes.StringValue { return m.PipelineId },
+		schema:            FilterProcessorResourceSchema,
+	}
+}
