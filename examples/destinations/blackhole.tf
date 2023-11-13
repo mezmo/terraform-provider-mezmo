@@ -23,9 +23,9 @@ resource "mezmo_demo_source" "source1" {
 }
 
 resource "mezmo_blackhole_destination" "destination1" {
-  pipeline_id  = mezmo_pipeline.pipeline1.id
-  title        = "My destination"
-  description  = "Trash the data without acking"
-  acks_enabled = false
-  inputs       = [mezmo_demo_source.source1.id]
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My destination"
+  description = "Trash the data without acking"
+  ack_enabled = false
+  inputs      = [mezmo_demo_source.source1.id]
 }

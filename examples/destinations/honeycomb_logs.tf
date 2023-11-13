@@ -7,6 +7,10 @@ terraform {
   required_version = ">= 1.1.0"
 }
 
+variable "my_honeycomb_key" {
+  type = string
+}
+
 provider "mezmo" {
   auth_key = "my secret"
 }
@@ -27,6 +31,6 @@ resource "mezmo_honeycomb_logs_destination" "destination1" {
   title       = "My destination"
   description = "Send log data to Honeycomb"
   inputs      = [mezmo_demo_source.source1.id]
-  api_key     = var.my_honeycomb.key
+  api_key     = var.my_honeycomb_key
   dataset     = "my_logs_ds"
 }

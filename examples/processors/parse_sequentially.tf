@@ -7,6 +7,10 @@ terraform {
   required_version = ">= 1.1.0"
 }
 
+variable "my_ingestion_key" {
+  type = string
+}
+
 provider "mezmo" {
   auth_key = "my secret"
 }
@@ -41,7 +45,7 @@ resource "mezmo_parse_sequentially_processor" "processor1" {
       parser = "json_parser"
     },
     {
-      parser = "csv_parser"
+      parser = "csv_row"
       csv_parser_options = {
         field_names = ["field_1", "field_2"]
       }
@@ -58,16 +62,17 @@ resource "mezmo_logs_destination" "destination1" {
 }
 
 resource "mezmo_blackhole_destination" "destination2" {
-  pipeline_id  = mezmo_pipeline.pipeline1.id
-  title        = "My destination"
-  description  = "Trash the data without acking"
-  acks_enabled = false
-  inputs       = [mezmo_parse_sequentially_processor.processor1.parsers.1.output_name]
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My destination"
+  description = "Trash the data without acking"
+  ack_enabled = false
+  inputs      = [mezmo_parse_sequentially_processor.processor1.parsers.1.output_name]
 }
 
 resource "mezmo_http_destination" "destination3" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "Http desintation"
   description = "Send data to an HTTP destination"
+  uri         = "https://example.org"
   inputs      = [mezmo_parse_sequentially_processor.processor1.parsers.2.output_name]
 }

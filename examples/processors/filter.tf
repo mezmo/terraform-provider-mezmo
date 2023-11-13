@@ -25,8 +25,9 @@ resource "mezmo_filter_processor" "processor1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My processor"
   description = "This processor filters logs"
+  action      = "drop"
   inputs      = [mezmo_demo_source.source1.id]
-  conditionals = {
+  conditional = {
     expressions = [
       {
         field        = ".status"
