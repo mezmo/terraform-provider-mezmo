@@ -7,6 +7,9 @@ terraform {
   required_version = ">= 1.1.0"
 }
 
+variable "my_aws_secret_access_key" {
+  type = string
+}
 provider "mezmo" {
   auth_key = "my secret"
 }

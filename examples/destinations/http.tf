@@ -26,6 +26,7 @@ resource "mezmo_http_destination" "webhook" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "Webhook"
   description = "This URL is an API that acts as a webhook"
+  uri         = "https://example.org"
   inputs      = [mezmo_demo_source.source1.id]
 }
 
@@ -33,6 +34,7 @@ resource "mezmo_http_destination" "storage" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "Storage"
   description = "This is an API that stores a copy of the data on disk"
+  uri         = "https://example.org"
   inputs      = [mezmo_demo_source.source1.id]
   auth = {
     strategy = "bearer"
@@ -44,6 +46,7 @@ resource "mezmo_http_destination" "some_api" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "Auth endpoint"
   description = "This API is authenticated with username/password"
+  uri         = "https://example.org"
   inputs      = [mezmo_demo_source.source1.id]
   auth = {
     strategy = "basic"

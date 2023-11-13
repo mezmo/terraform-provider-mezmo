@@ -7,6 +7,13 @@ terraform {
   required_version = ">= 1.1.0"
 }
 
+variable "my_new_relic_account_id" {
+  type = string
+}
+
+variable "my_license_key" {
+  type = string
+}
 provider "mezmo" {
   auth_key = "my secret"
 }

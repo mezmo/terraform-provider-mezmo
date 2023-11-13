@@ -31,11 +31,9 @@ resource "mezmo_loki_destination" "sink1" {
     user     = "username"
     password = "secret-password"
   }
-  enpoint = "http://example.com"
-  encoding = {
-    codec = "text"
-  }
-  path = "example/path"
+  endpoint = "http://example.com"
+  encoding = "json"
+  path     = "example/path"
   labels = {
     test_key_0 = "test_value_0"
     test_key_1 = "test_value_1"
