@@ -82,7 +82,7 @@ pipeline {
         script {
           currentBuild.description = "SANITY=${env.SANITY_BUILD}"
         }
-      
+
         sh 'FILES_TO_FORMAT=$(gofmt -l .) && echo -e "Files with formatting errors: $FILES_TO_FORMAT" && [ -z "$FILES_TO_FORMAT" ]'
       }
     }
@@ -107,6 +107,17 @@ pipeline {
           }
           steps {
             sh 'make test'
+          }
+        }
+        stage('Example Validation') {
+          agent {
+            node {
+              label 'ec2-fleet'
+              customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}-example_validation"
+            }
+          }
+          steps {
+            sh 'make -j8 -k -O examples'
           }
         }
       }
