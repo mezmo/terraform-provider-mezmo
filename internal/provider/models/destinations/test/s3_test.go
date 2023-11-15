@@ -108,6 +108,26 @@ func TestS3DestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_s3_destination" "import_target" {
+						title       = "My destination"
+						description = "my destination description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						region      = "us-west1"
+						auth = {
+							access_key_id = "my_key"
+							secret_access_key = "my_secret"
+						}
+						bucket = "mybucket"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_s3_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_s3_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

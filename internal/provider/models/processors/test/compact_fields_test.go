@@ -86,6 +86,21 @@ func TestCompactFieldsProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_compact_fields_processor" "import_target" {
+						title = "compact fields title"
+						description = "compact fields desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						fields = [".thing1", ".thing2"]
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_compact_fields_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_compact_fields_processor.my_processor"),
+				ImportStateVerify: true,
+			},
+
 			// Update fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

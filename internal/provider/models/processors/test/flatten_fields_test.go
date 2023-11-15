@@ -65,6 +65,20 @@ func TestFlattenFieldsProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_flatten_fields_processor" "import_target" {
+						title = "flatten fields title"
+						description = "flatten fields desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_flatten_fields_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_flatten_fields_processor.my_processor_defaults"),
+				ImportStateVerify: true,
+			},
+
 			// Create with fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

@@ -487,6 +487,30 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 					}),
 				),
 			},
+
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_sequentially_processor" "import_target" {
+						title = "custom csv parser title"
+						description = "custom csv parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parsers = [
+							{
+								parser = "csv_row"
+								csv_row_options = {
+									field_names = ["field1", "field2"]
+								}
+							}
+						]
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_parse_sequentially_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_parse_sequentially_processor.csv_parser"),
+				ImportStateVerify: true,
+			},
+
 			// Create multiple parsers
 			{
 				Config: GetCachedConfig(cacheKey) + `

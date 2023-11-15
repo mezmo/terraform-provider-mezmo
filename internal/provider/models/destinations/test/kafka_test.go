@@ -345,6 +345,28 @@ func TestKafkaDestinationResource(t *testing.T) {
 					}),
 				),
 			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_kafka_destination" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my kafka title"
+						description = "my kafka description"
+						brokers = [{
+						    host = "mezmo.com"
+						    port = 9092
+						}]
+						event_key_field = "my_key"
+						topic = "topic1"
+						compression = "gzip"
+						encoding = "json"
+						ack_enabled = true
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_kafka_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_kafka_destination.my_destination"),
+				ImportStateVerify: true,
+			},
 			// Update and Read with new broker testing
 			{
 				Config: GetCachedConfig(cacheKey) + `

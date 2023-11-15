@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"os"
 	"reflect"
 	"strings"
@@ -227,4 +228,40 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 // Schema implements resource.Resource.
 func (r *SourceResource[T]) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = r.schema
+}
+
+func (r *SourceResource[T]) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	parts := strings.Split(req.ID, "/")
+	if len(parts) != 2 {
+		resp.Diagnostics.AddError(
+			"Malformed Resource Import Id",
+			fmt.Sprintf(
+				"The source resource import id needs to be in the form of <pipeline id>/<source id>. The "+
+					"input \"%s\" did not contain two parts after parsing the id.",
+				req.ID,
+			),
+		)
+		return
+	}
+
+	pipelineId := strings.TrimSpace(parts[0])
+	if pipelineId == "" {
+		resp.Diagnostics.AddError(
+			"Resource Import Id Missing Pipeline Id Part",
+			"The pipeline id specified only contained whitespace.",
+		)
+	}
+
+	nodeId := strings.TrimSpace(parts[1])
+	if nodeId == "" {
+		resp.Diagnostics.AddError(
+			"Resource Import Id Missing Source Id Part",
+			"The source id specified only contained whitespace",
+		)
+	}
+
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), nodeId)...)
+		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("pipeline_id"), pipelineId)...)
+	}
 }

@@ -9,6 +9,7 @@ import (
 )
 
 func TestBlackholeDestinationResource(t *testing.T) {
+	const cacheKey = "blackhole_destination_resource"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
@@ -21,10 +22,10 @@ func TestBlackholeDestinationResource(t *testing.T) {
 			},
 			// Create and Read testing
 			{
-				Config: GetProviderConfig() + `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "parent pipeline"
-					}
+					}`) + `
 					resource "mezmo_blackhole_destination" "my_destination" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my destination title"
@@ -41,6 +42,19 @@ func TestBlackholeDestinationResource(t *testing.T) {
 						"inputs.#":      "0",
 					}),
 				),
+			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_blackhole_destination" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my destination title"
+						description = "my destination description"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_blackhole_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_blackhole_destination.my_destination"),
+				ImportStateVerify: true,
 			},
 			// Update and Read testing
 			{

@@ -69,6 +69,21 @@ func TestMezmoDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_logs_destination" "import_target" {
+						title = "My destination"
+						description = "my destination description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						ingestion_key = "my_key"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_logs_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_logs_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields (pass through)
 			{
 				Config: GetCachedConfig(cacheKey) + `

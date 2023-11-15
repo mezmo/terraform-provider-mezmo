@@ -77,6 +77,22 @@ func TestHoneycombLogsDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_honeycomb_logs_destination" "import_target" {
+						title = "My destination"
+						description = "my destination description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						dataset     = "ds1"
+						api_key     = "key1"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_honeycomb_logs_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_honeycomb_logs_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

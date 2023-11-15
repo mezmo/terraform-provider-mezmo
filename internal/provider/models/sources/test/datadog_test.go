@@ -46,6 +46,20 @@ func TestDatadogSource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_datadog_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						description = "my description"
+						title = "my title"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_datadog_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_datadog_source.my_source"),
+				ImportStateVerify: true,
+			},
+
 			// Updates
 			{
 				Config: GetCachedConfig(cacheKey) + `

@@ -55,6 +55,21 @@ func TestLogStashSource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_logstash_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "bad new title"
+						description = "new description"
+						capture_metadata = "true"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_logstash_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_logstash_source.my_source"),
+				ImportStateVerify: true,
+			},
+
 			// Updates
 			{
 				Config: GetCachedConfig(cacheKey) + `

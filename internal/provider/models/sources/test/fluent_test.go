@@ -58,6 +58,20 @@ func TestFluentSource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_fluent_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my title"
+						description = "my description"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_fluent_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_fluent_source.my_source"),
+				ImportStateVerify: true,
+			},
+
 			// Update and Read testing
 			{
 				Config: GetCachedConfig(cacheKey) + `

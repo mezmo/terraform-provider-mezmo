@@ -9,6 +9,7 @@ import (
 )
 
 func TestS3SourceResource(t *testing.T) {
+	const cacheKey = "s3_source_resource"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
@@ -53,10 +54,10 @@ func TestS3SourceResource(t *testing.T) {
 			},
 			// Create and Read testing
 			{
-				Config: GetProviderConfig() + `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "parent pipeline"
-					}
+					}`) + `
 					resource "mezmo_s3_source" "my_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my title"
@@ -81,6 +82,25 @@ func TestS3SourceResource(t *testing.T) {
 						"compression":            "auto",
 					}),
 				),
+			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_s3_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my title"
+						description = "my description"
+						region = "us-east-2"
+						sqs_queue_url = "https://hello.com/sqs"
+						auth = {
+							access_key_id = "123"
+							secret_access_key = "secret123"
+						}
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_s3_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_s3_source.my_source"),
+				ImportStateVerify: true,
 			},
 			// Update and Read testing
 			{

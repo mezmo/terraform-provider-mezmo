@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -15,8 +16,9 @@ import (
 )
 
 var (
-	_ resource.Resource              = &PipelineResource{}
-	_ resource.ResourceWithConfigure = &PipelineResource{}
+	_ resource.Resource                = &PipelineResource{}
+	_ resource.ResourceWithConfigure   = &PipelineResource{}
+	_ resource.ResourceWithImportState = &PipelineResource{}
 )
 
 func NewPipelineResource() resource.Resource {
@@ -182,4 +184,8 @@ func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateReques
 func setDiagnosticsHasError(source diag.Diagnostics, target *diag.Diagnostics) bool {
 	target.Append(source...)
 	return target.HasError()
+}
+
+func (r *PipelineResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

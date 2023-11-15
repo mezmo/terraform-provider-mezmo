@@ -9,6 +9,7 @@ import (
 )
 
 func TestDemoSourceResource(t *testing.T) {
+	const cacheKey = "demo_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
@@ -43,10 +44,10 @@ func TestDemoSourceResource(t *testing.T) {
 			},
 			// Create and Read testing
 			{
-				Config: GetProviderConfig() + `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "parent pipeline"
-					}
+					}`) + `
 					resource "mezmo_demo_source" "my_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my source title"
@@ -66,6 +67,20 @@ func TestDemoSourceResource(t *testing.T) {
 					}),
 					resource.TestCheckResourceAttrSet("mezmo_demo_source.my_source", "generation_id"),
 				),
+			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_demo_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my source title"
+						description = "my source description"
+						format = "json"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_demo_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_demo_source.my_source"),
+				ImportStateVerify: true,
 			},
 			// Update and Read testing
 			{

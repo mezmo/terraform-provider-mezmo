@@ -51,6 +51,19 @@ func TestPrometheusRemoteWriteSource(t *testing.T) {
 					}),
 				),
 			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_prometheus_remote_write_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my prometheus remote write title"
+						description = "my prometheus remote write description"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_prometheus_remote_write_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_prometheus_remote_write_source.my_source"),
+				ImportStateVerify: true,
+			},
 			// Update and Read testing
 			{
 				Config: GetCachedConfig(cacheKey) + `

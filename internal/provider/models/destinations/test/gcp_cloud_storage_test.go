@@ -186,6 +186,28 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 					}),
 				),
 			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_gcp_cloud_storage_destination" "import_target" {
+						title = "test dest"
+						description = "test dest description"
+						inputs = [mezmo_http_source.test_source.id]
+						pipeline_id = mezmo_pipeline.test_parent.id
+						encoding = "json"
+						compression = "gzip"
+						bucket = "test_bucket"
+						bucket_prefix = "bucket_prefix"
+						auth = {
+							type = "api_key"
+							value = "key"
+						}
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_gcp_cloud_storage_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_gcp_cloud_storage_destination.my_dest"),
+				ImportStateVerify: true,
+			},
 			// Update fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

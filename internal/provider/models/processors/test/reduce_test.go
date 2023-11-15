@@ -108,6 +108,20 @@ func TestReduceProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_reduce_processor" "import_target" {
+						title = "processor title"
+						description = "processor desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_reduce_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_reduce_processor.default_values"),
+				ImportStateVerify: true,
+			},
+
 			// Add options
 			{
 				Config: GetCachedConfig(cacheKey) + `

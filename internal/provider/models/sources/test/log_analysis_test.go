@@ -48,6 +48,19 @@ func TestLogAnalysisSource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("mezmo_log_analysis_source.my_source", "generation_id"),
 				),
 			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_log_analysis_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my source title"
+						description = "my source description"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_log_analysis_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_log_analysis_source.my_source"),
+				ImportStateVerify: true,
+			},
 			// Update and Read testing
 			{
 				Config: GetProviderConfig() + `

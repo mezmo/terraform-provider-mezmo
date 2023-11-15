@@ -241,6 +241,25 @@ func TestEventToMetricProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_event_to_metric_processor" "import_target" {
+						title = "title"
+						description = "desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						metric_name = "my_metric"
+						metric_type = "counter"
+						metric_kind = "absolute"
+						namespace_field = ".namespace"
+						value_field = ".something"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_event_to_metric_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_event_to_metric_processor.my_processor"),
+				ImportStateVerify: true,
+			},
+
 			// Update
 			{
 				Config: GetCachedConfig(cacheKey) + `

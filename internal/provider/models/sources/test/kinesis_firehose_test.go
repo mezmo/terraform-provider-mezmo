@@ -57,6 +57,21 @@ func TestKinesisFirehoseSourceResource(t *testing.T) {
 					}),
 				),
 			},
+			// Import
+			{
+				Config: providertest.GetCachedConfig(cacheKey) + `
+					resource "mezmo_kinesis_firehose_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "test title"
+						description = "test description"
+						decoding = "text"
+						capture_metadata = true
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_kinesis_firehose_source.import_target",
+				ImportStateIdFunc: providertest.ComputeImportId("mezmo_kinesis_firehose_source.my_source"),
+				ImportStateVerify: true,
+			},
 			{
 				Config: providertest.GetCachedConfig(cacheKey) + `
 					resource "mezmo_kinesis_firehose_source" "my_source" {

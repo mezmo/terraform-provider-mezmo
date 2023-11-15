@@ -197,6 +197,22 @@ func TestAzureEventHubSourceResource(t *testing.T) {
 			},
 			{
 				Config: providertest.GetCachedConfig(cacheKey) + `
+					resource "mezmo_azure_event_hub_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "test title"
+						description = "test description"
+						connection_string = "test_connection_string"
+						namespace = "test_namespace"
+						group_id = "test_group_id"
+						topics = ["topic1", "topic2"]
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_azure_event_hub_source.import_target",
+				ImportStateIdFunc: providertest.ComputeImportId("mezmo_azure_event_hub_source.my_source"),
+				ImportStateVerify: true,
+			},
+			{
+				Config: providertest.GetCachedConfig(cacheKey) + `
 					resource "mezmo_azure_event_hub_source" "my_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
