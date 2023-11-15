@@ -72,6 +72,23 @@ func TestAzureBlobStorageDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_azure_blob_storage_destination" "import_target" {
+						title             = "My destination"
+						description       = "my destination description"
+						inputs            = [mezmo_http_source.my_source.id]
+						pipeline_id       = mezmo_pipeline.test_parent.id
+						connection_string = "abc://defg.com"
+						container_name    = "my_container"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_azure_blob_storage_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_azure_blob_storage_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

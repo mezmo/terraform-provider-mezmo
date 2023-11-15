@@ -79,6 +79,23 @@ func TestNewRelicDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_new_relic_destination" "import_target" {
+						title = "My destination"
+						description = "my destination description"
+						inputs      = [mezmo_http_source.my_source.id]
+						pipeline_id = mezmo_pipeline.test_parent.id
+						account_id = "acc1"
+						license_key = "key1"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_new_relic_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_new_relic_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields (pass through)
 			{
 				Config: GetCachedConfig(cacheKey) + `

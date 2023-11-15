@@ -62,6 +62,31 @@ func TestLokiDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_loki_destination" "import_target" {
+						title = "test destination"
+						description = "loki destination"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						auth = {
+							strategy = "basic"
+							user     = "username"
+							password = "secret-password"
+						}
+						endpoint = "http://example.com"
+						encoding = "json"
+						labels = {
+							"test_key_0" = "test_value_0"
+							"test_key_1" = "test_value_1"
+						}
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_loki_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_loki_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Required field encoding
 			{
 				Config: GetCachedConfig(cacheKey) + `

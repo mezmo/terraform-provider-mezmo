@@ -430,6 +430,27 @@ func TestParseProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "import_target" {
+						title = "custom apache parser title"
+						description = "custom apache parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "apache_log"
+						apache_log_options = {
+							format = "common"
+							timestamp_format = "Custom"
+							custom_timestamp_format = "%Y/%m/%d %H:%M:%S"
+						}
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_parse_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_parse_processor.apache_custom_time"),
+				ImportStateVerify: true,
+			},
+
 			// Update apache parser with custom timestamp to nginx
 			{
 				Config: GetCachedConfig(cacheKey) + `

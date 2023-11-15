@@ -120,6 +120,26 @@ func TestSQSSource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_sqs_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						description = "my description"
+						title = "my title"
+						queue_url = "http://example.com/queue"
+						region = "us-east-2"
+						auth = {
+							access_key_id = "123"
+							secret_access_key = "secret123"
+						}
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_sqs_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_sqs_source.my_source"),
+				ImportStateVerify: true,
+			},
+
 			// Updates
 			{
 				Config: GetCachedConfig(cacheKey) + `

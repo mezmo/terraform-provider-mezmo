@@ -156,3 +156,17 @@ func StateHasExpectedValues(resourceName string, expected map[string]any) resour
 		return nil
 	}
 }
+
+func ComputeImportId(resourceName string) resource.ImportStateIdFunc {
+	return func(state *terraform.State) (string, error) {
+		resource := state.RootModule().Resources[resourceName]
+		if resource == nil {
+			return "", fmt.Errorf("resource \"%s\" not found", resourceName)
+		}
+		attributes := resource.Primary.Attributes
+		if pipelineId, ok := attributes["pipeline_id"]; ok {
+			return fmt.Sprintf("%s/%s", pipelineId, resource.Primary.ID), nil
+		}
+		return "", fmt.Errorf("resource \"%s\" does not have an attribute \"pipeline_id\"", resourceName)
+	}
+}

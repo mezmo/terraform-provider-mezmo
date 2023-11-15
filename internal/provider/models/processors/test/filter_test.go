@@ -167,6 +167,32 @@ func TestFilterProcessor(t *testing.T) {
 					}),
 				),
 			},
+
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_filter_processor" "import_target" {
+				title = "processor title"
+						description = "processor desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs = [mezmo_http_source.my_source.id]
+						action = "allow"
+						conditional = {
+							expressions = [
+								{
+									field = ".status"
+									operator = "equal"
+									value_number = 200
+								}
+							]
+						}
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_filter_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_filter_processor.single_expression"),
+				ImportStateVerify: true,
+			},
+
 			// Complex expression
 			{
 				Config: GetCachedConfig(cacheKey) + `

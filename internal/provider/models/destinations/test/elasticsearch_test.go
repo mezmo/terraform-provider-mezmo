@@ -101,6 +101,27 @@ func TestElasticSearchDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_elasticsearch_destination" "import_target" {
+						title = "My destination"
+						description = "my destination description"
+						inputs      = [mezmo_http_source.my_source.id]
+						pipeline_id = mezmo_pipeline.test_parent.id
+						endpoints   = ["https://google.com"]
+						auth = {
+							strategy = "basic"
+							user     = "user1"
+							password = "pass1"
+						}
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_elasticsearch_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_elasticsearch_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields (pass through)
 			{
 				Config: SetCachedConfig(cacheKey, `

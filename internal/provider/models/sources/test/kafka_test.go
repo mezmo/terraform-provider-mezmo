@@ -380,6 +380,26 @@ func TestKafkaSourceResource(t *testing.T) {
 					}),
 				),
 			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_kafka_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my kafka title"
+						description = "my kafka description"
+						brokers = [{
+						    host = "mezmo.com"
+						    port = 9092
+						}]
+						topics = ["topic1", "topic2"]
+						group_id = "my_group_id"
+						tls_enabled = true
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_kafka_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_kafka_source.my_source"),
+				ImportStateVerify: true,
+			},
 			// Update and Read with new broker testing
 			{
 				Config: GetCachedConfig(cacheKey) + `

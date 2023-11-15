@@ -146,6 +146,21 @@ func TestMetricsTagCardinalityLimitProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_metrics_tag_cardinality_limit_processor" "import_target" {
+						title = "title"
+						description = "desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						value_limit = 50
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_metrics_tag_cardinality_limit_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_metrics_tag_cardinality_limit_processor.my_processor"),
+				ImportStateVerify: true,
+			},
+
 			// Update fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

@@ -103,6 +103,22 @@ func TestSplunkHecLogsDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_splunk_hec_logs_destination" "import_target" {
+						title = "My destination"
+						description = "my destination description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						endpoint    = "https://google.com"
+						token       = "my_token"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_splunk_hec_logs_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_splunk_hec_logs_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update source fields and others
 			{
 				Config: GetCachedConfig(cacheKey) + `

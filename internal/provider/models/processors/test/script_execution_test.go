@@ -72,6 +72,21 @@ func TestScriptExecutionProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_script_execution_processor" "import_target" {
+						title = "processor title"
+						description = "processor desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						script = "function processEvent(e) { return e }"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_script_execution_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_script_execution_processor.my_processor"),
+				ImportStateVerify: true,
+			},
+
 			// Update
 			{
 				Config: GetCachedConfig(cacheKey) + `

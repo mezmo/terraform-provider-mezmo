@@ -9,6 +9,7 @@ import (
 )
 
 func TestStringifyProcessorResource(t *testing.T) {
+	const cacheKey = "stringify_processor_resource"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
@@ -21,10 +22,10 @@ func TestStringifyProcessorResource(t *testing.T) {
 			},
 			// Create and Read testing
 			{
-				Config: GetProviderConfig() + `
+				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
 						title = "parent pipeline"
-					}
+					}`) + `
 					resource "mezmo_stringify_processor" "my_processor" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "my stringify title"
@@ -40,6 +41,19 @@ func TestStringifyProcessorResource(t *testing.T) {
 						"inputs.#":      "0",
 					}),
 				),
+			},
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_stringify_processor" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						title = "my stringify title"
+						description = "my stringify description"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_stringify_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_stringify_processor.my_processor"),
+				ImportStateVerify: true,
 			},
 			// Update and Read testing
 			{

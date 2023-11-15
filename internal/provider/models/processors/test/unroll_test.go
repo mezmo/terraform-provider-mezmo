@@ -73,6 +73,21 @@ func TestUnrollProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_unroll_processor" "import_target" {
+						title = "processor title"
+						description = "processor desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".thing1"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_unroll_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_unroll_processor.my_processor"),
+				ImportStateVerify: true,
+			},
+
 			// Update
 			{
 				Config: GetCachedConfig(cacheKey) + `

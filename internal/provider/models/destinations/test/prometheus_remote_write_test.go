@@ -115,6 +115,22 @@ func TestPrometheusDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_prometheus_remote_write_destination" "import_target" {
+						title = "My destination"
+						description = "my destination description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs = [mezmo_http_source.my_source.id]
+						endpoint = "https://google.com"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_prometheus_remote_write_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_prometheus_remote_write_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

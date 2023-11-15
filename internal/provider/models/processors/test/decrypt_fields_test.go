@@ -159,6 +159,24 @@ func TestDecryptFieldsProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_decrypt_fields_processor" "import_target" {
+						title = "decrypt fields title"
+						description = "decrypt fields desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						algorithm = "AES-128-CFB"
+						key = "1111111111111111"
+						iv_field = ".some_iv_field"
+						field = ".something"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_decrypt_fields_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_decrypt_fields_processor.my_processor"),
+				ImportStateVerify: true,
+			},
+
 			// Update fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

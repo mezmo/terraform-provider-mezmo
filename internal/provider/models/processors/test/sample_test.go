@@ -77,6 +77,20 @@ func TestSampleProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_sample_processor" "import_target" {
+						title = "test title"
+						description = "test desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_sample_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_sample_processor.my_processor"),
+				ImportStateVerify: true,
+			},
+
 			// Update fields: always_include w/ no value
 			{
 				Config: GetCachedConfig(cacheKey) + `

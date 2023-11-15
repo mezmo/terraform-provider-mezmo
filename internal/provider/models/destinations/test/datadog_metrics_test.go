@@ -92,6 +92,22 @@ func TestDatadogMetricsDestinationResource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_datadog_metrics_destination" "import_target" {
+						title       = "my metrics destination"
+						description = "metrics description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						site        = "us3"
+						api_key     = "<secret-api-key>"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_datadog_metrics_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_datadog_metrics_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

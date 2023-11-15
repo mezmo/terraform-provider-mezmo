@@ -84,6 +84,21 @@ func TestDropFieldsProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_drop_fields_processor" "import_target" {
+						title = "processor title"
+						description = "processor desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						fields = [".thing1", ".thing2"]
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_drop_fields_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_drop_fields_processor.my_processor"),
+				ImportStateVerify: true,
+			},
+
 			// Update fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

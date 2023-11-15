@@ -94,6 +94,21 @@ func TestHttpDestination(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_http_destination" "import_target" {
+						title = "my http destination"
+						description = "http destination description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						uri = "http://example.com"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_http_destination.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_http_destination.my_destination"),
+				ImportStateVerify: true,
+			},
+
 			// Update all fields
 			{
 				Config: GetCachedConfig(cacheKey) + `

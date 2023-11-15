@@ -112,6 +112,28 @@ func TestMapFieldsProcessor(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_map_fields_processor" "import_target" {
+						title = "some title"
+						description = "some description"
+						inputs = [mezmo_http_source.my_source.id]
+						pipeline_id = mezmo_pipeline.test_parent.id
+
+						mappings = [
+							{
+								source_field = ".field1"
+								target_field = ".field2"
+							},
+						]
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_map_fields_processor.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_map_fields_processor.single_mapping"),
+				ImportStateVerify: true,
+			},
+
 			// Multiple mappings
 			{
 				Config: GetCachedConfig(cacheKey) + `

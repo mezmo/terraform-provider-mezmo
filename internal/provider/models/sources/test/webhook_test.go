@@ -66,6 +66,21 @@ func TestWebhookSource(t *testing.T) {
 				),
 			},
 
+			// Import
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_webhook_source" "import_target" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						description = "my description"
+						title = "my title"
+						signing_key = "sshhh"
+					}`,
+				ImportState:       true,
+				ResourceName:      "mezmo_webhook_source.import_target",
+				ImportStateIdFunc: ComputeImportId("mezmo_webhook_source.my_source"),
+				ImportStateVerify: true,
+			},
+
 			// Updates
 			{
 				Config: GetCachedConfig(cacheKey) + `
