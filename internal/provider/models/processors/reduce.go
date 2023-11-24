@@ -292,7 +292,7 @@ func ReduceProcessorToModel(plan *ReduceProcessorModel, component *Processor) {
 		flushCondition := component.UserConfig["flush_condition"].(map[string]any)
 		whenValue := flushCondition["when"].(string)
 		if whenValue == "starts_when" || whenValue == "ends_when" {
-			conditional := unwindConditionalToModel(flushCondition["conditional"].(map[string]any))
+			conditional := UnwindConditionalToModel(flushCondition["conditional"].(map[string]any))
 			plan.FlushCondition = NewObjectValueMust(map[string]attr.Type{
 				"when":        StringType{},
 				"conditional": conditional.Type(context.Background()),
@@ -302,68 +302,4 @@ func ReduceProcessorToModel(plan *ReduceProcessorModel, component *Processor) {
 			})
 		}
 	}
-}
-
-func unwindConditionalToModel(component map[string]any) ObjectValue {
-	value, _ := parseExpressionsItem(component, 0)
-	return value
-}
-
-func parseExpressionsItem(component map[string]any, level int) (value ObjectValue, isGroup bool) {
-	logicalOperation := "AND" // Default
-	if operation, ok := component["logical_operation"].(string); ok {
-		logicalOperation = operation
-	}
-	if childExpressionArr, ok := component["expressions"].([]any); ok {
-		// Branch
-		groupItems := make([]attr.Value, 0)
-		leafItems := make([]attr.Value, 0)
-		attributeTypes := ToAttrTypes(GetAttributesByLevel(level))
-
-		for _, e := range childExpressionArr {
-			child := e.(map[string]any)
-			value, isGroup := parseExpressionsItem(child, level+1)
-
-			if isGroup {
-				groupItems = append(groupItems, value)
-			} else {
-				leafItems = append(leafItems, value)
-			}
-		}
-
-		attributeValues := map[string]attr.Value{
-			"logical_operation": NewStringValue(logicalOperation),
-			"expressions":       NewListNull(NestedExpressionAttribute.Type()), // Default to match `plan` since there might only be group expressions on this level
-		}
-
-		if len(leafItems) > 0 {
-			attributeValues["expressions"] = NewListValueMust(NestedExpressionAttribute.Type(), leafItems)
-		}
-
-		expressionGroupType := GetChildExpressionGroupTypeByLevel(level)
-		if len(groupItems) > 0 {
-			attributeValues["expressions_group"] = NewListValueMust(expressionGroupType, groupItems)
-		} else if attributeTypes["expressions_group"] != nil {
-			attributeValues["expressions_group"] = NewListNull(expressionGroupType)
-		}
-
-		return NewObjectValueMust(
-			attributeTypes,
-			attributeValues), true
-	}
-
-	// Leaf
-	attributeValues := map[string]attr.Value{
-		"field":        NewStringValue(component["field"].(string)),
-		"operator":     NewStringValue(component["str_operator"].(string)),
-		"value_number": NewFloat64Null(),
-		"value_string": NewStringNull(),
-	}
-	if valueNumber, ok := component["value"].(float64); ok {
-		attributeValues["value_number"] = NewFloat64Value(valueNumber)
-	} else {
-		attributeValues["value_string"] = NewStringValue(component["value"].(string))
-	}
-
-	return NewObjectValueMust(ExpressionTypes, attributeValues), false
 }

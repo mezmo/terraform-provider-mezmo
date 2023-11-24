@@ -78,5 +78,5 @@ func FilterProcessorToModel(plan *FilterProcessorModel, component *Processor) {
 	plan.GenerationId = NewInt64Value(component.GenerationId)
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.Action = NewStringValue(component.UserConfig["action"].(string))
-	plan.Conditional = unwindConditionalToModel(component.UserConfig["conditional"].(map[string]any))
+	plan.Conditional = UnwindConditionalToModel(component.UserConfig["conditional"].(map[string]any))
 }
