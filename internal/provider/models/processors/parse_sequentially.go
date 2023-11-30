@@ -208,7 +208,8 @@ func parserItemToModel(api_parser_item map[string]any) map[string]attr.Value {
 		if !ok {
 			optional_fields = []string{}
 		}
-		values := MapAnyFillMissingValues(attr_types, api_options, optional_fields)
+		attr_type_keys := append(MapKeys(attr_types), optional_fields...)
+		values := MapAnyFillMissingValues(attr_types, StripUnknownOptions(attr_type_keys, api_options), optional_fields)
 		parser_item[options_key] = basetypes.NewObjectValueMust(attr_types, values)
 	}
 

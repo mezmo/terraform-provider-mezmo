@@ -188,7 +188,20 @@ func optionsToModel(parser string, options map[string]any) basetypes.ObjectValue
 		return basetypes.NewObjectNull(nil)
 	}
 
-	values := MapAnyFillMissingValues(attr_types, options, optional_fields)
+	// strip any new options we don't know about in Terraform world
+	attr_type_keys := append(MapKeys(attr_types), optional_fields...)
+
+	values := MapAnyFillMissingValues(attr_types, StripUnknownOptions(attr_type_keys, options), optional_fields)
 	new_options := basetypes.NewObjectValueMust(attr_types, values)
+	return new_options
+}
+
+func StripUnknownOptions(attr_type_keys []string, options map[string]any) map[string]any {
+	new_options := make(map[string]any)
+	for _, k := range attr_type_keys {
+		if v, ok := options[k]; ok {
+			new_options[k] = v
+		}
+	}
 	return new_options
 }

@@ -56,6 +56,7 @@ resource "mezmo_parse_processor" "regex" {
   field       = ".log"
   parser      = "regex_parser"
   regex_parser_options = {
-    pattern = "^(?P<number>[0-9]*)(?P<word>\\w*)(?P<singlequote>\\')(?P<slash>\\\\?)"
+    pattern        = "^(?P<number>[0-9]*)(?P<word>\\w*)(?P<singlequote>\\')(?P<slash>\\\\?)"
+    case_sensitive = false
   }
 }

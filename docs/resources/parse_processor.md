@@ -107,6 +107,13 @@ Required:
 
 - `pattern` (String) The regex pattern.
 
+Optional:
+
+- `case_sensitive` (Boolean) Perform case sensitive regex matching
+- `crlf_newline` (Boolean) When true and multiline = true, newline character will be interpreted as
+- `match_newline` (Boolean) When true, dot (.) will match newline characters
+- `multiline` (Boolean) When true, ^ and $ will match not only the beginning and end of a string but also the start and end of lines
+
 
 <a id="nestedatt--timestamp_parser_options"></a>
 ### Nested Schema for `timestamp_parser_options`

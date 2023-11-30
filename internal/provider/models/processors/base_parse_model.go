@@ -144,6 +144,26 @@ var base_options_parser_schema = SchemaAttributes{
 					stringvalidator.LengthAtLeast(1),
 				},
 			},
+			"case_sensitive": schema.BoolAttribute{
+				Optional:    true,
+				Computed:    true,
+				Description: "Perform case sensitive regex matching",
+			},
+			"multiline": schema.BoolAttribute{
+				Optional:    true,
+				Computed:    true,
+				Description: "When true, ^ and $ will match not only the beginning and end of a string but also the start and end of lines",
+			},
+			"match_newline": schema.BoolAttribute{
+				Optional:    true,
+				Computed:    true,
+				Description: "When true, dot (.) will match newline characters",
+			},
+			"crlf_newline": schema.BoolAttribute{
+				Optional:    true,
+				Computed:    true,
+				Description: "When true and multiline = true, newline character will be interpreted as \r\n",
+			},
 		},
 	},
 	"timestamp_parser_options": schema.SingleNestedAttribute{

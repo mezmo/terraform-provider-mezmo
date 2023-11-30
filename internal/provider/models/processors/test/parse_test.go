@@ -366,6 +366,74 @@ func TestParseProcessor(t *testing.T) {
 					}),
 				),
 			},
+			// regex parser with default options
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "regex_defaults" {
+						title = "regex parser title"
+						description = "regex parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "regex_parser"
+						regex_parser_options = {
+							pattern = "\\d{3}-\\d{2}-\\d{3}"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.regex_defaults", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.regex_defaults", map[string]any{
+						"pipeline_id":                         "#mezmo_pipeline.test_parent.id",
+						"title":                               "regex parser title",
+						"description":                         "regex parser desc",
+						"generation_id":                       "0",
+						"inputs.#":                            "0",
+						"field":                               ".something",
+						"parser":                              "regex_parser",
+						"regex_parser_options.pattern":        "\\d{3}-\\d{2}-\\d{3}",
+						"regex_parser_options.case_sensitive": "true",
+						"regex_parser_options.multiline":      "false",
+						"regex_parser_options.match_newline":  "false",
+						"regex_parser_options.crlf_newline":   "false",
+					}),
+				),
+			},
+			// regex parser with custom options
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "regex_custom" {
+						title = "regex parser title"
+						description = "regex parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "regex_parser"
+						regex_parser_options = {
+							pattern = "\\d{3}-\\d{2}-\\d{3}"
+							case_sensitive = false
+							multiline = true
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.regex_custom", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.regex_custom", map[string]any{
+						"pipeline_id":                         "#mezmo_pipeline.test_parent.id",
+						"title":                               "regex parser title",
+						"description":                         "regex parser desc",
+						"generation_id":                       "0",
+						"inputs.#":                            "0",
+						"field":                               ".something",
+						"parser":                              "regex_parser",
+						"regex_parser_options.pattern":        "\\d{3}-\\d{2}-\\d{3}",
+						"regex_parser_options.case_sensitive": "false",
+						"regex_parser_options.multiline":      "true",
+						"regex_parser_options.match_newline":  "false",
+						"regex_parser_options.crlf_newline":   "false",
+					}),
+				),
+			},
 			// Create apache parser with default timestamp
 			{
 				Config: GetCachedConfig(cacheKey) + `
