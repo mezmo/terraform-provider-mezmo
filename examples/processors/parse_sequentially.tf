@@ -49,6 +49,14 @@ resource "mezmo_parse_sequentially_processor" "processor1" {
       csv_parser_options = {
         field_names = ["field_1", "field_2"]
       }
+    },
+    {
+      parser = "regex_parser"
+      regex_parser_options = {
+        pattern        = "\\d{3}-\\d{2}-\\d{3}"
+        case_sensitive = false
+        multiline      = true
+      }
     }
   ]
 }

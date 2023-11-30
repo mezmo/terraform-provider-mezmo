@@ -450,6 +450,88 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 				ExpectError: regexp.MustCompile(`(?s)Attribute parsers\[0\].timestamp_parser_options.custom_format string length.*must be at least 1, got: 0`),
 			},
 
+			// Create regex parser - default options for regex
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_sequentially_processor" "with_regex" {
+						title = "custom regex parser title"
+						description = "custom regex parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parsers = [
+							{
+								parser = "regex_parser"
+								regex_parser_options = {
+									pattern = "\\d{3}-\\d{2}-\\d{3}"
+								}
+							}
+						]
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_sequentially_processor.with_regex", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_sequentially_processor.with_regex", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"title":                                  "custom regex parser title",
+						"description":                            "custom regex parser desc",
+						"generation_id":                          "0",
+						"inputs.#":                               "0",
+						"field":                                  ".something",
+						"parsers.#":                              "1",
+						"parsers.0.parser":                       "regex_parser",
+						"parsers.0.regex_parser_options.pattern": "\\d{3}-\\d{2}-\\d{3}",
+						"parsers.0.regex_parser_options.case_sensitive": "true",
+						"parsers.0.regex_parser_options.multiline":      "false",
+						"parsers.0.regex_parser_options.match_newline":  "false",
+						"parsers.0.regex_parser_options.crlf_newline":   "false",
+						"parsers.0.output_name":                         regexp.MustCompile(".+"),
+					}),
+				),
+			},
+			// Create regex parser - custom options for regex
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_sequentially_processor" "with_regex2" {
+						title = "custom regex parser title"
+						description = "custom regex parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parsers = [
+							{
+								parser = "regex_parser"
+								regex_parser_options = {
+									pattern = "\\d{3}-\\d{2}-\\d{3}"
+									multiline = true
+									case_sensitive = false
+									match_newline = true 
+									crlf_newline = true
+								}
+							}
+						]
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_sequentially_processor.with_regex2", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_sequentially_processor.with_regex2", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"title":                                  "custom regex parser title",
+						"description":                            "custom regex parser desc",
+						"generation_id":                          "0",
+						"inputs.#":                               "0",
+						"field":                                  ".something",
+						"parsers.#":                              "1",
+						"parsers.0.parser":                       "regex_parser",
+						"parsers.0.regex_parser_options.pattern": "\\d{3}-\\d{2}-\\d{3}",
+						"parsers.0.regex_parser_options.case_sensitive": "false",
+						"parsers.0.regex_parser_options.multiline":      "true",
+						"parsers.0.regex_parser_options.match_newline":  "true",
+						"parsers.0.regex_parser_options.crlf_newline":   "true",
+						"parsers.0.output_name":                         regexp.MustCompile(".+"),
+					}),
+				),
+			},
 			// Create CSV parser with field names
 			{
 				Config: GetCachedConfig(cacheKey) + `
