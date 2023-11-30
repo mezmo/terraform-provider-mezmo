@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
@@ -124,4 +125,75 @@ func GetAttributesByLevel(level int) map[string]schema.Attribute {
 
 func GetChildExpressionGroupTypeByLevel(level int) attr.Type {
 	return childExpressionGroups[level].Type()
+}
+
+func UnwindConditionalToModel(component map[string]any) ObjectValue {
+	value, _ := parseExpressionsItem(component, 0)
+	return value
+}
+
+func parseExpressionsItem(component map[string]any, level int) (value ObjectValue, isGroup bool) {
+	logicalOperation := "AND" // Default
+	if operation, ok := component["logical_operation"].(string); ok {
+		logicalOperation = operation
+	}
+	if childExpressionArr, ok := component["expressions"].([]any); ok {
+		// Branch
+		groupItems := make([]attr.Value, 0)
+		leafItems := make([]attr.Value, 0)
+		attributeTypes := ToAttrTypes(GetAttributesByLevel(level))
+
+		for _, e := range childExpressionArr {
+			child := e.(map[string]any)
+			value, isGroup := parseExpressionsItem(child, level+1)
+
+			if isGroup {
+				groupItems = append(groupItems, value)
+			} else {
+				leafItems = append(leafItems, value)
+			}
+		}
+
+		attributeValues := map[string]attr.Value{
+			"logical_operation": NewStringValue(logicalOperation),
+			"expressions":       NewListNull(NestedExpressionAttribute.Type()), // Default to match `plan` since there might only be group expressions on this level
+		}
+
+		expressionGroupType := GetChildExpressionGroupTypeByLevel(level)
+		mergeLeavesIntoGroups := len(leafItems) > 0 && len(groupItems) > 0
+		if mergeLeavesIntoGroups {
+			aTypes := expressionGroupType.(basetypes.ObjectType).AttributeTypes()
+			expressions := NewObjectValueMust(aTypes, map[string]attr.Value{
+				"logical_operation": NewStringValue("AND"),
+				"expressions":       NewListValueMust(NestedExpressionAttribute.Type(), leafItems),
+				"expressions_group": NewListNull(aTypes["expressions_group"].(basetypes.ListType).ElementType()),
+			})
+			groupItems = append([]attr.Value{expressions}, groupItems...)
+		} else if len(leafItems) > 0 {
+			attributeValues["expressions"] = NewListValueMust(NestedExpressionAttribute.Type(), leafItems)
+		}
+
+		if len(groupItems) > 0 {
+			attributeValues["expressions_group"] = NewListValueMust(expressionGroupType, groupItems)
+		} else if attributeTypes["expressions_group"] != nil {
+			attributeValues["expressions_group"] = NewListNull(expressionGroupType)
+		}
+
+		return NewObjectValueMust(attributeTypes, attributeValues), true
+	}
+
+	// Leaf
+	attributeValues := map[string]attr.Value{
+		"field":        NewStringValue(component["field"].(string)),
+		"operator":     NewStringValue(component["str_operator"].(string)),
+		"value_number": NewFloat64Null(),
+		"value_string": NewStringNull(),
+	}
+	if valueNumber, ok := component["value"].(float64); ok {
+		attributeValues["value_number"] = NewFloat64Value(valueNumber)
+	} else {
+		attributeValues["value_string"] = NewStringValue(component["value"].(string))
+	}
+
+	return NewObjectValueMust(ExpressionTypes, attributeValues), false
 }

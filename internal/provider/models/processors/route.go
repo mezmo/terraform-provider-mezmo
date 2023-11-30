@@ -123,7 +123,7 @@ func conditionalsToModel(resp_conditionals []any, list_item_type attr.Type) (Lis
 
 	for _, entry := range resp_conditionals {
 		conditional := entry.(map[string]any)["conditional"].(map[string]any)
-		unwound := unwindConditionalToModel(conditional)
+		unwound := UnwindConditionalToModel(conditional)
 
 		attr_types := unwound.AttributeTypes(context.Background())
 		attr_types["label"] = basetypes.StringType{}

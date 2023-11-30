@@ -1,0 +1,254 @@
+[
+  {
+    "description": "simple conditional expression",
+    "user_config": {
+      "conditional": {
+        "expressions": [
+          {
+            "field": ".field",
+            "str_operator": "equal",
+            "value": "foo"
+          },
+          {
+            "field": ".field2",
+            "str_operator": "greater",
+            "value": 10
+          }
+        ]
+      }
+    },
+    "expected_expression": {
+      "expressions": [
+        {
+          "field": ".field",
+          "operator": "equal",
+          "value_string": "foo",
+          "value_number": "null"
+        },
+        {
+          "field": ".field2",
+          "operator": "greater",
+          "value_number": 10,
+          "value_string": "null"
+        }
+      ],
+      "expressions_group": "null",
+      "logical_operation": "AND"
+    }
+  },
+  {
+    "description": "with one nested expression",
+    "user_config": {
+      "conditional": {
+        "logical_operation": "OR",
+        "expressions": [
+          {
+            "field": ".field",
+            "str_operator": "equal",
+            "value": "info"
+          },
+          {
+            "field": ".field2",
+            "str_operator": "starts_with",
+            "value": "pipeline"
+          },
+          {
+            "logical_operation": "OR",
+            "expressions": [
+              {
+                "field": ".field3",
+                "str_operator": "ends_with",
+                "value": "error"
+              },
+              {
+                "field": ".field4",
+                "str_operator": "equal",
+                "value": "foo"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "expected_expression": {
+      "expressions": "null",
+      "expressions_group": [
+        {
+          "expressions": [
+            {
+              "field": ".field",
+              "operator": "equal",
+              "value_number": "null",
+              "value_string": "info"
+            },
+            {
+              "field": ".field2",
+              "operator": "starts_with",
+              "value_number": "null",
+              "value_string": "pipeline"
+            }
+          ],
+          "expressions_group": "null",
+          "logical_operation": "AND"
+        },
+        {
+          "expressions": [
+            {
+              "field": ".field3",
+              "operator": "ends_with",
+              "value_number": "null",
+              "value_string": "error"
+            },
+            {
+              "field": ".field4",
+              "operator": "equal",
+              "value_number": "null",
+              "value_string": "foo"
+            }
+          ],
+          "expressions_group": "null",
+          "logical_operation": "OR"
+        }
+      ],
+      "logical_operation": "OR"
+    }
+  },
+  {
+    "description": "with multi-nested expressions (from QA tests)",
+    "user_config": {
+      "conditional": {
+        "expressions": [
+          {
+            "field": ".field",
+            "value": "foo",
+            "str_operator": "equal"
+          },
+          {
+            "field": ".field2",
+            "value": 10,
+            "str_operator": "greater"
+          },
+          {
+            "expressions": [
+              {
+                "field": ".field3",
+                "value": 15,
+                "str_operator": "less"
+              },
+              {
+                "field": ".field4",
+                "value": "",
+                "str_operator": "is_array"
+              },
+              {
+                "expressions": [
+                  {
+                    "field": ".field5",
+                    "value": 19,
+                    "str_operator": "less_or_equal"
+                  },
+                  {
+                    "field": ".field6",
+                    "value": "",
+                    "str_operator": "exists"
+                  },
+                  {
+                    "field": ".field7",
+                    "value": "",
+                    "str_operator": "not_exists"
+                  },
+                  {
+                    "field": ".field8",
+                    "value": "foo",
+                    "str_operator": "contains"
+                  }
+                ],
+                "logical_operation": "AND"
+              }
+            ],
+            "logical_operation": "OR"
+          }
+        ],
+        "logical_operation": "OR"
+      }
+    },
+    "expected_expression": {
+      "expressions": "null",
+      "expressions_group": [
+        {
+          "expressions": [
+            {
+              "field": ".field",
+              "operator": "equal",
+              "value_string": "foo",
+              "value_number": "null"
+            },
+            {
+              "field": ".field2",
+              "operator": "greater",
+              "value_number": 10,
+              "value_string": "null"
+            }
+          ],
+          "expressions_group": "null",
+          "logical_operation": "AND"
+        },
+        {
+          "expressions": "null",
+          "expressions_group": [
+            {
+              "expressions": [
+                {
+                  "field": ".field3",
+                  "value_number": 15,
+                  "operator": "less",
+                  "value_string": "null"
+                },
+                {
+                  "field": ".field4",
+                  "value_string": "",
+                  "operator": "is_array",
+                  "value_number": "null"
+                }
+              ],
+              "expressions_group": "null",
+              "logical_operation": "AND"
+            },
+            {
+              "expressions": [
+                {
+                  "field": ".field5",
+                  "value_number": 19,
+                  "operator": "less_or_equal",
+                  "value_string": "null"
+                },
+                {
+                  "field": ".field6",
+                  "value_string": "",
+                  "operator": "exists",
+                  "value_number": "null"
+                },
+                {
+                  "field": ".field7",
+                  "value_string": "",
+                  "operator": "not_exists",
+                  "value_number": "null"
+                },
+                {
+                  "field": ".field8",
+                  "value_string": "foo",
+                  "operator": "contains",
+                  "value_number": "null"
+                }
+              ],
+              "expressions_group": "null",
+              "logical_operation": "AND"
+            }
+          ],
+          "logical_operation": "OR"
+        }
+      ],
+      "logical_operation": "OR"
+    }
+  }
+]
