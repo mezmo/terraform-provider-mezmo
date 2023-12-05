@@ -37,7 +37,8 @@ examples/%.tf: build-test-example-binary
 		-e TF_CLI_CONFIG_FILE=/opt/app/tf-dev-config \
 		-w /opt/example/ \
 		hashicorp/terraform:latest \
-		validate
+		validate -compact-warnings | \
+		awk '/Provider development overrides are in effect/ {next} {print}'
 
 .PHONY: local-test
 ENV := $(PWD)/env/local.env
