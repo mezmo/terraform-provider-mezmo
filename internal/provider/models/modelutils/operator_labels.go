@@ -18,6 +18,7 @@ var Operators = []string{
 	"is_string",
 	"less",
 	"less_or_equal",
+	"not_contains",
 	"not_equal",
 	"not_exists",
 	"not_regex_match",
