@@ -33,11 +33,10 @@ var HttpSourceResourceSchema = schema.Schema{
 			Required:    false,
 			Optional:    true,
 			Computed:    true,
-			Default:     stringdefault.StaticString("json"),
+			Default:     stringdefault.StaticString("auto"),
 			Description: "The decoding method for converting frames into data events.",
 			Validators: []validator.String{
-				stringvalidator.OneOf(
-					"bytes", "json", "ndjson"),
+				stringvalidator.OneOf("bytes", "json", "ndjson", "auto"),
 			},
 		},
 	}, []string{"capture_metadata", "gateway_route_id"}),
