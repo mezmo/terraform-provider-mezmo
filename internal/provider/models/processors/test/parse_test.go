@@ -628,6 +628,21 @@ func TestParseProcessor(t *testing.T) {
 					}),
 				),
 			},
+			// user_options correctly serialized
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "parse_processor_with_user_options" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs = [mezmo_http_source.my_source.id]
+						title       = "2-parser"
+						field       = ".user.email"
+						parser      = "key_value_log"
+						key_value_log_options = {
+							key_value_delimiter = "@"
+						}
+					}`,
+				Check: resource.TestMatchResourceAttr("mezmo_parse_processor.parse_processor_with_user_options", "id", regexp.MustCompile(`[\w-]{36}`)),
+			},
 			// Server side validation on create
 			{
 				Config: GetCachedConfig(cacheKey) + `
