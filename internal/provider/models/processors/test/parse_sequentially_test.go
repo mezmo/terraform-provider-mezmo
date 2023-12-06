@@ -587,7 +587,7 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 									pattern = "\\d{3}-\\d{2}-\\d{3}"
 									multiline = true
 									case_sensitive = false
-									match_newline = true 
+									match_newline = true
 									crlf_newline = true
 								}
 							}
