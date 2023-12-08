@@ -434,6 +434,77 @@ func TestParseProcessor(t *testing.T) {
 					}),
 				),
 			},
+
+			// Parser with empty target_field
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "with_empty_target" {
+						title = "custom apache parser title"
+						description = "custom apache parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						target_field = ""
+						parser = "apache_log"
+						apache_log_options = {
+							format = "common"
+							timestamp_format = "Custom"
+							custom_timestamp_format = "%Y/%m/%d %H:%M:%S"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.with_empty_target", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.with_empty_target", map[string]any{
+						"pipeline_id":                         "#mezmo_pipeline.test_parent.id",
+						"title":                               "custom apache parser title",
+						"description":                         "custom apache parser desc",
+						"generation_id":                       "0",
+						"inputs.#":                            "0",
+						"field":                               ".something",
+						"target_field":                        "",
+						"parser":                              "apache_log",
+						"apache_log_options.format":           "common",
+						"apache_log_options.timestamp_format": "Custom",
+						"apache_log_options.custom_timestamp_format": "%Y/%m/%d %H:%M:%S",
+					}),
+				),
+			},
+			// with non empty parser
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "with_target" {
+						title = "custom apache parser title"
+						description = "custom apache parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						target_field = ".parsed"
+						parser = "apache_log"
+						apache_log_options = {
+							format = "common"
+							timestamp_format = "Custom"
+							custom_timestamp_format = "%Y/%m/%d %H:%M:%S"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.with_target", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.with_target", map[string]any{
+						"pipeline_id":                         "#mezmo_pipeline.test_parent.id",
+						"title":                               "custom apache parser title",
+						"description":                         "custom apache parser desc",
+						"generation_id":                       "0",
+						"inputs.#":                            "0",
+						"field":                               ".something",
+						"target_field":                        ".parsed",
+						"parser":                              "apache_log",
+						"apache_log_options.format":           "common",
+						"apache_log_options.timestamp_format": "Custom",
+						"apache_log_options.custom_timestamp_format": "%Y/%m/%d %H:%M:%S",
+					}),
+				),
+			},
 			// Create apache parser with default timestamp
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -458,6 +529,7 @@ func TestParseProcessor(t *testing.T) {
 						"generation_id":                       "0",
 						"inputs.#":                            "0",
 						"field":                               ".something",
+						"target_field":                        "",
 						"parser":                              "apache_log",
 						"apache_log_options.format":           "common",
 						"apache_log_options.timestamp_format": "%d/%b/%Y:%T %z",
@@ -490,6 +562,7 @@ func TestParseProcessor(t *testing.T) {
 						"generation_id":                       "0",
 						"inputs.#":                            "0",
 						"field":                               ".something",
+						"target_field":                        "",
 						"parser":                              "apache_log",
 						"apache_log_options.format":           "common",
 						"apache_log_options.timestamp_format": "Custom",
@@ -547,6 +620,7 @@ func TestParseProcessor(t *testing.T) {
 						"inputs.#":                           "1",
 						"inputs.0":                           "#mezmo_http_source.my_source.id",
 						"field":                              ".something",
+						"target_field":                       "",
 						"parser":                             "nginx_log",
 						"nginx_log_options.format":           "combined",
 						"nginx_log_options.timestamp_format": "Custom",

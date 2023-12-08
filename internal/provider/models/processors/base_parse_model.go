@@ -200,9 +200,6 @@ var base_schema = SchemaAttributes{
 		Computed: true,
 		Description: "The field into which the parsed value should be inserted. Leave blank to " +
 			"insert the parsed data into the original field.",
-		Validators: []validator.String{
-			stringvalidator.LengthAtLeast(1),
-		},
 	},
 }
 

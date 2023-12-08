@@ -450,6 +450,88 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 				ExpectError: regexp.MustCompile(`(?s)Attribute parsers\[0\].timestamp_parser_options.custom_format string length.*must be at least 1, got: 0`),
 			},
 
+			// parser with empty target
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_sequentially_processor" "with_empty_target" {
+						title = "custom regex parser title"
+						description = "custom regex parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						target_field = ""
+						parsers = [
+							{
+								parser = "regex_parser"
+								regex_parser_options = {
+									pattern = "\\d{3}-\\d{2}-\\d{3}"
+								}
+							}
+						]
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_sequentially_processor.with_empty_target", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_sequentially_processor.with_empty_target", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"title":                                  "custom regex parser title",
+						"description":                            "custom regex parser desc",
+						"generation_id":                          "0",
+						"inputs.#":                               "0",
+						"field":                                  ".something",
+						"target_field":                           "",
+						"parsers.#":                              "1",
+						"parsers.0.parser":                       "regex_parser",
+						"parsers.0.regex_parser_options.pattern": "\\d{3}-\\d{2}-\\d{3}",
+						"parsers.0.regex_parser_options.case_sensitive": "true",
+						"parsers.0.regex_parser_options.multiline":      "false",
+						"parsers.0.regex_parser_options.match_newline":  "false",
+						"parsers.0.regex_parser_options.crlf_newline":   "false",
+						"parsers.0.output_name":                         regexp.MustCompile(".+"),
+					}),
+				),
+			},
+			// with explicit target
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_sequentially_processor" "with_target" {
+						title = "custom regex parser title"
+						description = "custom regex parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						target_field = ".data_parsed"
+						parsers = [
+							{
+								parser = "regex_parser"
+								regex_parser_options = {
+									pattern = "\\d{3}-\\d{2}-\\d{3}"
+								}
+							}
+						]
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_sequentially_processor.with_target", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_sequentially_processor.with_target", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"title":                                  "custom regex parser title",
+						"description":                            "custom regex parser desc",
+						"generation_id":                          "0",
+						"inputs.#":                               "0",
+						"field":                                  ".something",
+						"target_field":                           ".data_parsed",
+						"parsers.#":                              "1",
+						"parsers.0.parser":                       "regex_parser",
+						"parsers.0.regex_parser_options.pattern": "\\d{3}-\\d{2}-\\d{3}",
+						"parsers.0.regex_parser_options.case_sensitive": "true",
+						"parsers.0.regex_parser_options.multiline":      "false",
+						"parsers.0.regex_parser_options.match_newline":  "false",
+						"parsers.0.regex_parser_options.crlf_newline":   "false",
+						"parsers.0.output_name":                         regexp.MustCompile(".+"),
+					}),
+				),
+			},
 			// Create regex parser - default options for regex
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -478,6 +560,7 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 						"generation_id":                          "0",
 						"inputs.#":                               "0",
 						"field":                                  ".something",
+						"target_field":                           "",
 						"parsers.#":                              "1",
 						"parsers.0.parser":                       "regex_parser",
 						"parsers.0.regex_parser_options.pattern": "\\d{3}-\\d{2}-\\d{3}",
@@ -521,6 +604,7 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 						"generation_id":                          "0",
 						"inputs.#":                               "0",
 						"field":                                  ".something",
+						"target_field":                           "",
 						"parsers.#":                              "1",
 						"parsers.0.parser":                       "regex_parser",
 						"parsers.0.regex_parser_options.pattern": "\\d{3}-\\d{2}-\\d{3}",
@@ -560,6 +644,7 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 						"generation_id":    "0",
 						"inputs.#":         "0",
 						"field":            ".something",
+						"target_field":     "",
 						"parsers.#":        "1",
 						"parsers.0.parser": "csv_row",
 						"parsers.0.csv_row_options.field_names.#": "2",
