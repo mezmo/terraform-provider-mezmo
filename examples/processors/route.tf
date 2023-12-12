@@ -169,3 +169,11 @@ resource "mezmo_blackhole_destination" "destination2" {
   ack_enabled = false
   inputs      = [mezmo_route_processor.processor3.conditionals.1.output_name]
 }
+
+resource "mezmo_blackhole_destination" "destination3" {
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My destination"
+  description = "Send unmatched data to blackhole"
+  ack_enabled = false
+  inputs      = [mezmo_route_processor.processor3.unmatched]
+}

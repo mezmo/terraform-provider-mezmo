@@ -227,6 +227,10 @@ var parse_sequential_schema = ExtendSchemaAttributes(base_schema, SchemaAttribut
 			Attributes: parse_sequential_item_schema,
 		},
 	},
+	"unmatched": schema.StringAttribute{
+		Computed:    true,
+		Description: "A system generated value to identify the results that don't match any parser.",
+	},
 })
 
 // Make copy of the parse base schema to ensure it can be shared
