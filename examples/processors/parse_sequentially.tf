@@ -84,3 +84,11 @@ resource "mezmo_http_destination" "destination3" {
   uri         = "https://example.org"
   inputs      = [mezmo_parse_sequentially_processor.processor1.parsers.2.output_name]
 }
+
+resource "mezmo_blackhole_destination" "destination4" {
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "Http desintation"
+  description = "Send unmatched data to a blackhole"
+  uri         = "https://example.org"
+  inputs      = [mezmo_parse_sequentially_processor.processor1.unmatched]
+}

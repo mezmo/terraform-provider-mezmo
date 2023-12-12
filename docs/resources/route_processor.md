@@ -30,6 +30,7 @@ Route data based on whether or not it matches logical comparisons.
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the processor
+- `unmatched` (String) A system generated value to identify the results that don't match any condition.
 
 <a id="nestedatt--conditionals"></a>
 ### Nested Schema for `conditionals`

@@ -2,6 +2,7 @@ package processors
 
 import (
 	"context"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -22,6 +23,9 @@ type RouteProcessorModel struct {
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
 	Conditionals List   `tfsdk:"conditionals" user_config:"true"`
+	// unmatched exists in outputs from API which is not exposed to the
+	// user. Mapped to user_config to make TF happy
+	Unmatched String `tfsdk:"unmatched" user_config:"true"`
 }
 
 const ROUTE_PROCESSOR_TYPE_NAME = "route"
@@ -50,6 +54,10 @@ var RouteProcessorResourceSchema = schema.Schema{
 					},
 				}),
 			},
+		},
+		"unmatched": schema.StringAttribute{
+			Computed:    true,
+			Description: "A system generated value to identify the results that don't match any condition.",
 		},
 	}),
 }
@@ -86,6 +94,11 @@ func RouteProcessorToModel(plan *RouteProcessorModel, component *Processor) {
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 
+	outputs := mappedOutputs(component)
+	if unmatched, ok := outputs["_unmatched"]; ok {
+		plan.Unmatched = unmatched
+	}
+
 	conditionals, ok := component.UserConfig["conditionals"].([]any)
 	if ok {
 		elemType := plan.Conditionals.ElementType(context.Background())
@@ -96,8 +109,7 @@ func RouteProcessorToModel(plan *RouteProcessorModel, component *Processor) {
 			elemType = listType.(basetypes.ListType).ElementType()
 		}
 
-		list_value, diag := conditionalsToModel(conditionals, elemType)
-
+		list_value, diag := conditionalsToModel(conditionals, elemType, outputs)
 		if !diag.HasError() {
 			plan.Conditionals = list_value
 		}
@@ -118,24 +130,29 @@ func conditionalsFromModel(v List) map[string]any {
 	}
 }
 
-func conditionalsToModel(resp_conditionals []any, list_item_type attr.Type) (List, diag.Diagnostics) {
+func conditionalsToModel(respConditionals []any, listItemType attr.Type, outputs map[string]basetypes.StringValue) (List, diag.Diagnostics) {
 	var conditionals []basetypes.ObjectValue
 
-	for _, entry := range resp_conditionals {
+	for _, entry := range respConditionals {
 		conditional := entry.(map[string]any)["conditional"].(map[string]any)
 		unwound := UnwindConditionalToModel(conditional)
 
-		attr_types := unwound.AttributeTypes(context.Background())
-		attr_types["label"] = basetypes.StringType{}
-		attr_types["output_name"] = basetypes.StringType{}
+		attrTypes := unwound.AttributeTypes(context.Background())
+		attrTypes["label"] = basetypes.StringType{}
+		attrTypes["output_name"] = basetypes.StringType{}
 
-		attr_values := unwound.Attributes()
-		attr_values["label"] = StringValue(entry.(map[string]any)["label"].(string))
-		attr_values["output_name"] = StringValue(entry.(map[string]any)["_output_name"].(string))
+		attrValues := unwound.Attributes()
+		attrValues["label"] = StringValue(entry.(map[string]any)["label"].(string))
+		apiOutputName := entry.(map[string]any)["_output_name"].(string)
+		if apiOutputName != "" {
+			if outputName, ok := outputs[strings.ToLower(apiOutputName)]; ok {
+				attrValues["output_name"] = outputName
+			}
+		}
 
-		unwound = basetypes.NewObjectValueMust(attr_types, attr_values)
+		unwound = basetypes.NewObjectValueMust(attrTypes, attrValues)
 		conditionals = append(conditionals, unwound)
 	}
 
-	return basetypes.NewListValueFrom(context.Background(), list_item_type, conditionals)
+	return basetypes.NewListValueFrom(context.Background(), listItemType, conditionals)
 }
