@@ -191,8 +191,8 @@ func parseExpressionsItem(component map[string]any, level int) (value ObjectValu
 	}
 	if valueNumber, ok := component["value"].(float64); ok {
 		attributeValues["value_number"] = NewFloat64Value(valueNumber)
-	} else {
-		attributeValues["value_string"] = NewStringValue(component["value"].(string))
+	} else if valueString, ok := component["value"].(string); ok && valueString != "" {
+		attributeValues["value_string"] = NewStringValue(valueString)
 	}
 
 	return NewObjectValueMust(ExpressionTypes, attributeValues), false

@@ -206,7 +206,7 @@
                 },
                 {
                   "field": ".field4",
-                  "value_string": "",
+                  "value_string": "null",
                   "operator": "is_array",
                   "value_number": "null"
                 }
@@ -224,13 +224,13 @@
                 },
                 {
                   "field": ".field6",
-                  "value_string": "",
+                  "value_string": "null",
                   "operator": "exists",
                   "value_number": "null"
                 },
                 {
                   "field": ".field7",
-                  "value_string": "",
+                  "value_string": "null",
                   "operator": "not_exists",
                   "value_number": "null"
                 },
