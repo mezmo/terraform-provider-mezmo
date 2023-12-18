@@ -18,7 +18,7 @@ resource "mezmo_pipeline" "pipeline1" {
 resource "mezmo_http_source" "source1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My HTTP source"
-  description = "This receives data from my webhook"
+  description = "This receives data from HTTP clients"
   decoding    = "json"
 }
 

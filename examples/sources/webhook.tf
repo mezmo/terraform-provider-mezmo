@@ -19,5 +19,4 @@ resource "mezmo_webhook_source" "my_webhook" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My webhook source"
   description = "This is a source made from a webhook call"
-  signing_key = "sshhhh"
 }

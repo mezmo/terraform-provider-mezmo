@@ -18,7 +18,6 @@ Receive data from incoming webhooks using the WebSub protocol
 ### Required
 
 - `pipeline_id` (String) The uuid of the pipeline
-- `signing_key` (String, Sensitive) The key used to sign the body of the request
 
 ### Optional
 

@@ -6,7 +6,6 @@
   "type": "webhook",
   "generation_id": 0,
   "user_config": {
-    "signing_key": "sshhh",
     "capture_metadata": true
   }
 }
