@@ -20,9 +20,7 @@ func TestDatadogSource(t *testing.T) {
 					resource "mezmo_pipeline" "test_parent" {
 							title = "parent pipeline"
 						}`) + `
-					resource "mezmo_datadog_source" "my_source" {
-						signing_key = "nope"
-					}`,
+					resource "mezmo_datadog_source" "my_source" {}`,
 				ExpectError: regexp.MustCompile("The argument \"pipeline_id\" is required"),
 			},
 

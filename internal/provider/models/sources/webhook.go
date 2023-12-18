@@ -3,10 +3,8 @@ package sources
 import (
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 )
@@ -21,23 +19,12 @@ type WebhookSourceModel struct {
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
 	GatewayRouteId  String `tfsdk:"gateway_route_id"`
-	SigningKey      String `tfsdk:"signing_key" user_config:"true"`
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
 
 var WebhookSourceResourceSchema = schema.Schema{
 	Description: "Receive data from incoming webhooks using the WebSub protocol",
-	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
-		"signing_key": schema.StringAttribute{
-			Required:    true,
-			Sensitive:   true,
-			Description: "The key used to sign the body of the request",
-			Validators: []validator.String{
-				stringvalidator.LengthAtLeast(1),
-				stringvalidator.LengthAtMost(512),
-			},
-		},
-	}, []string{"capture_metadata", "gateway_route_id"}),
+	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "gateway_route_id"}),
 }
 
 func WebhookSourceFromModel(plan *WebhookSourceModel, previousState *WebhookSourceModel) (*Source, diag.Diagnostics) {
@@ -49,7 +36,6 @@ func WebhookSourceFromModel(plan *WebhookSourceModel, previousState *WebhookSour
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{
-				"signing_key":      plan.SigningKey.ValueString(),
 				"capture_metadata": plan.CaptureMetadata.ValueBool(),
 			},
 		},
@@ -88,7 +74,6 @@ func WebhookSourceToModel(plan *WebhookSourceModel, component *Source) {
 		plan.Description = StringValue(component.Description)
 	}
 	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
-	plan.SigningKey = StringValue(component.UserConfig["signing_key"].(string))
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.GatewayRouteId = StringValue(component.GatewayRouteId)
 }
