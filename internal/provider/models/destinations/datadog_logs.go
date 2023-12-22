@@ -75,8 +75,12 @@ func DatadogLogsFromModel(plan *DatadogLogsDestinationModel, previousState *Data
 
 func DatadogLogsDestinationToModel(plan *DatadogLogsDestinationModel, component *Destination) {
 	plan.Id = StringValue(component.Id)
-	plan.Title = StringValue(component.Title)
-	plan.Description = StringValue(component.Description)
+	if component.Title != "" {
+		plan.Title = StringValue(component.Title)
+	}
+	if component.Description != "" {
+		plan.Description = StringValue(component.Description)
+	}
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.Inputs = modelutils.SliceToStringListValue(component.Inputs)
 	plan.ApiKey = StringValue(component.UserConfig["api_key"].(string))

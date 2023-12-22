@@ -24,8 +24,6 @@ func TestLokiDestinationResource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 					}`) + `
 					resource "mezmo_loki_destination" "my_destination" {
-						title = "test destination"
-						description = "loki destination"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						auth = {
 							strategy = "basic"
@@ -44,8 +42,6 @@ func TestLokiDestinationResource(t *testing.T) {
 						"mezmo_loki_destination.my_destination", "id", regexp.MustCompile(`[\w-]{36}`)),
 
 					StateHasExpectedValues("mezmo_loki_destination.my_destination", map[string]any{
-						"title":             "test destination",
-						"description":       "loki destination",
 						"pipeline_id":       "#mezmo_pipeline.test_parent.id",
 						"generation_id":     "0",
 						"ack_enabled":       "true",

@@ -134,8 +134,12 @@ func LokiFromModel(plan *LokiDestinationModel, previousState *LokiDestinationMod
 
 func LokiDestinationToModel(plan *LokiDestinationModel, component *Destination) {
 	plan.Id = StringValue(component.Id)
-	plan.Title = StringValue(component.Title)
-	plan.Description = StringValue(component.Description)
+	if component.Title != "" {
+		plan.Title = StringValue(component.Title)
+	}
+	if component.Description != "" {
+		plan.Description = StringValue(component.Description)
+	}
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
