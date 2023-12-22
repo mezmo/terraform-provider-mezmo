@@ -83,7 +83,7 @@ func TestDatadogLogsDestinationResource(t *testing.T) {
 				ExpectError: regexp.MustCompile("Attribute compression value must be one of"),
 			},
 
-			// Test defaults
+			// Test defaults with minimal values
 			{
 				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
@@ -93,8 +93,6 @@ func TestDatadogLogsDestinationResource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 					}`) + `
 					resource "mezmo_datadog_logs_destination" "my_destination" {
-						title       = "my logs destination"
-						description = "logs description"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						site        = "us3"
 						api_key     = "<secret-api-key>"
@@ -107,8 +105,6 @@ func TestDatadogLogsDestinationResource(t *testing.T) {
 
 					StateHasExpectedValues("mezmo_datadog_logs_destination.my_destination", map[string]any{
 						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
-						"title":         "my logs destination",
-						"description":   "logs description",
 						"generation_id": "0",
 						"ack_enabled":   "true",
 						"inputs.#":      "0",
