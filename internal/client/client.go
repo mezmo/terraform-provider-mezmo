@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/exp/slices"
 	"io"
 	"net/http"
 )
@@ -49,6 +50,50 @@ type client struct {
 	endpoint   string
 	authKey    string
 	headers    map[string]string
+}
+
+var DISALLOWED_EMPTY_STRING_FIELDS_BY_PARSER = map[string][]string{
+	"parse_key_value": {"field_delimiter", "key_delimiter"},
+}
+
+// filter off fields containing empty strings if they should not be serialized
+// as such
+func filterEmptyStrings(m map[string]any) map[string]any {
+	parserName, ok := m["parser"].(string)
+	if !ok {
+		return m
+	}
+	filteredFields, ok := DISALLOWED_EMPTY_STRING_FIELDS_BY_PARSER[parserName]
+	if !ok {
+		return m
+	}
+	userOptions, _ := m["options"].(map[string]any)
+	for key, val := range userOptions {
+		if slices.Contains(filteredFields, key) {
+			switch v := val.(type) {
+			case string:
+				if v == "" {
+					delete(userOptions, key)
+				}
+			}
+		}
+	}
+	if userOptions != nil {
+		m["options"] = userOptions
+	}
+	return m
+}
+
+func filterNodeEmptyStrings(u *BaseNode) {
+	u.UserConfig = filterEmptyStrings(u.UserConfig)
+
+	parsers, _ := u.UserConfig["parsers"].([]map[string]any)
+	for _, parserAttrs := range parsers {
+		filterEmptyStrings(parserAttrs)
+	}
+	if parsers != nil {
+		u.UserConfig["parsers"] = parsers
+	}
 }
 
 // CreatePipeline implements Client.
@@ -159,6 +204,7 @@ func (c *client) newRequest(method string, url string, body io.Reader) *http.Req
 // CreateSource implements Client.
 func (c *client) CreateSource(pipelineId string, component *Source) (*Source, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source", c.endpoint, pipelineId)
+	filterNodeEmptyStrings(&component.BaseNode)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -197,6 +243,7 @@ func (c *client) Source(pipelineId string, id string) (*Source, error) {
 // UpdateSource implements Client.
 func (c *client) UpdateSource(pipelineId string, component *Source) (*Source, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, component.Id)
+	filterNodeEmptyStrings(&component.BaseNode)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -228,6 +275,7 @@ func (c *client) Destination(pipelineId string, id string) (*Destination, error)
 // CreateDestination implements Client.
 func (c *client) CreateDestination(pipelineId string, component *Destination) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink", c.endpoint, pipelineId)
+	filterNodeEmptyStrings(&component.BaseNode)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -252,6 +300,7 @@ func (c *client) DeleteDestination(pipelineId string, id string) error {
 // UpdateDestination implements Client.
 func (c *client) UpdateDestination(pipelineId string, component *Destination) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, component.Id)
+	filterNodeEmptyStrings(&component.BaseNode)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -283,6 +332,7 @@ func (c *client) Processor(pipelineId string, id string) (*Processor, error) {
 // CreateProcessor implements Client.
 func (c *client) CreateProcessor(pipelineId string, component *Processor) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform", c.endpoint, pipelineId)
+	filterNodeEmptyStrings(&component.BaseNode)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -307,6 +357,7 @@ func (c *client) DeleteProcessor(pipelineId string, id string) error {
 // UpdateProcessor implements Client.
 func (c *client) UpdateProcessor(pipelineId string, component *Processor) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, component.Id)
+	filterNodeEmptyStrings(&component.BaseNode)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err

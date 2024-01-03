@@ -588,7 +588,7 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 									pattern = "\\d{3}-\\d{2}-\\d{3}"
 									multiline = true
 									case_sensitive = false
-									match_newline = true 
+									match_newline = true
 									crlf_newline = true
 								}
 							}
@@ -791,6 +791,26 @@ func TestParseSequentiallyProcessor(t *testing.T) {
 						"unmatched":                                    regexp.MustCompile(`^.+\..+$`),
 					}),
 				),
+			},
+			// user_options correctly serialized
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_sequentially_processor" "parse_processor_with_user_options" {
+						title = "create parsers title"
+						description = "create parsers desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs = [mezmo_http_source.my_source.id]
+						field = ".app"
+						parsers = [
+							{
+								parser = "key_value_log"
+								key_value_log_options = {
+									key_value_delimiter = "@"
+								}
+							}
+						]
+					}`,
+				Check: resource.TestMatchResourceAttr("mezmo_parse_sequentially_processor.parse_processor_with_user_options", "id", regexp.MustCompile(`[\w-]{36}`)),
 			},
 			// Server side validation on create
 			{
