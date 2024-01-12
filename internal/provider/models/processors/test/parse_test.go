@@ -335,7 +335,149 @@ func TestParseProcessor(t *testing.T) {
 				ExpectError: regexp.MustCompile("Attribute timestamp_parser_options.custom_format string length must be"),
 			},
 
-			// Create CSV parser with field names
+			// apache log - default timestamp
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "apache_default" {
+						title = "custom apache parser title"
+						description = "custom apache parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "apache_log"
+						apache_log_options = {
+							format = "combined"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.apache_default", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.apache_default", map[string]any{
+						"pipeline_id":                         "#mezmo_pipeline.test_parent.id",
+						"title":                               "custom apache parser title",
+						"description":                         "custom apache parser desc",
+						"generation_id":                       "0",
+						"inputs.#":                            "0",
+						"field":                               ".something",
+						"parser":                              "apache_log",
+						"apache_log_options.format":           "combined",
+						"apache_log_options.timestamp_format": "%d/%b/%Y:%T %z",
+					}),
+				),
+			},
+			// apache log - custom timestamp
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "apache_default_custom_time" {
+						title = "custom apache parser title"
+						description = "custom apache parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "apache_log"
+						apache_log_options = {
+							format = "combined"
+							timestamp_format = "Custom"
+							custom_timestamp_format = "%d-%b-%YT%T"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.apache_default_custom_time", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.apache_default_custom_time", map[string]any{
+						"pipeline_id":                         "#mezmo_pipeline.test_parent.id",
+						"title":                               "custom apache parser title",
+						"description":                         "custom apache parser desc",
+						"generation_id":                       "0",
+						"inputs.#":                            "0",
+						"field":                               ".something",
+						"parser":                              "apache_log",
+						"apache_log_options.format":           "combined",
+						"apache_log_options.timestamp_format": "Custom",
+						"apache_log_options.custom_timestamp_format": "%d-%b-%YT%T",
+					}),
+				),
+			},
+			// cef log - no options
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "cef_default" {
+						title = "cef parser title"
+						description = "cef parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "cef_log"
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.cef_default", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.cef_default", map[string]any{
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+						"title":         "cef parser title",
+						"description":   "cef parser desc",
+						"generation_id": "0",
+						"inputs.#":      "0",
+						"field":         ".something",
+						"parser":        "cef_log",
+					}),
+				),
+			},
+			// cef log with options
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "cef_translate_custom" {
+						title = "cef parser title"
+						description = "cef parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "cef_log"
+						cef_log_options = {
+							translate_custom_fields = true
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.cef_translate_custom", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.cef_translate_custom", map[string]any{
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+						"title":         "cef parser title",
+						"description":   "cef parser desc",
+						"generation_id": "0",
+						"inputs.#":      "0",
+						"field":         ".something",
+						"parser":        "cef_log",
+						"cef_log_options.translate_custom_fields": "true",
+					}),
+				),
+			},
+			// CSV parser - no options
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "csv_parser_default" {
+						title = "custom csv parser title"
+						description = "custom csv parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "csv_row"
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.csv_parser_default", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.csv_parser_default", map[string]any{
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+						"title":         "custom csv parser title",
+						"description":   "custom csv parser desc",
+						"generation_id": "0",
+						"inputs.#":      "0",
+						"field":         ".something",
+						"parser":        "csv_row",
+					}),
+				),
+			},
+			// CSV parser with options
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_parse_processor" "csv_parser" {
@@ -366,7 +508,216 @@ func TestParseProcessor(t *testing.T) {
 					}),
 				),
 			},
-			// regex parser with default options
+			// grok parser
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "grok_parser" {
+						title = "grok parser title"
+						description = "grok parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "grok_parser"
+						grok_parser_options = {
+							pattern = "%%{USERNAME:user} %%{EMAILADDRESS:email}"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.grok_parser", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.grok_parser", map[string]any{
+						"pipeline_id":                 "#mezmo_pipeline.test_parent.id",
+						"title":                       "grok parser title",
+						"description":                 "grok parser desc",
+						"generation_id":               "0",
+						"inputs.#":                    "0",
+						"field":                       ".something",
+						"parser":                      "grok_parser",
+						"grok_parser_options.pattern": "%{USERNAME:user} %{EMAILADDRESS:email}",
+					}),
+				),
+			},
+			// key value parser - no options
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "key_value_parser" {
+						title = "key value parser title"
+						description = "key value parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "key_value_log"
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.key_value_parser", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.key_value_parser", map[string]any{
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+						"title":         "key value parser title",
+						"description":   "key value parser desc",
+						"generation_id": "0",
+						"inputs.#":      "0",
+						"field":         ".something",
+						"parser":        "key_value_log",
+					}),
+				),
+			},
+			// key value with all options
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "key_value_parser_all_options" {
+						title = "key value parser title"
+						description = "key value parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "key_value_log"
+						key_value_log_options = {
+							field_delimiter = ":"
+							key_value_delimiter = ","
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.key_value_parser_all_options", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.key_value_parser_all_options", map[string]any{
+						"pipeline_id":                           "#mezmo_pipeline.test_parent.id",
+						"title":                                 "key value parser title",
+						"description":                           "key value parser desc",
+						"generation_id":                         "0",
+						"inputs.#":                              "0",
+						"field":                                 ".something",
+						"parser":                                "key_value_log",
+						"key_value_log_options.field_delimiter": ":",
+						"key_value_log_options.key_value_delimiter": ",",
+					}),
+				),
+			},
+			// field delimiter only
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "key_value_parser_field_only" {
+						title = "key value parser title"
+						description = "key value parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "key_value_log"
+						key_value_log_options = {
+							field_delimiter = ":"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.key_value_parser_field_only", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.key_value_parser_field_only", map[string]any{
+						"pipeline_id":                           "#mezmo_pipeline.test_parent.id",
+						"title":                                 "key value parser title",
+						"description":                           "key value parser desc",
+						"generation_id":                         "0",
+						"inputs.#":                              "0",
+						"field":                                 ".something",
+						"parser":                                "key_value_log",
+						"key_value_log_options.field_delimiter": ":",
+					}),
+					StateDoesNotHaveFields("mezmo_parse_processor.key_value_parser_field_only", []string{"key_value_log_options.key_value_delimiter"}),
+				),
+			},
+			// key value field delimiter only
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "key_value_parser_key_only" {
+						title = "key value parser title"
+						description = "key value parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "key_value_log"
+						key_value_log_options = {
+							key_value_delimiter = ":"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.key_value_parser_key_only", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.key_value_parser_key_only", map[string]any{
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+						"title":         "key value parser title",
+						"description":   "key value parser desc",
+						"generation_id": "0",
+						"inputs.#":      "0",
+						"field":         ".something",
+						"parser":        "key_value_log",
+						"key_value_log_options.key_value_delimiter": ":",
+					}),
+					StateDoesNotHaveFields("mezmo_parse_processor.key_value_parser_key_only", []string{"key_value_log_options.field_delimiter"}),
+				),
+			},
+			// nginx default
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "nginx_default" {
+						title = "nginx parser title"
+						description = "nginx parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "nginx_log"
+						nginx_log_options = {
+							format = "error"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.nginx_default", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.nginx_default", map[string]any{
+						"pipeline_id":                        "#mezmo_pipeline.test_parent.id",
+						"title":                              "nginx parser title",
+						"description":                        "nginx parser desc",
+						"generation_id":                      "0",
+						"inputs.#":                           "0",
+						"field":                              ".something",
+						"parser":                             "nginx_log",
+						"nginx_log_options.format":           "error",
+						"nginx_log_options.timestamp_format": "%Y/%m/%d %H:%M:%S",
+					}),
+					StateDoesNotHaveFields("mezmo_parse_processor.nginx_default", []string{"nginx_log_options.custom_timestamp_format"}),
+				),
+			},
+			// nginx custom timestamp
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "nginx_custom_time" {
+						title = "nginx parser title"
+						description = "nginx parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "nginx_log"
+						nginx_log_options = {
+							format = "error"
+							timestamp_format = "Custom"
+							custom_timestamp_format = "%d-%b-%YT%T"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.nginx_custom_time", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.nginx_custom_time", map[string]any{
+						"pipeline_id":                        "#mezmo_pipeline.test_parent.id",
+						"title":                              "nginx parser title",
+						"description":                        "nginx parser desc",
+						"generation_id":                      "0",
+						"inputs.#":                           "0",
+						"field":                              ".something",
+						"parser":                             "nginx_log",
+						"nginx_log_options.format":           "error",
+						"nginx_log_options.timestamp_format": "Custom",
+						"nginx_log_options.custom_timestamp_format": "%d-%b-%YT%T",
+					}),
+				),
+			},
+			// regex parser without flags
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_parse_processor" "regex_defaults" {
@@ -399,7 +750,7 @@ func TestParseProcessor(t *testing.T) {
 					}),
 				),
 			},
-			// regex parser with custom options
+			// regex parser with flags
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_parse_processor" "regex_custom" {
@@ -434,7 +785,67 @@ func TestParseProcessor(t *testing.T) {
 					}),
 				),
 			},
+			// timestamp parser default
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "timestamp_parser_default" {
+						title = "timestamp parser title"
+						description = "timestamp parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "timestamp_parser"
+						timestamp_parser_options = {
+							format = "%a %d %b %T %Y"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.timestamp_parser_default", "id", regexp.MustCompile(`[\w-]{36}`)),
 
+					StateHasExpectedValues("mezmo_parse_processor.timestamp_parser_default", map[string]any{
+						"pipeline_id":                     "#mezmo_pipeline.test_parent.id",
+						"title":                           "timestamp parser title",
+						"description":                     "timestamp parser desc",
+						"generation_id":                   "0",
+						"inputs.#":                        "0",
+						"field":                           ".something",
+						"parser":                          "timestamp_parser",
+						"timestamp_parser_options.format": "%a %d %b %T %Y",
+					}),
+					StateDoesNotHaveFields("mezmo_parse_processor.timestamp_parser_default", []string{"timestamp_parser_options.custom_format"}),
+				),
+			},
+			// timestamp parser custom format
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_parse_processor" "timestamp_parser_custom" {
+						title = "timestamp parser title"
+						description = "timestamp parser desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						field = ".something"
+						parser = "timestamp_parser"
+						timestamp_parser_options = {
+							format = "Custom"
+							custom_format = "%Y/%m/%d %H:%M:%S"
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.timestamp_parser_custom", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_parse_processor.timestamp_parser_custom", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"title":                                  "timestamp parser title",
+						"description":                            "timestamp parser desc",
+						"generation_id":                          "0",
+						"inputs.#":                               "0",
+						"field":                                  ".something",
+						"parser":                                 "timestamp_parser",
+						"timestamp_parser_options.format":        "Custom",
+						"timestamp_parser_options.custom_format": "%Y/%m/%d %H:%M:%S",
+					}),
+				),
+			},
 			// Parser with empty target_field
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -505,71 +916,6 @@ func TestParseProcessor(t *testing.T) {
 					}),
 				),
 			},
-			// Create apache parser with default timestamp
-			{
-				Config: GetCachedConfig(cacheKey) + `
-					resource "mezmo_parse_processor" "apache_defaults" {
-						title = "apache parser title"
-						description = "apache parser desc"
-						pipeline_id = mezmo_pipeline.test_parent.id
-						field = ".something"
-						parser = "apache_log"
-						apache_log_options = {
-							format = "common"
-						}
-					}`,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestMatchResourceAttr(
-						"mezmo_parse_processor.apache_defaults", "id", regexp.MustCompile(`[\w-]{36}`)),
-
-					StateHasExpectedValues("mezmo_parse_processor.apache_defaults", map[string]any{
-						"pipeline_id":                         "#mezmo_pipeline.test_parent.id",
-						"title":                               "apache parser title",
-						"description":                         "apache parser desc",
-						"generation_id":                       "0",
-						"inputs.#":                            "0",
-						"field":                               ".something",
-						"target_field":                        "",
-						"parser":                              "apache_log",
-						"apache_log_options.format":           "common",
-						"apache_log_options.timestamp_format": "%d/%b/%Y:%T %z",
-					}),
-				),
-			},
-			// Create apache parser with custom timestamp
-			{
-				Config: GetCachedConfig(cacheKey) + `
-					resource "mezmo_parse_processor" "apache_custom_time" {
-						title = "custom apache parser title"
-						description = "custom apache parser desc"
-						pipeline_id = mezmo_pipeline.test_parent.id
-						field = ".something"
-						parser = "apache_log"
-						apache_log_options = {
-							format = "common"
-							timestamp_format = "Custom"
-							custom_timestamp_format = "%Y/%m/%d %H:%M:%S"
-						}
-					}`,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestMatchResourceAttr(
-						"mezmo_parse_processor.apache_custom_time", "id", regexp.MustCompile(`[\w-]{36}`)),
-
-					StateHasExpectedValues("mezmo_parse_processor.apache_custom_time", map[string]any{
-						"pipeline_id":                         "#mezmo_pipeline.test_parent.id",
-						"title":                               "custom apache parser title",
-						"description":                         "custom apache parser desc",
-						"generation_id":                       "0",
-						"inputs.#":                            "0",
-						"field":                               ".something",
-						"target_field":                        "",
-						"parser":                              "apache_log",
-						"apache_log_options.format":           "common",
-						"apache_log_options.timestamp_format": "Custom",
-						"apache_log_options.custom_timestamp_format": "%Y/%m/%d %H:%M:%S",
-					}),
-				),
-			},
 
 			// Import
 			{
@@ -588,14 +934,14 @@ func TestParseProcessor(t *testing.T) {
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_parse_processor.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_parse_processor.apache_custom_time"),
+				ImportStateIdFunc: ComputeImportId("mezmo_parse_processor.with_target"),
 				ImportStateVerify: true,
 			},
 
 			// Update apache parser with custom timestamp to nginx
 			{
 				Config: GetCachedConfig(cacheKey) + `
-					resource "mezmo_parse_processor" "apache_custom_time" {
+					resource "mezmo_parse_processor" "with_target" {
 						title = "custom apache parser title"
 						description = "custom apache parser desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
@@ -610,9 +956,9 @@ func TestParseProcessor(t *testing.T) {
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
-						"mezmo_parse_processor.apache_custom_time", "id", regexp.MustCompile(`[\w-]{36}`)),
+						"mezmo_parse_processor.with_target", "id", regexp.MustCompile(`[\w-]{36}`)),
 
-					StateHasExpectedValues("mezmo_parse_processor.apache_custom_time", map[string]any{
+					StateHasExpectedValues("mezmo_parse_processor.with_target", map[string]any{
 						"pipeline_id":                        "#mezmo_pipeline.test_parent.id",
 						"title":                              "custom apache parser title",
 						"description":                        "custom apache parser desc",
@@ -628,7 +974,7 @@ func TestParseProcessor(t *testing.T) {
 					}),
 				),
 			},
-			// Server side validation on create
+			// // Server side validation on create
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_parse_processor" "apache_defaults" {
@@ -643,13 +989,13 @@ func TestParseProcessor(t *testing.T) {
 						}
 					}`,
 				// custom_timestamp_format field is required
-				ExpectError: regexp.MustCompile("valid strftime datetime"),
+				ExpectError: regexp.MustCompile("(?s)have required property.*'custom_timestamp_format'"),
 			},
 
-			// Error: server-side validation on update
+			// // Error: server-side validation on update
 			{
 				Config: GetCachedConfig(cacheKey) + `
-					resource "mezmo_parse_processor" "apache_custom_time" {
+					resource "mezmo_parse_processor" "with_target" {
 						title = "custom apache parser title"
 						description = "custom apache parser desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
@@ -662,7 +1008,7 @@ func TestParseProcessor(t *testing.T) {
 						}
 					}`,
 				// custom_timestamp_format field is required
-				ExpectError: regexp.MustCompile("valid strftime datetime"),
+				ExpectError: regexp.MustCompile("(?s)have required property.*'custom_timestamp_format'"),
 			},
 			// Delete testing automatically occurs in TestCase
 		},

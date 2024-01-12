@@ -98,7 +98,7 @@ func MapValuesToMapAny(obj interface{}, dd *diag.Diagnostics) map[string]any {
 	target := make(map[string]any, len(attrs))
 
 	for k, v := range attrs {
-		if v.IsUnknown() {
+		if v.IsUnknown() || v.IsNull() {
 			continue
 		}
 		switch v := v.(type) {
