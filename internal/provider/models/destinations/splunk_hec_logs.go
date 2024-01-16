@@ -164,10 +164,10 @@ func splunkValueTypeFromModel(
 	if !planValue.IsNull() {
 		m := MapValuesToMapAny(*planValue, dd)
 		target := component.UserConfig[configName].(map[string]any)
-		if m["field"] != "" {
+		if _, ok := m["field"]; ok {
 			target["value_type"] = "field"
 			target["value"] = m["field"]
-		} else if m["value"] != "" {
+		} else if _, ok := m["value"]; ok {
 			target["value_type"] = "value"
 			target["value"] = m["value"]
 		} else {

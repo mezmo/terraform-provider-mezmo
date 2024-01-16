@@ -157,6 +157,30 @@ func StateHasExpectedValues(resourceName string, expected map[string]any) resour
 	}
 }
 
+func StateDoesNotHaveFields(resourceName string, fields []string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		resource := s.RootModule().Resources[resourceName]
+		if resource == nil {
+			return fmt.Errorf("resource \"%s\" not found", resourceName)
+		}
+		attributes := resource.Primary.Attributes
+
+		if os.Getenv("DEBUG_ATTRIBUTES") == "1" {
+			modelutils.PrintJSON(fmt.Sprintf("------ %s STATE ATTRIBUTES ------", resourceName), attributes)
+		}
+
+		for _, field := range fields {
+			val, found := attributes[field]
+
+			if found {
+				return fmt.Errorf("Expected key \"%s\" not to exist in %s. Found %s", field, resourceName, val)
+			}
+		}
+
+		return nil
+	}
+}
+
 func ComputeImportId(resourceName string) resource.ImportStateIdFunc {
 	return func(state *terraform.State) (string, error) {
 		resource := state.RootModule().Resources[resourceName]
