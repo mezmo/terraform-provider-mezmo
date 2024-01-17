@@ -28,6 +28,7 @@ type ReduceProcessorModel struct {
 	Inputs          ListValue   `tfsdk:"inputs"`
 	GenerationId    Int64Value  `tfsdk:"generation_id"`
 	DurationMs      Int64Value  `tfsdk:"duration_ms" user_config:"true"`
+	MaxEvents       Int64Value  `tfsdk:"max_events" user_config:"true"`
 	GroupBy         ListValue   `tfsdk:"group_by" user_config:"true"`
 	DateFormats     ListValue   `tfsdk:"date_formats" user_config:"true"`
 	MergeStrategies ListValue   `tfsdk:"merge_strategies" user_config:"true"`
@@ -44,6 +45,12 @@ var ReduceProcessorResourceSchema = schema.Schema{
 				"an \"ends when\" condition is satisfied.",
 			Computed: true,
 			Default:  int64default.StaticInt64(30000),
+		},
+		"max_events": schema.Int64Attribute{
+			Optional: true,
+			Description: "The maximum number of events that can be included in a time window (specified " +
+				"by duration_ms). The reduce operation will stop once it has reached this " +
+				"number of events, regardless of whether the duration_ms have elapsed.",
 		},
 		"group_by": schema.ListAttribute{
 			ElementType: StringType{},
@@ -152,6 +159,9 @@ func ReduceProcessorFromModel(plan *ReduceProcessorModel, previousState *ReduceP
 		component.Inputs = inputs
 	}
 
+	if !plan.MaxEvents.IsNull() {
+		component.UserConfig["max_events"] = plan.MaxEvents.ValueInt64()
+	}
 	if !plan.GroupBy.IsNull() {
 		component.UserConfig["group_by"] = StringListValueToStringSlice(plan.GroupBy)
 	}
@@ -252,6 +262,9 @@ func ReduceProcessorToModel(plan *ReduceProcessorModel, component *Processor) {
 
 	plan.DurationMs = NewInt64Value(int64(component.UserConfig["duration_ms"].(float64)))
 
+	if component.UserConfig["max_events"] != nil {
+		plan.MaxEvents = NewInt64Value(int64(component.UserConfig["max_events"].(float64)))
+	}
 	if component.UserConfig["group_by"] != nil {
 		plan.GroupBy = SliceToStringListValue(component.UserConfig["group_by"].([]any))
 	}
