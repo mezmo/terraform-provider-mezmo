@@ -27,6 +27,7 @@ Combine multiple events over time into one based on a set of criteria
 - `flush_condition` (Attributes) Force accumulated event reduction to flush the result when a conditional expression evaluates to true on an inbound event. (see [below for nested schema](#nestedatt--flush_condition))
 - `group_by` (List of String) Before reducing, group events based on matching data from each of these field paths. Supports nesting via dot-notation.
 - `inputs` (List of String) The ids of the input components
+- `max_events` (Number) The maximum number of events that can be included in a time window (specified by duration_ms). The reduce operation will stop once it has reached this number of events, regardless of whether the duration_ms have elapsed.
 - `merge_strategies` (Attributes List) Specify merge strategies for individual root-level properties. Dot-notation is supported, but nested field lookup paths will be an error. (see [below for nested schema](#nestedatt--merge_strategies))
 - `title` (String) A user-defined title for the processor
 
