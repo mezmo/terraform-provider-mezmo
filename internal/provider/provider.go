@@ -120,6 +120,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewOpenTelemetryTracesSourceResource,
 
 		// Processors
+		NewAggregateV2ProcessorResource,
 		NewCompactFieldsProcessorResource,
 		NewDecryptFieldsProcessorResource,
 		NewDedupeProcessorResource,
