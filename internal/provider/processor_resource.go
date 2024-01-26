@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-framework/path"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
@@ -18,7 +19,8 @@ import (
 )
 
 type ProcessorModel interface {
-	CompactFieldsProcessorModel |
+	AggregateV2ProcessorModel |
+		CompactFieldsProcessorModel |
 		DecryptFieldsProcessorModel |
 		DedupeProcessorModel |
 		DropFieldsProcessorModel |
