@@ -208,7 +208,7 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 				ImportStateIdFunc: ComputeImportId("mezmo_gcp_cloud_storage_destination.my_dest"),
 				ImportStateVerify: true,
 			},
-			// Update fields
+			// Update fields, remove bucket prefix since it's optional
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_http_source" "new_source" {
@@ -222,7 +222,6 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 						encoding = "text"
 						compression = "none"
 						bucket = "new_bucket"
-						bucket_prefix = "newprefix"
 						ack_enabled = false
 						auth = {
 							type = "credentials_json"
@@ -242,7 +241,6 @@ func TestGcpCloudStorageSinkResource(t *testing.T) {
 						"encoding":      "text",
 						"compression":   "none",
 						"bucket":        "new_bucket",
-						"bucket_prefix": "newprefix",
 						"auth.type":     "credentials_json",
 						"auth.value":    "{}",
 					}),

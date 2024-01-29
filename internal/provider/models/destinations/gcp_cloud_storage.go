@@ -109,7 +109,6 @@ func GcpCloudStorageDestinationFromModel(plan *GcpCloudStorageDestinationModel, 
 				"encoding":           plan.Encoding.ValueString(),
 				"bucket":             plan.Bucket.ValueString(),
 				"compression":        plan.Compression.ValueString(),
-				"bucket_prefix":      plan.BucketPrefix.ValueString(),
 			},
 		},
 	}
@@ -120,6 +119,10 @@ func GcpCloudStorageDestinationFromModel(plan *GcpCloudStorageDestinationModel, 
 		component.UserConfig["api_key"] = GetAttributeValue[String](auth, "value").ValueString()
 	} else {
 		component.UserConfig["credentials_json"] = GetAttributeValue[String](auth, "value").ValueString()
+	}
+
+	if plan.BucketPrefix.ValueString() != "" {
+		component.UserConfig["bucket_prefix"] = plan.BucketPrefix.ValueString()
 	}
 
 	if previousState != nil {
@@ -143,9 +146,12 @@ func GcpCloudStorageDestinationToModel(plan *GcpCloudStorageDestinationModel, co
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
 	plan.Compression = StringValue(component.UserConfig["compression"].(string))
 	plan.Encoding = StringValue(component.UserConfig["encoding"].(string))
-	plan.BucketPrefix = StringValue(component.UserConfig["bucket_prefix"].(string))
 	plan.Bucket = StringValue(component.UserConfig["bucket"].(string))
 	plan.BatchTimeoutSeconds = Int64Value(int64(component.UserConfig["batch_timeout_secs"].(float64)))
+
+	if component.UserConfig["bucket_prefix"] != nil {
+		plan.BucketPrefix = StringValue(component.UserConfig["bucket_prefix"].(string))
+	}
 
 	authAttrTypes := plan.Auth.AttributeTypes(context.Background())
 	if len(authAttrTypes) == 0 {
