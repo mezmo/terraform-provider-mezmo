@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/processors"
@@ -174,6 +175,11 @@ func (r *ProcessorResource[T]) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	component, err := r.client.Processor(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	// force re-creation of manually deleted resources
+	if client.IsNotFoundError(err) {
+		resp.State.RemoveResource(ctx)
+		return
+	}
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error reading processor",

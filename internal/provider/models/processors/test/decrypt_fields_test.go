@@ -219,6 +219,34 @@ func TestDecryptFieldsProcessor(t *testing.T) {
 				}`,
 				ExpectError: regexp.MustCompile("NOT have fewer than 32"),
 			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_decrypt_fields_processor" "test_processor" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					inputs 			= []
+					algorithm 	= "AES-128-CFB"
+					key 				= "1111111111111111"
+					iv_field 		= ".some_iv_field"
+					field 			= ".something"
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_decrypt_fields_processor.test_processor", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_decrypt_fields_processor.test_processor", "title", "new title"),
+					// delete the resource
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_decrypt_fields_processor.test_processor",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
+			},
 
 			// Delete testing automatically occurs in TestCase
 		},

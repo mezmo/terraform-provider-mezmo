@@ -1,10 +1,11 @@
 package sources
 
 import (
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 	"regexp"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
 func TestKinesisFirehoseSourceResource(t *testing.T) {
@@ -148,6 +149,29 @@ func TestKinesisFirehoseSourceResource(t *testing.T) {
 						"gateway_route_id": "#mezmo_kinesis_firehose_source.parent_source.gateway_route_id",
 					}),
 				),
+			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: providertest.GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_kinesis_firehose_source" "test_source" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_kinesis_firehose_source.test_source", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_kinesis_firehose_source.test_source", "title", "new title"),
+					// delete the resource
+					providertest.TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_kinesis_firehose_source.test_source",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})

@@ -133,6 +133,35 @@ func TestS3SourceResource(t *testing.T) {
 					}),
 				),
 			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_s3_source" "test_source" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					region 			= "us-east-2"
+					sqs_queue_url = "https://hello.com/sqs"
+					auth 					= {
+						access_key_id = "123"
+						secret_access_key = "secret123"
+					}
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_s3_source.test_source", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_s3_source.test_source", "title", "new title"),
+					// delete the resource
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_s3_source.test_source",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})

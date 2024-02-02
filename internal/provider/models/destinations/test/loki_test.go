@@ -30,7 +30,7 @@ func TestLokiDestinationResource(t *testing.T) {
 							user     = "username"
 							password = "secret-password"
 						}
-						endpoint = "http://example.com"
+						endpoint = "https://google.com"
 						encoding = "json"
 						labels = {
 							"test_key_0" = "test_value_0"
@@ -46,7 +46,7 @@ func TestLokiDestinationResource(t *testing.T) {
 						"generation_id":     "0",
 						"ack_enabled":       "true",
 						"inputs.#":          "0",
-						"endpoint":          "http://example.com",
+						"endpoint":          "https://google.com",
 						"encoding":          "json",
 						"auth.strategy":     "basic",
 						"auth.user":         "username",
@@ -70,7 +70,7 @@ func TestLokiDestinationResource(t *testing.T) {
 							user     = "username"
 							password = "secret-password"
 						}
-						endpoint = "http://example.com"
+						endpoint = "https://google.com"
 						encoding = "json"
 						labels = {
 							"test_key_0" = "test_value_0"
@@ -172,7 +172,7 @@ func TestLokiDestinationResource(t *testing.T) {
 							user     = "new-username"
 							password = "new-secret-password"
 						}
-						endpoint = "http://newexample.com"
+						endpoint = "https://google.com"
 						encoding = "text"
 						path     = "new/path"
 						labels = {
@@ -192,7 +192,7 @@ func TestLokiDestinationResource(t *testing.T) {
 						"generation_id":         "1",
 						"ack_enabled":           "false",
 						"inputs.#":              "1",
-						"endpoint":              "http://newexample.com",
+						"endpoint":              "https://google.com",
 						"encoding":              "text",
 						"auth.strategy":         "basic",
 						"auth.user":             "new-username",
@@ -202,6 +202,43 @@ func TestLokiDestinationResource(t *testing.T) {
 						"labels.new_test_key_1": "new_test_value_1",
 					}),
 				),
+			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_http_source" "my_source2" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+				}
+				resource "mezmo_loki_destination" "test_destination" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					inputs 			= [mezmo_http_source.my_source2.id]
+					auth = {
+						strategy = "basic"
+						user     = "username"
+						password = "secret-password"
+					}
+					endpoint = "https://google.com"
+					encoding = "json"
+					labels = {
+						"test_key_0" = "test_value_0"
+						"test_key_1" = "test_value_1"
+					}
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_loki_destination.test_destination", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_loki_destination.test_destination", "title", "new title"),
+					// verify resource will be re-created after refresh
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_loki_destination.test_destination",
+					),
+				),
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})

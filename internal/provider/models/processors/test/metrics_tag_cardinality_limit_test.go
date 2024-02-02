@@ -194,6 +194,31 @@ func TestMetricsTagCardinalityLimitProcessor(t *testing.T) {
 					}),
 				),
 			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_metrics_tag_cardinality_limit_processor" "test_processor" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					inputs 			= []
+					value_limit = 50
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_metrics_tag_cardinality_limit_processor.test_processor", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_metrics_tag_cardinality_limit_processor.test_processor", "title", "new title"),
+					// delete the resource
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_metrics_tag_cardinality_limit_processor.test_processor",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
+			},
 
 			// Delete testing automatically occurs in TestCase
 		},

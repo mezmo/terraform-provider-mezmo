@@ -1,10 +1,11 @@
 package sources
 
 import (
-	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 	"regexp"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
 func TestAzureEventHubSourceResource(t *testing.T) {
@@ -237,6 +238,33 @@ func TestAzureEventHubSourceResource(t *testing.T) {
 						"topics.0":          "topic_new",
 					}),
 				),
+			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: providertest.GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_azure_event_hub_source" "test_source" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					connection_string = "test_connection_string"
+					namespace 				= "test_namespace"
+					group_id 					= "test_group_id"
+					topics 						= ["topic1", "topic2"]
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_azure_event_hub_source.test_source", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_azure_event_hub_source.test_source", "title", "new title"),
+					// delete the resource
+					providertest.TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_azure_event_hub_source.test_source",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
 			},
 		},
 	})

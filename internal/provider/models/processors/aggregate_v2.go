@@ -41,7 +41,7 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 			Description: "When method is set to tumbling, this is the interval over which metrics are aggregated in millseconds",
 		},
 		"strategy": schema.StringAttribute{
-			Optional:    true,
+			Required:    true,
 			Description: "When method is set to sliding, this is the strategy in which to perform the aggregation",
 		},
 		"window_duration": schema.Int64Attribute{

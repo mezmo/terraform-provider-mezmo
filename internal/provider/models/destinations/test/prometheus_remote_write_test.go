@@ -214,6 +214,33 @@ func TestPrometheusDestinationResource(t *testing.T) {
 					`,
 				ExpectError: regexp.MustCompile("(?s)endpoint.*Must be a valid.*URI"),
 			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_http_source" "my_source2" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+				}
+				resource "mezmo_prometheus_remote_write_destination" "test_destination" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					inputs 			= [mezmo_http_source.my_source2.id]
+					endpoint = "https://google.com"
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_prometheus_remote_write_destination.test_destination", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_prometheus_remote_write_destination.test_destination", "title", "new title"),
+					// verify resource will be re-created after refresh
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_prometheus_remote_write_destination.test_destination",
+					),
+				),
+				ExpectNonEmptyPlan: true,
+			},
 
 			// Delete testing automatically occurs in TestCase
 		},

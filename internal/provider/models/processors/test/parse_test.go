@@ -1010,6 +1010,35 @@ func TestParseProcessor(t *testing.T) {
 				// custom_timestamp_format field is required
 				ExpectError: regexp.MustCompile("(?s)have required property.*'custom_timestamp_format'"),
 			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_parse_processor" "test_processor" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					inputs 			= []
+					field				= ".field"
+					parser 			= "apache_log"
+					apache_log_options = {
+						format = "combined"
+					}
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_parse_processor.test_processor", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_parse_processor.test_processor", "title", "new title"),
+					// delete the resource
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_parse_processor.test_processor",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})
