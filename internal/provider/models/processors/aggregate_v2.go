@@ -13,7 +13,7 @@ const AGGREGATE_PROCESSOR_NODE_NAME = "aggregate-v2"
 const AGGREGATE_PROCESSOR_TYPE_NAME = "aggregate_v2"
 
 var METHODS = map[string]string{"TUMBLING": "tumbling", "SLIDING": "sliding"}
-var STRATEGIES = map[string]string{"SUM": "SUM", "AVERAGE": "AVG", "SET_INTERSECTION": "SET_INTERSECTION", "DISTROBUTION_CONCATENATION": "DIST_CONCAT"}
+var STRATEGIES = map[string]string{"SUM": "SUM", "AVERAGE": "AVG", "SET_INTERSECTION": "SET_INTERSECTION", "DISTRIBUTION_CONCATENATION": "DIST_CONCAT"}
 
 type AggregateV2ProcessorModel struct {
 	Id           String `tfsdk:"id"`
