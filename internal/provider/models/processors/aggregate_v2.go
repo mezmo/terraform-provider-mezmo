@@ -23,7 +23,7 @@ type AggregateV2ProcessorModel struct {
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
 	Method       String `tfsdk:"method" user_config:"true"`
-	IntervalMS   Int64  `tfsdk:"interval" user_config:"true"`
+	Interval     Int64  `tfsdk:"interval" user_config:"true"`
 	Strategy     String `tfsdk:"strategy" user_config:"true"`
 	Duration     Int64  `tfsdk:"window_duration" user_config:"true"`
 	Conditional  Object `tfsdk:"conditional" user_config:"true"`
@@ -38,7 +38,7 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 		},
 		"interval": schema.Int64Attribute{
 			Optional:    true,
-			Description: "When method is set to tumbling, this is the interval over which metrics are aggregated in millseconds",
+			Description: "When method is set to tumbling, this is the interval over which metrics are aggregated in seconds",
 		},
 		"strategy": schema.StringAttribute{
 			Optional:    true,
@@ -79,8 +79,8 @@ func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousStat
 		user_config["method"] = plan.Method.ValueString()
 	}
 
-	if !plan.IntervalMS.IsNull() {
-		user_config["interval"] = plan.IntervalMS.ValueInt64()
+	if !plan.Interval.IsNull() {
+		user_config["interval"] = plan.Interval.ValueInt64()
 	}
 
 	if !plan.Strategy.IsNull() {
@@ -111,7 +111,7 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 	plan.Method = basetypes.NewStringValue(component.UserConfig["method"].(string))
 
 	if component.UserConfig["interval"] != nil {
-		plan.IntervalMS = Int64Value(int64(component.UserConfig["interval"].(float64)))
+		plan.Interval = Int64Value(int64(component.UserConfig["interval"].(float64)))
 	}
 
 	if component.UserConfig["strategy"] != nil {

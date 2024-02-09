@@ -25,7 +25,7 @@ func TestAggregateV2Processor(t *testing.T) {
 					}`) + `
 					resource "mezmo_aggregate_v2_processor" "my_processor" {
 						method      = "tumbling"
-  						interval    = 36000
+  						interval    = 3600
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"pipeline_id\" is required"),
 			},
@@ -38,7 +38,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						description = "Lets aggregate stuff"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						method      = "tumbling"
-  						interval    = 36000
+  						interval    = 3600
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
@@ -51,7 +51,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						"generation_id": "0",
 						"inputs.#":      "0",
 						"method":        "tumbling",
-						"interval":      "36000",
+						"interval":      "3600",
 					}),
 				),
 			},
@@ -64,7 +64,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						description = "Lets aggregate stuff"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						method      = "tumbling"
-  						interval    = 36000
+  						interval    = 3600
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_aggregate_v2_processor.import_target",
@@ -81,7 +81,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_http_source.my_source.id]
 						method      = "tumbling"
-  						interval    = 3600
+  						interval    = 1800
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
@@ -92,7 +92,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						"inputs.#":      "1",
 						"inputs.0":      "#mezmo_http_source.my_source.id",
 						"method":        "tumbling",
-						"interval":      "3600",
+						"interval":      "1800",
 					}),
 				),
 			},

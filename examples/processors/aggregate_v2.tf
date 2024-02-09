@@ -27,7 +27,7 @@ resource "mezmo_aggregate_v2_processor" "processor1" {
   title       = "My aggregate v2 processor"
   description = "Aggregate my metrics via tumbling window"
   method      = "tumbling"
-  interval    = 36000
+  interval    = 3600
 }
 
 resource "mezmo_aggregate_v2_processor" "processor2" {
