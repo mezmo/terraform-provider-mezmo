@@ -490,6 +490,36 @@ func TestKafkaSourceResource(t *testing.T) {
 					}),
 				),
 			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_kafka_source" "test_source" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					brokers 		= [{
+						host 			= "mezmo.com"
+						port 			= 9092
+					}]
+					topics 			= ["topic1", "topic2"]
+					group_id 		= "my_group_id"
+					tls_enabled = true
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_kafka_source.test_source", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_kafka_source.test_source", "title", "new title"),
+					// delete the resource
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_kafka_source.test_source",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})

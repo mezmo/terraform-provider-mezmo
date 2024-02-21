@@ -99,7 +99,7 @@ func TestSQSSource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						description = "my description"
 						title = "my title"
-						queue_url = "http://example.com/queue"
+						queue_url = "https://google.com/queue"
 						region = "us-east-2"
 						auth = {
 							access_key_id = "123"
@@ -112,7 +112,7 @@ func TestSQSSource(t *testing.T) {
 						"description":            "my description",
 						"title":                  "my title",
 						"region":                 "us-east-2",
-						"queue_url":              "http://example.com/queue",
+						"queue_url":              "https://google.com/queue",
 						"auth.access_key_id":     "123",
 						"auth.secret_access_key": "secret123",
 						"generation_id":          "0",
@@ -147,7 +147,7 @@ func TestSQSSource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						description = "new description"
 						title = "new title"
-						queue_url = "http://example.com/another/queue"
+						queue_url = "https://google.com/another/queue"
 						region = "us-east-1"
 						auth = {
 							access_key_id = "456"
@@ -160,12 +160,41 @@ func TestSQSSource(t *testing.T) {
 						"description":            "new description",
 						"title":                  "new title",
 						"region":                 "us-east-1",
-						"queue_url":              "http://example.com/another/queue",
+						"queue_url":              "https://google.com/another/queue",
 						"auth.access_key_id":     "456",
 						"auth.secret_access_key": "abc123",
 						"generation_id":          "1",
 					}),
 				),
+			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_sqs_source" "test_source" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					queue_url 	= "https://google.com/queue"
+					region 			= "us-east-2"
+					auth 				= {
+						access_key_id 		= "123"
+						secret_access_key = "secret123"
+					}
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_sqs_source.test_source", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_sqs_source.test_source", "title", "new title"),
+					// delete the resource
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_sqs_source.test_source",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
 			},
 
 			// Delete testing automatically occurs in TestCase

@@ -44,6 +44,20 @@ func TestPipelineResource(t *testing.T) {
 					resource.TestCheckResourceAttr("mezmo_pipeline.test", "title", "updated title"),
 				),
 			},
+			// manually delete a pipeline and verify it is re-created
+			{
+				Config: GetProviderConfig() + `
+					resource "mezmo_pipeline" "test_deleted" {
+						title = "updated title"
+					}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("mezmo_pipeline.test_deleted", "title", "updated title"),
+					// delete the resource
+					TestDeletePipelineManually("mezmo_pipeline.test_deleted"),
+				),
+				// verify resource is created after refresh
+				ExpectNonEmptyPlan: true,
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})

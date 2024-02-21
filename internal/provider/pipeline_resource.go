@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"reflect"
+
+	"github.com/hashicorp/terraform-plugin-framework/path"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
@@ -136,6 +137,11 @@ func (r *PipelineResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	pipeline, err := r.client.Pipeline(state.Id.ValueString())
+	// force re-creation of manually deleted resources
+	if client.IsNotFoundError(err) {
+		resp.State.RemoveResource(ctx)
+		return
+	}
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Pipeline",

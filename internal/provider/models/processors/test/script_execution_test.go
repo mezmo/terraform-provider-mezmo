@@ -133,6 +133,31 @@ func TestScriptExecutionProcessor(t *testing.T) {
 				}`,
 				ExpectError: regexp.MustCompile("script is not valid JavaScript"),
 			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_script_execution_processor" "test_processor" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					inputs 			= []
+					script 			= "function processEvent(e) { return e }"
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_script_execution_processor.test_processor", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_script_execution_processor.test_processor", "title", "new title"),
+					// delete the resource
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_script_execution_processor.test_processor",
+					),
+				),
+				// verify resource will be re-created after refresh
+				ExpectNonEmptyPlan: true,
+			},
 
 			// Delete testing automatically occurs in TestCase
 		},

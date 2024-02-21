@@ -110,11 +110,8 @@ func readBody(resp *http.Response, err error) error {
 		return err
 	}
 
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
-		return fmt.Errorf("%s: %s", resp.Status, string(body))
+		return newAPIError(resp)
 	}
 
 	return err
@@ -125,11 +122,8 @@ func readJson(result any, resp *http.Response, err error) error {
 		return err
 	}
 
-	defer resp.Body.Close()
-
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
-		body, _ := io.ReadAll(resp.Body)
-		return fmt.Errorf("%s: %s", resp.Status, string(body))
+		return newAPIError(resp)
 	}
 
 	return json.NewDecoder(resp.Body).Decode(result)

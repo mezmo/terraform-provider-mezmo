@@ -74,7 +74,7 @@ func TestHttpDestination(t *testing.T) {
 						title = "my http destination"
 						description = "http destination description"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						uri = "http://example.com"
+						uri = "https://google.com"
 					}
 					`,
 				Check: resource.ComposeTestCheckFunc(
@@ -90,6 +90,7 @@ func TestHttpDestination(t *testing.T) {
 						"compression":   "none",
 						"ack_enabled":   "true",
 						"inputs.#":      "0",
+						"uri":           "https://google.com",
 					}),
 				),
 			},
@@ -101,7 +102,7 @@ func TestHttpDestination(t *testing.T) {
 						title = "my http destination"
 						description = "http destination description"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						uri = "http://example.com"
+						uri = "https://example.com"
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_http_destination.import_target",
@@ -116,7 +117,7 @@ func TestHttpDestination(t *testing.T) {
 						title = "new title"
 						description = "new description"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						uri = "http://example.com"
+						uri = "https://google.com"
 						encoding = "json"
 						compression = "gzip"
 						ack_enabled = "false"
@@ -158,7 +159,7 @@ func TestHttpDestination(t *testing.T) {
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_http_destination" "my_destination" {
 						pipeline_id = mezmo_pipeline.test_parent.id
-						uri = "http://example.com"
+						uri = "https://google.com"
 						inputs = [mezmo_http_source.my_source.id]
 					}
 					`,
@@ -173,6 +174,33 @@ func TestHttpDestination(t *testing.T) {
 						"headers.%":     nil,
 					}),
 				),
+			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_http_source" "my_source2" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+				}
+				resource "mezmo_http_destination" "test_destination" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					title 			= "new title"
+					uri = "https://google.com"
+					inputs 			= [mezmo_http_source.my_source2.id]
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_http_destination.test_destination", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_http_destination.test_destination", "title", "new title"),
+					// verify resource will be re-created after refresh
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_http_destination.test_destination",
+					),
+				),
+				ExpectNonEmptyPlan: true,
 			},
 
 			// Delete testing automatically occurs in TestCase

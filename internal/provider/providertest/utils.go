@@ -17,6 +17,7 @@ import (
 )
 
 const authAccountId = "tf_test_01"
+const authUserEmail = "info@mezmo.com"
 
 var setupMutex sync.Mutex
 var isAccountCreated bool
@@ -51,10 +52,10 @@ func GetProviderConfig() string {
 			headers  = {
 				// Used for authenticating against the service directly
 				"x-auth-account-id"  = %q
-				"x-auth-user-email" = "info@mezmo.com"
+				"x-auth-user-email" = %q
 			}
 		}
-		`, GetTestEndpoint(), authAccountId)
+		`, GetTestEndpoint(), authAccountId, authUserEmail)
 }
 
 func TestPreCheck(t *testing.T) {
@@ -193,4 +194,91 @@ func ComputeImportId(resourceName string) resource.ImportStateIdFunc {
 		}
 		return "", fmt.Errorf("resource \"%s\" does not have an attribute \"pipeline_id\"", resourceName)
 	}
+}
+
+func TestDeletePipelineManually(resourceName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		return deleteResource(
+			resourceName,
+			getResourceID(s, resourceName),
+			"",
+		)
+	}
+}
+
+func TestDeletePipelineNodeManually(pipelineResourceName string, resourceName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		return deleteResource(
+			resourceName,
+			getResourceID(s, pipelineResourceName),
+			getResourceID(s, resourceName),
+		)
+	}
+}
+
+func getResourceID(s *terraform.State, resourceName string) string {
+	res, ok := s.RootModule().Resources[resourceName]
+	if ok {
+		return res.Primary.ID
+	}
+	return ""
+}
+
+func deleteResource(resourceName string, pipelineId string, resourceId string) error {
+	// resource names from TF state are of the form <resource_type>.<name>
+	// example: mezmo_pipeline.test
+	resourceType := strings.Split(resourceName, ".")[0]
+	endpoint := fmt.Sprintf("/v3/pipeline/%s", pipelineId)
+	if resourceType == "mezmo_pipeline" {
+		err := makeDeleteRequest(endpoint)
+		return err
+	}
+	nodeType, err := pipelineNodeType(resourceType)
+	if err != nil {
+		return err
+	}
+	if resourceId == "" {
+		return fmt.Errorf("resource ID is required for %s deletion", resourceName)
+	}
+	// convert to v3/pipeline/<node_type>/<node_id>
+	endpoint = fmt.Sprintf("%s/%s/%s", endpoint, nodeType, resourceId)
+	err = makeDeleteRequest(endpoint)
+	return err
+}
+
+func pipelineNodeType(resourceType string) (string, error) {
+	switch {
+	case strings.HasSuffix(resourceType, "_destination"):
+		return "sink", nil
+	case strings.HasSuffix(resourceType, "_processor"):
+		return "transform", nil
+	case strings.HasSuffix(resourceType, "_source"):
+		return "source", nil
+	default:
+		return "", fmt.Errorf("unknown resource type: %s", resourceType)
+	}
+}
+
+func makeDeleteRequest(urlPath string) error {
+	client := http.Client{Timeout: 5 * time.Second}
+	req, err := http.NewRequest(
+		http.MethodDelete,
+		GetTestEndpoint()+urlPath,
+		nil,
+	)
+	if err != nil {
+		return fmt.Errorf("unable to create http request %s. reason: %s", urlPath, err.Error())
+	}
+	req.Header.Add("x-account-id", authAccountId)
+	req.Header.Add("x-auth-user-email", authUserEmail)
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("request %s failed. reason: %s", urlPath, err.Error())
+	}
+	if resp.StatusCode >= http.StatusOK && resp.StatusCode <= http.StatusNoContent {
+		return nil
+	}
+	return fmt.Errorf("received status code %d for %s", resp.StatusCode, urlPath)
 }

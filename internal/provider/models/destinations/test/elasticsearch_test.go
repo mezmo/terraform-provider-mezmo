@@ -171,6 +171,38 @@ func TestElasticSearchDestinationResource(t *testing.T) {
 					}),
 				),
 			},
+			// confirm manually deleted resources are recreated
+			{
+				Config: GetProviderConfig() + `
+				resource "mezmo_pipeline" "test_parent2" {
+					title = "pipeline"
+				}
+				resource "mezmo_http_source" "my_source2" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+				}
+				resource "mezmo_elasticsearch_destination" "test_destination" {
+					pipeline_id = mezmo_pipeline.test_parent2.id
+					endpoints   = ["https://google.com"]
+					title 			= "new title"
+					auth 				= {
+						strategy 	= "basic"
+						user     	= "user1"
+						password 	= "pass1"
+					}
+					inputs 			= [mezmo_http_source.my_source2.id]
+				}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_elasticsearch_destination.test_destination", "id", regexp.MustCompile(`[\w-]{36}`)),
+					resource.TestCheckResourceAttr("mezmo_elasticsearch_destination.test_destination", "title", "new title"),
+					// verify resource will be re-created after refresh
+					TestDeletePipelineNodeManually(
+						"mezmo_pipeline.test_parent2",
+						"mezmo_elasticsearch_destination.test_destination",
+					),
+				),
+				ExpectNonEmptyPlan: true,
+			},
 
 			// Delete testing automatically occurs in TestCase
 		},
