@@ -25,7 +25,7 @@ func TestAggregateV2Processor(t *testing.T) {
 					}`) + `
 					resource "mezmo_aggregate_v2_processor" "my_processor" {
 						method      = "tumbling"
-							interval    = 36000
+						interval    = 36000
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"pipeline_id\" is required"),
 			},
@@ -54,6 +54,10 @@ func TestAggregateV2Processor(t *testing.T) {
 						"method":        "tumbling",
 						"interval":      "3600",
 						"strategy":      "SUM",
+						"group_by.#":    "3",
+						"group_by.0":    ".name",
+						"group_by.1":    ".namespace",
+						"group_by.2":    ".tags",
 					}),
 				),
 			},
@@ -62,16 +66,37 @@ func TestAggregateV2Processor(t *testing.T) {
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_aggregate_v2_processor" "import_target" {
-						title = "My aggregate v2 processor"
+						title 		= "My aggregate v2 processor"
 						description = "Lets aggregate stuff"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						method      = "tumbling"
-							interval    = 36000
+						interval    = 3600
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_aggregate_v2_processor.import_target",
 				ImportStateIdFunc: ComputeImportId("mezmo_aggregate_v2_processor.my_processor"),
 				ImportStateVerify: true,
+			},
+
+			// Update fields
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_aggregate_v2_processor" "my_processor" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs 		= [mezmo_http_source.my_source.id]
+						method      = "tumbling"
+						strategy    = "SUM"
+						interval    = 3600
+						group_by 	= [".foo", ".bar"]
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
+						"group_by.#":    "2",
+						"group_by.0":    ".foo",
+						"group_by.1":    ".bar",
+						"generation_id": "1",
+					}),
+				),
 			},
 
 			// Update fields
@@ -91,7 +116,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
 						"title":         "new title",
 						"description":   "new desc",
-						"generation_id": "1",
+						"generation_id": "2",
 						"inputs.#":      "1",
 						"inputs.0":      "#mezmo_http_source.my_source.id",
 						"method":        "tumbling",
@@ -118,7 +143,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						"pipeline_id":     "#mezmo_pipeline.test_parent.id",
 						"title":           "new title",
 						"description":     "new desc",
-						"generation_id":   "2",
+						"generation_id":   "3",
 						"inputs.#":        "1",
 						"inputs.0":        "#mezmo_http_source.my_source.id",
 						"method":          "sliding",
@@ -135,10 +160,10 @@ func TestAggregateV2Processor(t *testing.T) {
 						title = "new title"
 						description = "new desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						inputs = [mezmo_http_source.my_source.id]
+						inputs 		= [mezmo_http_source.my_source.id]
 						method      = "sliding"
 						strategy	= "AVG"
-							window_duration  = 10
+						window_duration  = 10
 						conditional = {
 							expressions = [
 								{
@@ -154,7 +179,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
 						"title":                                  "new title",
 						"description":                            "new desc",
-						"generation_id":                          "3",
+						"generation_id":                          "4",
 						"inputs.#":                               "1",
 						"inputs.0":                               "#mezmo_http_source.my_source.id",
 						"method":                                 "sliding",
@@ -173,9 +198,9 @@ func TestAggregateV2Processor(t *testing.T) {
 				Config: GetCachedConfig(cacheKey) + `
 				resource "mezmo_aggregate_v2_processor" "my_processor" {
 					pipeline_id = mezmo_pipeline.test_parent.id
-					inputs = [mezmo_http_source.my_source.id]
-					method = "tumbling"
-					interval = "36000"
+					inputs 		= [mezmo_http_source.my_source.id]
+					method 		= "tumbling"
+					interval 	= "36000"
 					strategy    = "SUM"
 				}`,
 				ExpectError: regexp.MustCompile("(?s)must.*be <=.*"),
@@ -186,9 +211,9 @@ func TestAggregateV2Processor(t *testing.T) {
 				Config: GetCachedConfig(cacheKey) + `
 				resource "mezmo_aggregate_v2_processor" "my_processor" {
 					pipeline_id = mezmo_pipeline.test_parent.id
-					inputs = [mezmo_http_source.my_source.id]
-					method = "sliding"
-					strategy = "asdf"
+					inputs 	 	= [mezmo_http_source.my_source.id]
+					method 	 	= "sliding"
+					strategy 	= "asdf"
 				}`,
 				ExpectError: regexp.MustCompile("(?s)Bad.*Request"),
 			},
@@ -197,10 +222,10 @@ func TestAggregateV2Processor(t *testing.T) {
 			{
 				Config: GetCachedConfig(cacheKey) + `
 				resource "mezmo_aggregate_v2_processor" "my_processor" {
-					pipeline_id = mezmo_pipeline.test_parent.id
-					inputs = [mezmo_http_source.my_source.id]
-					method = "sliding"
-					strategy = "AVG"
+					pipeline_id 	= mezmo_pipeline.test_parent.id
+					inputs 			= [mezmo_http_source.my_source.id]
+					method 			= "sliding"
+					strategy 		= "AVG"
 					window_duration = 305325235325
 				}`,
 				ExpectError: regexp.MustCompile("/window_duration/maximum"),
@@ -213,10 +238,10 @@ func TestAggregateV2Processor(t *testing.T) {
 				}
 				resource "mezmo_aggregate_v2_processor" "test_processor" {
 					pipeline_id = mezmo_pipeline.test_parent2.id
-					title 			= "new title"
-					inputs 			= []
+					title 		= "new title"
+					inputs 		= []
 					method      = "tumbling"
-  				interval    = 3600
+  					interval    = 3600
 					strategy    = "SUM"
 				}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
