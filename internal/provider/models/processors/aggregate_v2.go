@@ -16,17 +16,18 @@ var METHODS = map[string]string{"TUMBLING": "tumbling", "SLIDING": "sliding"}
 var STRATEGIES = map[string]string{"SUM": "SUM", "AVERAGE": "AVG", "SET_INTERSECTION": "SET_INTERSECTION", "DISTROBUTION_CONCATENATION": "DIST_CONCAT"}
 
 type AggregateV2ProcessorModel struct {
-	Id           String `tfsdk:"id"`
-	PipelineId   String `tfsdk:"pipeline_id"`
-	Title        String `tfsdk:"title"`
-	Description  String `tfsdk:"description"`
-	Inputs       List   `tfsdk:"inputs"`
-	GenerationId Int64  `tfsdk:"generation_id"`
-	Method       String `tfsdk:"method" user_config:"true"`
-	IntervalMS   Int64  `tfsdk:"interval" user_config:"true"`
-	Strategy     String `tfsdk:"strategy" user_config:"true"`
-	Duration     Int64  `tfsdk:"window_duration" user_config:"true"`
-	Conditional  Object `tfsdk:"conditional" user_config:"true"`
+	Id           String              `tfsdk:"id"`
+	PipelineId   String              `tfsdk:"pipeline_id"`
+	Title        String              `tfsdk:"title"`
+	Description  String              `tfsdk:"description"`
+	Inputs       List                `tfsdk:"inputs"`
+	GenerationId Int64               `tfsdk:"generation_id"`
+	Method       String              `tfsdk:"method" user_config:"true"`
+	IntervalMS   Int64               `tfsdk:"interval" user_config:"true"`
+	Strategy     String              `tfsdk:"strategy" user_config:"true"`
+	Duration     Int64               `tfsdk:"window_duration" user_config:"true"`
+	Conditional  Object              `tfsdk:"conditional" user_config:"true"`
+	GroupBy      basetypes.ListValue `tfsdk:"group_by" user_config:"true"`
 }
 
 var AggregateV2ProcessorResourceSchema = schema.Schema{
@@ -38,7 +39,8 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 		},
 		"interval": schema.Int64Attribute{
 			Optional:    true,
-			Description: "When method is set to tumbling, this is the interval over which metrics are aggregated in millseconds",
+			Computed:    true,
+			Description: "When method is set to tumbling, this is the interval over which metrics are aggregated in seconds",
 		},
 		"strategy": schema.StringAttribute{
 			Required:    true,
@@ -46,12 +48,19 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 		},
 		"window_duration": schema.Int64Attribute{
 			Optional:    true,
+			Computed:    true,
 			Description: "When method is set to sliding, this is the interval over which metrics are aggregated in seconds",
 		},
 		"conditional": schema.SingleNestedAttribute{
 			Optional:    true,
 			Description: "When method is set to sliding: " + ParentConditionalAttribute.Description,
 			Attributes:  ParentConditionalAttribute.Attributes,
+		},
+		"group_by": schema.ListAttribute{
+			ElementType: basetypes.StringType{},
+			Optional:    true,
+			Computed:    true,
+			Description: "Group events based on matching data from each of these field paths. Supports nesting via dot-notation.",
 		},
 	}),
 }
@@ -95,6 +104,10 @@ func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousStat
 		user_config["conditional"] = unwindConditionalFromModel(plan.Conditional)
 	}
 
+	if !plan.GroupBy.IsNull() && len(plan.GroupBy.Elements()) > 0 {
+		component.UserConfig["group_by"] = StringListValueToStringSlice(plan.GroupBy)
+	}
+
 	return &component, dd
 }
 
@@ -124,6 +137,10 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 
 	if component.UserConfig["conditional"] != nil {
 		plan.Conditional = UnwindConditionalToModel(component.UserConfig["conditional"].(map[string]any))
+	}
+
+	if component.UserConfig["group_by"] != nil {
+		plan.GroupBy = SliceToStringListValue(component.UserConfig["group_by"].([]any))
 	}
 
 }
