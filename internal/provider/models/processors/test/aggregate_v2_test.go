@@ -39,12 +39,11 @@ func TestAggregateV2Processor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						method      = "tumbling"
 						interval    = 3600
-						strategy    = "SUM"
+						strategy    = "sum"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_aggregate_v2_processor.my_processor", "id", regexp.MustCompile(`[\w-]{36}`)),
-
 					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
 						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
 						"title":         "My aggregate v2 processor",
@@ -53,12 +52,13 @@ func TestAggregateV2Processor(t *testing.T) {
 						"inputs.#":      "0",
 						"method":        "tumbling",
 						"interval":      "3600",
-						"strategy":      "SUM",
+						"strategy":      "sum",
 						"group_by.#":    "3",
 						"group_by.0":    ".name",
 						"group_by.1":    ".namespace",
 						"group_by.2":    ".tags",
 					}),
+					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
 			},
 
@@ -85,7 +85,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs 		= [mezmo_http_source.my_source.id]
 						method      = "tumbling"
-						strategy    = "SUM"
+						strategy    = "sum"
 						interval    = 3600
 						group_by 	= [".foo", ".bar"]
 					}`,
@@ -96,6 +96,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						"group_by.1":    ".bar",
 						"generation_id": "1",
 					}),
+					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
 			},
 
@@ -109,7 +110,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						inputs = [mezmo_http_source.my_source.id]
 						method      = "tumbling"
 						interval    = 3600
-						strategy    = "SUM"
+						strategy    = "sum"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
@@ -121,8 +122,9 @@ func TestAggregateV2Processor(t *testing.T) {
 						"inputs.0":      "#mezmo_http_source.my_source.id",
 						"method":        "tumbling",
 						"interval":      "3600",
-						"strategy":      "SUM",
+						"strategy":      "sum",
 					}),
+					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
 			},
 
@@ -135,7 +137,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_http_source.my_source.id]
 						method      = "sliding"
-						strategy	= "AVG"
+						strategy	= "average"
 						window_duration  = 10
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -147,9 +149,10 @@ func TestAggregateV2Processor(t *testing.T) {
 						"inputs.#":        "1",
 						"inputs.0":        "#mezmo_http_source.my_source.id",
 						"method":          "sliding",
-						"strategy":        "AVG",
+						"strategy":        "average",
 						"window_duration": "10",
 					}),
+					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
 			},
 
@@ -162,7 +165,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs 		= [mezmo_http_source.my_source.id]
 						method      = "sliding"
-						strategy	= "AVG"
+						strategy	= "average"
 						window_duration  = 10
 						conditional = {
 							expressions = [
@@ -183,13 +186,52 @@ func TestAggregateV2Processor(t *testing.T) {
 						"inputs.#":                               "1",
 						"inputs.0":                               "#mezmo_http_source.my_source.id",
 						"method":                                 "sliding",
-						"strategy":                               "AVG",
+						"strategy":                               "average",
 						"window_duration":                        "10",
 						"conditional.expressions.#":              "1",
 						"conditional.expressions.0.field":        ".status",
 						"conditional.expressions.0.operator":     "equal",
 						"conditional.expressions.0.value_number": "200",
 					}),
+					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
+				),
+			},
+
+			// Update field
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_aggregate_v2_processor" "my_processor" {
+						title 			 = "custom script"
+						pipeline_id 	 = mezmo_pipeline.test_parent.id
+						inputs			 = [mezmo_http_source.my_source.id]
+						method 			 = "sliding"
+						window_duration  = 10
+						script 			 = "function process(event, metadata) { event.foo = \"bar\"; return event }"
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
+						"script": "function process(event, metadata) { event.foo = \"bar\"; return event }",
+					}),
+					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"strategy"}),
+				),
+			},
+
+			// Update field
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_aggregate_v2_processor" "my_processor" {
+						title 			 = "back to strategy"
+						pipeline_id 	 = mezmo_pipeline.test_parent.id
+						inputs			 = [mezmo_http_source.my_source.id]
+						method 			 = "sliding"
+						window_duration  = 10
+						strategy		 = "average"
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
+						"strategy": "average",
+					}),
+					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
 			},
 
@@ -201,7 +243,7 @@ func TestAggregateV2Processor(t *testing.T) {
 					inputs 		= [mezmo_http_source.my_source.id]
 					method 		= "tumbling"
 					interval 	= "36000"
-					strategy    = "SUM"
+					strategy    = "sum"
 				}`,
 				ExpectError: regexp.MustCompile("(?s)must.*be <=.*"),
 			},
@@ -215,7 +257,7 @@ func TestAggregateV2Processor(t *testing.T) {
 					method 	 	= "sliding"
 					strategy 	= "asdf"
 				}`,
-				ExpectError: regexp.MustCompile("(?s)Bad.*Request"),
+				ExpectError: regexp.MustCompile("Attribute strategy value must be one of"),
 			},
 
 			// Error: server-side validation - invalid window duration
@@ -225,7 +267,7 @@ func TestAggregateV2Processor(t *testing.T) {
 					pipeline_id 	= mezmo_pipeline.test_parent.id
 					inputs 			= [mezmo_http_source.my_source.id]
 					method 			= "sliding"
-					strategy 		= "AVG"
+					strategy 		= "average"
 					window_duration = 305325235325
 				}`,
 				ExpectError: regexp.MustCompile("/window_duration/maximum"),
@@ -242,7 +284,7 @@ func TestAggregateV2Processor(t *testing.T) {
 					inputs 		= []
 					method      = "tumbling"
   					interval    = 3600
-					strategy    = "SUM"
+					strategy    = "sum"
 				}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestMatchResourceAttr(

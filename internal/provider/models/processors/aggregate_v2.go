@@ -1,8 +1,10 @@
 package processors
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
@@ -13,7 +15,12 @@ const AGGREGATE_PROCESSOR_NODE_NAME = "aggregate-v2"
 const AGGREGATE_PROCESSOR_TYPE_NAME = "aggregate_v2"
 
 var METHODS = map[string]string{"TUMBLING": "tumbling", "SLIDING": "sliding"}
-var STRATEGIES = map[string]string{"SUM": "SUM", "AVERAGE": "AVG", "SET_INTERSECTION": "SET_INTERSECTION", "DISTROBUTION_CONCATENATION": "DIST_CONCAT"}
+var STRATEGIES = map[string]string{
+	"sum":                        "SUM",
+	"average":                    "AVG",
+	"set_intersection":           "SET_INTERSECTION",
+	"distribution_concatenation": "DIST_CONCAT",
+}
 
 type AggregateV2ProcessorModel struct {
 	Id           String              `tfsdk:"id"`
@@ -28,6 +35,7 @@ type AggregateV2ProcessorModel struct {
 	Duration     Int64               `tfsdk:"window_duration" user_config:"true"`
 	Conditional  Object              `tfsdk:"conditional" user_config:"true"`
 	GroupBy      basetypes.ListValue `tfsdk:"group_by" user_config:"true"`
+	Script       String              `tfsdk:"script" user_config:"true"`
 }
 
 var AggregateV2ProcessorResourceSchema = schema.Schema{
@@ -43,8 +51,14 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 			Description: "When method is set to tumbling, this is the interval over which metrics are aggregated in seconds",
 		},
 		"strategy": schema.StringAttribute{
-			Required:    true,
+			Optional:    true,
+			Computed:    true,
 			Description: "When method is set to sliding, this is the strategy in which to perform the aggregation",
+			Validators:  []validator.String{stringvalidator.OneOf(MapKeys(STRATEGIES)...)},
+		},
+		"script": schema.StringAttribute{
+			Optional: true,
+			Computed: false,
 		},
 		"window_duration": schema.Int64Attribute{
 			Optional:    true,
@@ -92,8 +106,24 @@ func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousStat
 		user_config["interval"] = plan.IntervalMS.ValueInt64()
 	}
 
-	if !plan.Strategy.IsNull() {
-		user_config["strategy"] = plan.Strategy.ValueString()
+	strategySet := !(plan.Strategy.IsNull() || plan.Strategy.IsUnknown())
+	scripSet := !(plan.Script.IsNull() || plan.Script.IsNull())
+	if !strategySet && !scripSet {
+		dd.AddError(
+			"Error in plan",
+			"Either 'strategy' or 'script' must be defined.",
+		)
+	} else if strategySet && scripSet {
+		dd.AddError(
+			"Error in plan",
+			"Cannot define both 'strategy' and 'script' fields.",
+		)
+	} else if scripSet {
+		user_config["strategy"] = "CUSTOM"
+		user_config["script"] = plan.Script.ValueString()
+	} else {
+		delete(user_config, "script")
+		user_config["strategy"] = STRATEGIES[plan.Strategy.ValueString()]
 	}
 
 	if !plan.Duration.IsNull() {
@@ -128,7 +158,14 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 	}
 
 	if component.UserConfig["strategy"] != nil {
-		plan.Strategy = basetypes.NewStringValue(component.UserConfig["strategy"].(string))
+		apiStrategy := component.UserConfig["strategy"].(string)
+		if apiStrategy == "CUSTOM" {
+			plan.Strategy = basetypes.NewStringNull()
+			plan.Script = basetypes.NewStringValue(component.UserConfig["script"].(string))
+		} else {
+			plan.Strategy = basetypes.NewStringValue(FindKey(STRATEGIES, apiStrategy))
+			plan.Script = basetypes.NewStringNull()
+		}
 	}
 
 	if component.UserConfig["window_duration"] != nil {
