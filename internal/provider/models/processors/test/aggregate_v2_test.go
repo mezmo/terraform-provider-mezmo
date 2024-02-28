@@ -272,6 +272,49 @@ func TestAggregateV2Processor(t *testing.T) {
 				}`,
 				ExpectError: regexp.MustCompile("/window_duration/maximum"),
 			},
+
+			// Error: window duration
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_aggregate_v2_processor" "my_processor" {
+						pipeline_id 	= mezmo_pipeline.test_parent.id
+						inputs 			= [mezmo_http_source.my_source.id]
+						strategy 		= "sum"
+						method 			= "tumbling"
+						interval 		= 10
+						window_duration = 5
+					}`,
+				ExpectError: regexp.MustCompile("The field 'window_duration' can only be set if method == 'sliding'"),
+			},
+
+			// Error: window min
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_aggregate_v2_processor" "my_processor" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs 		= [mezmo_http_source.my_source.id]
+						strategy 	= "sum"
+						method 		= "tumbling"
+						interval 	= 10
+						window_min 	= 5
+					}`,
+				ExpectError: regexp.MustCompile("The field 'window_min' can only be set if method == 'sliding'"),
+			},
+
+			// Error: interval
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_aggregate_v2_processor" "my_processor" {
+						pipeline_id 	= mezmo_pipeline.test_parent.id
+						inputs 			= [mezmo_http_source.my_source.id]
+						strategy 		= "sum"
+						method 			= "sliding"
+						interval 		= 10
+						window_duration = 5
+					}`,
+				ExpectError: regexp.MustCompile("The field 'interval' can only be set if method == 'tumbling'"),
+			},
+
 			// confirm manually deleted resources are recreated
 			{
 				Config: GetProviderConfig() + `
