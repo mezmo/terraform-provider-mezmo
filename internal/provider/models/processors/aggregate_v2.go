@@ -14,7 +14,6 @@ import (
 const AGGREGATE_PROCESSOR_NODE_NAME = "aggregate-v2"
 const AGGREGATE_PROCESSOR_TYPE_NAME = "aggregate_v2"
 
-var METHODS = map[string]string{"TUMBLING": "tumbling", "SLIDING": "sliding"}
 var STRATEGIES = map[string]string{
 	"sum":                        "SUM",
 	"average":                    "AVG",
@@ -30,9 +29,10 @@ type AggregateV2ProcessorModel struct {
 	Inputs       List                `tfsdk:"inputs"`
 	GenerationId Int64               `tfsdk:"generation_id"`
 	Method       String              `tfsdk:"method" user_config:"true"`
-	IntervalMS   Int64               `tfsdk:"interval" user_config:"true"`
+	Interval     Int64               `tfsdk:"interval" user_config:"true"`
 	Strategy     String              `tfsdk:"strategy" user_config:"true"`
 	Duration     Int64               `tfsdk:"window_duration" user_config:"true"`
+	Minimum      Int64               `tfsdk:"window_min" user_config:"true"`
 	Conditional  Object              `tfsdk:"conditional" user_config:"true"`
 	GroupBy      basetypes.ListValue `tfsdk:"group_by" user_config:"true"`
 	Script       String              `tfsdk:"script" user_config:"true"`
@@ -44,6 +44,7 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 		"method": schema.StringAttribute{
 			Required:    true,
 			Description: "The method in which to aggregate metrics (tumbling or sliding)",
+			Validators:  []validator.String{stringvalidator.OneOf("tumbling", "sliding")},
 		},
 		"interval": schema.Int64Attribute{
 			Optional:    true,
@@ -65,6 +66,11 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 			Computed:    true,
 			Description: "When method is set to sliding, this is the interval over which metrics are aggregated in seconds",
 		},
+		"window_min": schema.Int64Attribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "",
+		},
 		"conditional": schema.SingleNestedAttribute{
 			Optional:    true,
 			Description: "When method is set to sliding: " + ParentConditionalAttribute.Description,
@@ -77,6 +83,76 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 			Description: "Group events based on matching data from each of these field paths. Supports nesting via dot-notation.",
 		},
 	}),
+}
+
+func methodConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[string]any, dd *diag.Diagnostics) {
+	isIntervalSet := !plan.Interval.IsNull() && !plan.Interval.IsUnknown()
+	isDurationSet := !plan.Duration.IsNull() && !plan.Duration.IsUnknown()
+	isMinimumSet := !plan.Minimum.IsNull() && !plan.Minimum.IsUnknown()
+	method := plan.Method.ValueString()
+
+	userConfig["method"] = method
+	if method == "tumbling" {
+		if isDurationSet {
+			dd.AddError(
+				"Error in plan",
+				"The field 'window_duration' can only be set if method == 'sliding'",
+			)
+		}
+
+		if isMinimumSet {
+			dd.AddError(
+				"Error in plan",
+				"The field 'window_min' can only be set if method == 'sliding'",
+			)
+		}
+
+		if isIntervalSet {
+			userConfig["interval"] = plan.Interval.ValueInt64()
+		}
+	} else if method == "sliding" {
+		if isIntervalSet {
+			dd.AddError(
+				"Error in plan",
+				"The field 'interval' can only be set if method == 'tumbling'",
+			)
+		}
+
+		if isDurationSet {
+			userConfig["window_duration"] = plan.Duration.ValueInt64()
+		}
+		if isMinimumSet {
+			userConfig["window_min"] = plan.Minimum.ValueInt64()
+		}
+	} else {
+		dd.AddError(
+			"Error in plan",
+			"The method '%s' is not handled correctly in the provider. Please open a GitHub issue to report this.",
+		)
+	}
+}
+
+func strategyConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[string]any, dd *diag.Diagnostics) {
+	strategySet := !(plan.Strategy.IsNull() || plan.Strategy.IsUnknown())
+	scripSet := !(plan.Script.IsNull() || plan.Script.IsNull())
+	if !strategySet && !scripSet {
+		dd.AddError(
+			"Error in plan",
+			"Either 'strategy' or 'script' must be defined.",
+		)
+	} else if strategySet && scripSet {
+		dd.AddError(
+			"Error in plan",
+			"Cannot define both 'strategy' and 'script' fields.",
+		)
+	} else if scripSet {
+		userConfig["strategy"] = "CUSTOM"
+		userConfig["script"] = plan.Script.ValueString()
+	} else {
+		delete(userConfig, "script")
+		userConfig["strategy"] = STRATEGIES[plan.Strategy.ValueString()]
+	}
+
 }
 
 func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousState *AggregateV2ProcessorModel) (*Processor, diag.Diagnostics) {
@@ -98,37 +174,8 @@ func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousStat
 	component.Inputs = StringListValueToStringSlice(plan.Inputs)
 	user_config := component.UserConfig
 
-	if !plan.Method.IsNull() {
-		user_config["method"] = plan.Method.ValueString()
-	}
-
-	if !plan.IntervalMS.IsNull() {
-		user_config["interval"] = plan.IntervalMS.ValueInt64()
-	}
-
-	strategySet := !(plan.Strategy.IsNull() || plan.Strategy.IsUnknown())
-	scripSet := !(plan.Script.IsNull() || plan.Script.IsNull())
-	if !strategySet && !scripSet {
-		dd.AddError(
-			"Error in plan",
-			"Either 'strategy' or 'script' must be defined.",
-		)
-	} else if strategySet && scripSet {
-		dd.AddError(
-			"Error in plan",
-			"Cannot define both 'strategy' and 'script' fields.",
-		)
-	} else if scripSet {
-		user_config["strategy"] = "CUSTOM"
-		user_config["script"] = plan.Script.ValueString()
-	} else {
-		delete(user_config, "script")
-		user_config["strategy"] = STRATEGIES[plan.Strategy.ValueString()]
-	}
-
-	if !plan.Duration.IsNull() {
-		user_config["window_duration"] = plan.Duration.ValueInt64()
-	}
+	methodConfigFromModel(plan, user_config, &dd)
+	strategyConfigFromModel(plan, user_config, &dd)
 
 	if !plan.Conditional.IsNull() {
 		user_config["conditional"] = unwindConditionalFromModel(plan.Conditional)
@@ -154,7 +201,7 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 	plan.Method = basetypes.NewStringValue(component.UserConfig["method"].(string))
 
 	if component.UserConfig["interval"] != nil {
-		plan.IntervalMS = Int64Value(int64(component.UserConfig["interval"].(float64)))
+		plan.Interval = Int64Value(int64(component.UserConfig["interval"].(float64)))
 	}
 
 	if component.UserConfig["strategy"] != nil {
@@ -170,6 +217,10 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 
 	if component.UserConfig["window_duration"] != nil {
 		plan.Duration = Int64Value(int64(component.UserConfig["window_duration"].(float64)))
+	}
+
+	if component.UserConfig["window_min"] != nil {
+		plan.Minimum = Int64Value(int64(component.UserConfig["window_min"].(float64)))
 	}
 
 	if component.UserConfig["conditional"] != nil {
