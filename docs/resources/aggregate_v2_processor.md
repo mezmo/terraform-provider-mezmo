@@ -25,12 +25,13 @@ Aggregates multiple metric events into a single metric event using either a tumb
 
 - `conditional` (Attributes) When method is set to sliding: A group of expressions (optionally nested) joined by a logical operator (see [below for nested schema](#nestedatt--conditional))
 - `description` (String) A user-defined value describing the processor
-- `event_timestamp` (String) Force accumulated event reduction to flush the result when a conditional expression evaluates to true on an inbound event.
 - `group_by` (List of String) Group events based on matching data from each of these field paths. Supports nesting via dot-notation.
 - `inputs` (List of String) The ids of the input components
-- `operation` (String) The operation in which to perform the aggregation
+- `interval` (Number) When method is set to tumbling, this is the interval over which metrics are aggregated in seconds
 - `script` (String)
+- `strategy` (String) When method is set to sliding, this is the strategy in which to perform the aggregation
 - `title` (String) A user-defined title for the processor
+- `window_duration` (Number) When method is set to sliding, this is the interval over which metrics are aggregated in seconds
 - `window_min` (Number)
 
 ### Read-Only
