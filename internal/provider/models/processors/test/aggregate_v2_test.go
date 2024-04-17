@@ -24,7 +24,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 					}`) + `
 					resource "mezmo_aggregate_v2_processor" "my_processor" {
-						method      = "tumbling"
+						window_type = "tumbling"
 						interval    = 36000
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"pipeline_id\" is required"),
@@ -37,9 +37,9 @@ func TestAggregateV2Processor(t *testing.T) {
 						title = "My aggregate v2 processor"
 						description = "Lets aggregate stuff"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						method      = "tumbling"
+						window_type = "tumbling"
 						interval    = 3600
-						strategy    = "sum"
+						operation   = "sum"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
@@ -50,9 +50,9 @@ func TestAggregateV2Processor(t *testing.T) {
 						"description":   "Lets aggregate stuff",
 						"generation_id": "0",
 						"inputs.#":      "0",
-						"method":        "tumbling",
+						"window_type":   "tumbling",
 						"interval":      "3600",
-						"strategy":      "sum",
+						"operation":     "sum",
 						"group_by.#":    "3",
 						"group_by.0":    ".name",
 						"group_by.1":    ".namespace",
@@ -69,7 +69,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						title 		= "My aggregate v2 processor"
 						description = "Lets aggregate stuff"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						method      = "tumbling"
+						window_type = "tumbling"
 						interval    = 3600
 					}`,
 				ImportState:       true,
@@ -84,8 +84,8 @@ func TestAggregateV2Processor(t *testing.T) {
 					resource "mezmo_aggregate_v2_processor" "my_processor" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs 		= [mezmo_http_source.my_source.id]
-						method      = "tumbling"
-						strategy    = "sum"
+						window_type = "tumbling"
+						operation   = "sum"
 						interval    = 3600
 						group_by 	= [".foo", ".bar"]
 					}`,
@@ -107,10 +107,10 @@ func TestAggregateV2Processor(t *testing.T) {
 						title = "new title"
 						description = "new desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						inputs = [mezmo_http_source.my_source.id]
-						method      = "tumbling"
+						inputs      = [mezmo_http_source.my_source.id]
+						window_type = "tumbling"
 						interval    = 3600
-						strategy    = "sum"
+						operation   = "sum"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
@@ -120,9 +120,9 @@ func TestAggregateV2Processor(t *testing.T) {
 						"generation_id": "2",
 						"inputs.#":      "1",
 						"inputs.0":      "#mezmo_http_source.my_source.id",
-						"method":        "tumbling",
+						"window_type":   "tumbling",
 						"interval":      "3600",
-						"strategy":      "sum",
+						"operation":     "sum",
 					}),
 					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
@@ -135,22 +135,22 @@ func TestAggregateV2Processor(t *testing.T) {
 						title = "new title"
 						description = "new desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						inputs = [mezmo_http_source.my_source.id]
-						method      = "sliding"
-						strategy	= "average"
-						window_duration  = 10
+						inputs      = [mezmo_http_source.my_source.id]
+						window_type = "sliding"
+						operation	= "average"
+						interval    = 10
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
-						"pipeline_id":     "#mezmo_pipeline.test_parent.id",
-						"title":           "new title",
-						"description":     "new desc",
-						"generation_id":   "3",
-						"inputs.#":        "1",
-						"inputs.0":        "#mezmo_http_source.my_source.id",
-						"method":          "sliding",
-						"strategy":        "average",
-						"window_duration": "10",
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+						"title":         "new title",
+						"description":   "new desc",
+						"generation_id": "3",
+						"inputs.#":      "1",
+						"inputs.0":      "#mezmo_http_source.my_source.id",
+						"window_type":   "sliding",
+						"operation":     "average",
+						"interval":      "10",
 					}),
 					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
@@ -164,9 +164,9 @@ func TestAggregateV2Processor(t *testing.T) {
 						description = "new desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs 		= [mezmo_http_source.my_source.id]
-						method      = "sliding"
-						strategy	= "average"
-						window_duration  = 10
+						window_type = "sliding"
+						operation	= "average"
+						interval    = 10
 						conditional = {
 							expressions = [
 								{
@@ -185,9 +185,9 @@ func TestAggregateV2Processor(t *testing.T) {
 						"generation_id":                          "4",
 						"inputs.#":                               "1",
 						"inputs.0":                               "#mezmo_http_source.my_source.id",
-						"method":                                 "sliding",
-						"strategy":                               "average",
-						"window_duration":                        "10",
+						"window_type":                            "sliding",
+						"operation":                              "average",
+						"interval":                               "10",
 						"conditional.expressions.#":              "1",
 						"conditional.expressions.0.field":        ".status",
 						"conditional.expressions.0.operator":     "equal",
@@ -204,8 +204,8 @@ func TestAggregateV2Processor(t *testing.T) {
 						title 			 = "custom script"
 						pipeline_id 	 = mezmo_pipeline.test_parent.id
 						inputs			 = [mezmo_http_source.my_source.id]
-						method 			 = "sliding"
-						window_duration  = 10
+						window_type      = "sliding"
+						interval         = 10
 						script 			 = "function process(event, metadata) { event.foo = \"bar\"; return event }"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -223,112 +223,59 @@ func TestAggregateV2Processor(t *testing.T) {
 						title 			 = "back to strategy"
 						pipeline_id 	 = mezmo_pipeline.test_parent.id
 						inputs			 = [mezmo_http_source.my_source.id]
-						method 			 = "sliding"
-						window_duration  = 10
-						strategy		 = "average"
+						window_type 	 = "sliding"
+						interval         = 10
+						operation		 = "average"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
-						"strategy": "average",
+						"operation": "average",
 					}),
 					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
 			},
 
-			// Error: server-side validation for missing strategy
-			{
-				Config: GetCachedConfig(cacheKey) + `
-				resource "mezmo_aggregate_v2_processor" "my_processor" {
-					pipeline_id = mezmo_pipeline.test_parent.id
-					inputs 		= [mezmo_http_source.my_source.id]
-					method 		= "tumbling"
-					interval 	= "36000"
-					strategy    = "sum"
-				}`,
-				ExpectError: regexp.MustCompile("(?s)must.*be <=.*"),
-			},
-
-			// Error: server-side validation for invalid strategy
-			{
-				Config: GetCachedConfig(cacheKey) + `
-				resource "mezmo_aggregate_v2_processor" "my_processor" {
-					pipeline_id = mezmo_pipeline.test_parent.id
-					inputs 	 	= [mezmo_http_source.my_source.id]
-					method 	 	= "sliding"
-					strategy 	= "asdf"
-				}`,
-				ExpectError: regexp.MustCompile("Attribute strategy value must be one of"),
-			},
-
-			// Error: server-side validation - invalid window duration
-			{
-				Config: GetCachedConfig(cacheKey) + `
-				resource "mezmo_aggregate_v2_processor" "my_processor" {
-					pipeline_id 	= mezmo_pipeline.test_parent.id
-					inputs 			= [mezmo_http_source.my_source.id]
-					method 			= "sliding"
-					strategy 		= "average"
-					window_duration = 305325235325
-				}`,
-				ExpectError: regexp.MustCompile("/window_duration/maximum"),
-			},
-
-			// Error: window duration
+			// Error: server-side validation - invalid interval
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_aggregate_v2_processor" "my_processor" {
 						pipeline_id 	= mezmo_pipeline.test_parent.id
 						inputs 			= [mezmo_http_source.my_source.id]
-						strategy 		= "sum"
-						method 			= "tumbling"
-						interval 		= 10
-						window_duration = 5
+						window_type 	= "sliding"
+						operation 		= "average"
+						interval        = 305325235325
 					}`,
-				ExpectError: regexp.MustCompile("The field 'window_duration' can only be set if method == 'sliding'"),
+				ExpectError: regexp.MustCompile("/interval/maximum"),
 			},
 
 			// Error: window min
 			{
 				Config: GetCachedConfig(cacheKey) + `
-					resource "mezmo_aggregate_v2_processor" "my_processor" {
-						pipeline_id = mezmo_pipeline.test_parent.id
-						inputs 		= [mezmo_http_source.my_source.id]
-						strategy 	= "sum"
-						method 		= "tumbling"
-						interval 	= 10
-						window_min 	= 5
-					}`,
-				ExpectError: regexp.MustCompile("The field 'window_min' can only be set if method == 'sliding'"),
-			},
-
-			// Error: interval
-			{
-				Config: GetCachedConfig(cacheKey) + `
-					resource "mezmo_aggregate_v2_processor" "my_processor" {
-						pipeline_id 	= mezmo_pipeline.test_parent.id
-						inputs 			= [mezmo_http_source.my_source.id]
-						strategy 		= "sum"
-						method 			= "sliding"
-						interval 		= 10
-						window_duration = 5
-					}`,
-				ExpectError: regexp.MustCompile("The field 'interval' can only be set if method == 'tumbling'"),
+						resource "mezmo_aggregate_v2_processor" "my_processor" {
+							pipeline_id = mezmo_pipeline.test_parent.id
+							inputs 		= [mezmo_http_source.my_source.id]
+							operation 	= "sum"
+							window_type = "tumbling"
+							interval 	= 10
+							window_min 	= 5
+						}`,
+				ExpectError: regexp.MustCompile("The field 'window_min' is only allowed when using a sliding window type."),
 			},
 
 			// confirm manually deleted resources are recreated
 			{
 				Config: GetProviderConfig() + `
-				resource "mezmo_pipeline" "test_parent2" {
-					title = "pipeline"
-				}
-				resource "mezmo_aggregate_v2_processor" "test_processor" {
-					pipeline_id = mezmo_pipeline.test_parent2.id
-					title 		= "new title"
-					inputs 		= []
-					method      = "tumbling"
-  					interval    = 3600
-					strategy    = "sum"
-				}`,
+					resource "mezmo_pipeline" "test_parent2" {
+						title = "pipeline"
+					}
+					resource "mezmo_aggregate_v2_processor" "test_processor" {
+						pipeline_id = mezmo_pipeline.test_parent2.id
+						title 		= "new title"
+						inputs 		= []
+						window_type = "tumbling"
+						interval    = 3600
+						operation   = "sum"
+					}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_aggregate_v2_processor.test_processor", "id", regexp.MustCompile(`[\w-]{36}`)),

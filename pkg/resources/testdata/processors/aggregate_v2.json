@@ -8,9 +8,13 @@
     "type": "aggregate-v2",
     "deploy_type": "saas",
     "user_config": {
-        "method": "sliding",
-        "strategy": "AVG",
-        "window_duration": 10
+        "window": {
+            "type": "sliding",
+            "interval": 10
+        },
+        "evaluate": {
+            "operation": "AVG"
+        }
     },
     "inputs": [
         "563d2374-63ae-11ee-abe2-26dab184329f.805821a7"
