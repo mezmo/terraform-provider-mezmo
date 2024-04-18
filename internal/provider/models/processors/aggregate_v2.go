@@ -22,19 +22,20 @@ var OPERATIONS = map[string]string{
 }
 
 type AggregateV2ProcessorModel struct {
-	Id           String              `tfsdk:"id"`
-	PipelineId   String              `tfsdk:"pipeline_id"`
-	Title        String              `tfsdk:"title"`
-	Description  String              `tfsdk:"description"`
-	Inputs       List                `tfsdk:"inputs"`
-	GenerationId Int64               `tfsdk:"generation_id"`
-	Interval     Int64               `tfsdk:"interval" user_config:"true"`
-	Minimum      Int64               `tfsdk:"window_min" user_config:"true"`
-	Conditional  Object              `tfsdk:"conditional" user_config:"true"`
-	GroupBy      basetypes.ListValue `tfsdk:"group_by" user_config:"true"`
-	Script       String              `tfsdk:"script" user_config:"true"`
-	WindowType   String              `tfsdk:"window_type" user_config:"true"`
-	Operation    String              `tfsdk:"operation" user_config:"true"`
+	Id             String              `tfsdk:"id"`
+	PipelineId     String              `tfsdk:"pipeline_id"`
+	Title          String              `tfsdk:"title"`
+	Description    String              `tfsdk:"description"`
+	Inputs         List                `tfsdk:"inputs"`
+	GenerationId   Int64               `tfsdk:"generation_id"`
+	Interval       Int64               `tfsdk:"interval" user_config:"true"`
+	Minimum        Int64               `tfsdk:"window_min" user_config:"true"`
+	Conditional    Object              `tfsdk:"conditional" user_config:"true"`
+	GroupBy        basetypes.ListValue `tfsdk:"group_by" user_config:"true"`
+	Script         String              `tfsdk:"script" user_config:"true"`
+	WindowType     String              `tfsdk:"window_type" user_config:"true"`
+	Operation      String              `tfsdk:"operation" user_config:"true"`
+	EventTimestamp String              `tfsdk:"event_timestamp" user_config:"true"`
 }
 
 var AggregateV2ProcessorResourceSchema = schema.Schema{
@@ -74,6 +75,15 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 			Optional:    true,
 			Computed:    true,
 			Description: "Group events based on matching data from each of these field paths. Supports nesting via dot-notation.",
+		},
+		"event_timestamp": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "Force accumulated event reduction to flush the result when a conditional expression evaluates to true on an inbound event.",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+				stringvalidator.LengthAtMost(200),
+			},
 		},
 	}),
 }
@@ -151,6 +161,10 @@ func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousStat
 		component.UserConfig["group_by"] = StringListValueToStringSlice(plan.GroupBy)
 	}
 
+	if !plan.EventTimestamp.IsNull() && !plan.EventTimestamp.IsUnknown() {
+		user_config["event_timestamp"] = plan.EventTimestamp.ValueString()
+	}
+
 	return &component, dd
 }
 
@@ -190,6 +204,10 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 
 	if component.UserConfig["group_by"] != nil {
 		plan.GroupBy = SliceToStringListValue(component.UserConfig["group_by"].([]any))
+	}
+
+	if component.UserConfig["event_timestamp"] != nil {
+		plan.EventTimestamp = basetypes.NewStringValue(component.UserConfig["event_timestamp"].(string))
 	}
 
 }

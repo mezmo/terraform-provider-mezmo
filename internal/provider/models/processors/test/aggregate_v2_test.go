@@ -45,18 +45,19 @@ func TestAggregateV2Processor(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_aggregate_v2_processor.my_processor", "id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_aggregate_v2_processor.my_processor", map[string]any{
-						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
-						"title":         "My aggregate v2 processor",
-						"description":   "Lets aggregate stuff",
-						"generation_id": "0",
-						"inputs.#":      "0",
-						"window_type":   "tumbling",
-						"interval":      "3600",
-						"operation":     "sum",
-						"group_by.#":    "3",
-						"group_by.0":    ".name",
-						"group_by.1":    ".namespace",
-						"group_by.2":    ".tags",
+						"pipeline_id":     "#mezmo_pipeline.test_parent.id",
+						"title":           "My aggregate v2 processor",
+						"description":     "Lets aggregate stuff",
+						"generation_id":   "0",
+						"inputs.#":        "0",
+						"window_type":     "tumbling",
+						"interval":        "3600",
+						"operation":       "sum",
+						"group_by.#":      "3",
+						"group_by.0":      ".name",
+						"group_by.1":      ".namespace",
+						"group_by.2":      ".tags",
+						"event_timestamp": ".timestamp",
 					}),
 					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
@@ -288,6 +289,28 @@ func TestAggregateV2Processor(t *testing.T) {
 				),
 				// verify resource will be re-created after refresh
 				ExpectNonEmptyPlan: true,
+			},
+
+			// Setting optional event_timestamp field
+			{
+				Config: GetProviderConfig() + `
+					resource "mezmo_pipeline" "test_parent3" {
+						title = "event timestamp test"
+					}
+					resource "mezmo_aggregate_v2_processor" "event_timestamp_processor" {
+						pipeline_id     = mezmo_pipeline.test_parent3.id
+						title           = "new processor"
+						inputs          = []
+						window_type     = "tumbling"
+						interval        = 3600
+						operation       = "sum"
+						event_timestamp = ".my_ts_field"
+					}`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					StateHasExpectedValues("mezmo_aggregate_v2_processor.event_timestamp_processor", map[string]any{
+						"event_timestamp": ".my_ts_field",
+					}),
+				),
 			},
 
 			// Delete testing automatically occurs in TestCase
