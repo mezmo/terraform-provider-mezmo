@@ -14,11 +14,15 @@ generate-doc:
 test:
 	docker-compose -f compose/base.yml pull && docker-compose -p terraform-provider-mezmo-$(BUILD_TAG) -f compose/base.yml -f compose/test.yml up --remove-orphans --exit-code-from terraform-provider-mezmo --build
 
-.PHONY: build-test-example-binary
-build-test-example-binary:
+# Builds a binary using goreleaser. Uses the systems GOOS/GOARCH unless one is
+# already specified.
+.PHONY: build-snapshot-binary
+build-snapshot-binary:
+	$(eval GOOS ?= $(shell go env GOOS))
+	$(eval GOARCH ?= $(shell go env GOARCH))
 	docker run \
-	-e GOOS=linux \
-	-e GOARCH=amd64 \
+	-e GOOS \
+	-e GOARCH \
 	-v $(PWD):/opt/app \
 	-w /opt/app \
 	goreleaser/goreleaser \
@@ -27,6 +31,17 @@ build-test-example-binary:
 		--snapshot \
 		--clean \
 		-o terraform-provider-mezmo
+
+# Set vars for the test-example target to be build
+.PHONY: set-test-example-target
+set-test-example-target:
+	$(eval GOOS=linux)
+	$(eval GOARCH=amd64)
+	$(eval export)
+
+# Build a binary to be used to test the examples
+.PHONY: build-test-example-binary
+build-test-example-binary: set-test-example-target build-snapshot-binary
 
 examples: $(wildcard examples/*/*.tf)
 
