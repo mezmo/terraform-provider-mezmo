@@ -26,17 +26,17 @@ resource "mezmo_aggregate_v2_processor" "processor1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My aggregate v2 processor"
   description = "Aggregate my metrics via tumbling window"
-  method      = "tumbling"
-  interval    = 36000
+  window_type = "tumbling"
+  interval    = 3600
 }
 
 resource "mezmo_aggregate_v2_processor" "processor2" {
-  pipeline_id     = mezmo_pipeline.pipeline1.id
-  title           = "My aggregate v2 processor"
-  description     = "Aggregate my metrics via sliding window"
-  method          = "sliding"
-  window_duration = 3600
-  strategy        = "AVG"
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My aggregate v2 processor"
+  description = "Aggregate my metrics via sliding window"
+  window_type = "sliding"
+  interval    = 3600
+  operation   = "average"
   conditional = {
     expressions = [
       {
