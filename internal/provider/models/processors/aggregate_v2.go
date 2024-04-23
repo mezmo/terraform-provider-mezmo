@@ -48,12 +48,12 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 		},
 		"interval": schema.Int64Attribute{
 			Required:    true,
-			Description: "When window_type is set to tumbling, this is the interval over which events are aggregated in seconds",
+			Description: "The interval over which events are aggregated in seconds",
 		},
 		"operation": schema.StringAttribute{
 			Optional:    true,
 			Computed:    true,
-			Description: "When window_type is set to sliding, this is the operation in which to perform the aggregation",
+			Description: "The operation in which to perform the aggregation",
 			Validators:  []validator.String{stringvalidator.OneOf(MapKeys(OPERATIONS)...)},
 		},
 		"script": schema.StringAttribute{
