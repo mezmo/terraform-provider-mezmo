@@ -1,4 +1,5 @@
 BUILD_TAG ?= "1"
+SHELL = '/bin/bash'
 
 default: build
 
@@ -20,7 +21,7 @@ test:
 build-snapshot-binary:
 	$(eval GOOS ?= $(shell go env GOOS))
 	$(eval GOARCH ?= $(shell go env GOARCH))
-	docker run \
+	@docker run \
 	-e GOOS \
 	-e GOARCH \
 	-v $(PWD):/opt/app \
@@ -46,14 +47,15 @@ build-test-example-binary: set-test-example-target build-snapshot-binary
 examples: $(wildcard examples/*/*.tf)
 
 examples/%.tf: build-test-example-binary
-	docker run \
+	@docker run \
 		-v $(PWD):/opt/app \
 		-v $(PWD)/$@:/opt/example/$(notdir $@) \
 		-e TF_CLI_CONFIG_FILE=/opt/app/tf-dev-config \
 		-w /opt/example/ \
 		hashicorp/terraform:latest \
 		validate -compact-warnings | \
-		awk '/Provider development overrides are in effect/ {next} {print}'
+		awk '/Provider development overrides are in effect/ {next} {print}' ; \
+		exit $${PIPESTATUS[0]}
 
 .PHONY: local-test
 ENV := $(PWD)/env/local.env
