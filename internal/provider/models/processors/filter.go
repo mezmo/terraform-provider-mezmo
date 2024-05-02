@@ -37,8 +37,8 @@ var FilterProcessorResourceSchema = schema.Schema{
 		},
 		"conditional": schema.SingleNestedAttribute{
 			Required:    true,
-			Description: ParentConditionalAttribute.Description,
-			Attributes:  ParentConditionalAttribute.Attributes,
+			Description: ParentConditionalAttribute(Non_Change_Operator_Labels).Description,
+			Attributes:  ParentConditionalAttribute(Non_Change_Operator_Labels).Attributes,
 		},
 	}),
 }
@@ -62,7 +62,7 @@ func FilterProcessorFromModel(plan *FilterProcessorModel, previousState *FilterP
 	}
 
 	component.Inputs = StringListValueToStringSlice(plan.Inputs)
-	component.UserConfig["conditional"] = unwindConditionalFromModel(plan.Conditional)
+	component.UserConfig["conditional"] = UnwindConditionalFromModel(plan.Conditional)
 
 	return component, dd
 }
@@ -78,5 +78,5 @@ func FilterProcessorToModel(plan *FilterProcessorModel, component *Processor) {
 	plan.GenerationId = NewInt64Value(component.GenerationId)
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.Action = NewStringValue(component.UserConfig["action"].(string))
-	plan.Conditional = UnwindConditionalToModel(component.UserConfig["conditional"].(map[string]any))
+	plan.Conditional = UnwindConditionalToModel(component.UserConfig["conditional"].(map[string]any), Non_Change_Operator_Labels)
 }

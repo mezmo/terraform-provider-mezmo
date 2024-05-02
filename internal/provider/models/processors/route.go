@@ -38,7 +38,7 @@ var RouteProcessorResourceSchema = schema.Schema{
 			Required:    true,
 			Description: "A list of conditions, each of which has a label and an expression or expression groups.",
 			NestedObject: schema.NestedAttributeObject{
-				Attributes: ExtendSchemaAttributes(ParentConditionalAttribute.Attributes, map[string]schema.Attribute{
+				Attributes: ExtendSchemaAttributes(ParentConditionalAttribute(Non_Change_Operator_Labels).Attributes, map[string]schema.Attribute{
 					"label": schema.StringAttribute{
 						Required:    true,
 						Description: "A label for the expresion group",
@@ -120,7 +120,7 @@ func conditionalsFromModel(v List) map[string]any {
 	var conditionals []map[string]any
 	for _, entry := range v.Elements() {
 		conditionals = append(conditionals, map[string]any{
-			"conditional": unwindConditionalFromModel(entry),
+			"conditional": UnwindConditionalFromModel(entry),
 			"label":       entry.(Object).Attributes()["label"].(String).ValueString(),
 		})
 	}
@@ -135,7 +135,7 @@ func conditionalsToModel(respConditionals []any, listItemType attr.Type, outputs
 
 	for _, entry := range respConditionals {
 		conditional := entry.(map[string]any)["conditional"].(map[string]any)
-		unwound := UnwindConditionalToModel(conditional)
+		unwound := UnwindConditionalToModel(conditional, Non_Change_Operator_Labels)
 
 		attrTypes := unwound.AttributeTypes(context.Background())
 		attrTypes["label"] = basetypes.StringType{}

@@ -1,0 +1,43 @@
+{
+  "id": "73dc62ec-0be1-11ef-aa34-0242ac1c0003",
+  "pipeline_id": "7342b3c2-0be1-11ef-aa34-0242ac1c0003",
+  "component_kind": "source",
+  "component_id": "7347756a-0be1-11ef-aa34-0242ac1c0003",
+  "inputs": [
+    "7347756a-0be1-11ef-aa34-0242ac1c0003"
+  ],
+  "alert_config": {
+    "alert_payload": {
+      "destination": {
+        "ingestion_key": "abc123"
+      },
+      "message": "You received a threshold alert for a Log event",
+      "severity": "INFO",
+      "style": "static",
+      "subject": "Threshold Alert for Log event"
+    },
+    "evaluation": {
+      "alert_type": "threshold",
+      "conditional": {
+        "expressions": [
+          {
+            "field": ".event_count",
+            "str_operator": "greater",
+            "value": 5000
+          }
+        ],
+        "logical_operation": "AND"
+      },
+      "event_timestamp": ".timestamp",
+      "event_type": "log",
+      "operation": "CUSTOM",
+      "script": "function myFunc(a, e, m) { return a }",
+      "window_duration_minutes": 5,
+      "window_type": "tumbling"
+    },
+    "general": {
+      "name": "my threshold alert"
+    }
+  },
+  "active": true
+}

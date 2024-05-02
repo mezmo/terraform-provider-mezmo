@@ -1,0 +1,14 @@
+version: '2.4'
+
+services:
+  timescaledb-metrics:
+    logging:
+      driver: none
+
+  localstack:
+    logging:
+      driver: none
+
+  account-service:
+    logging:
+      driver: none

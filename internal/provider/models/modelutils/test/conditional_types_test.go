@@ -27,7 +27,7 @@ func TestUnwindConditionalToModel(t *testing.T) {
 
 	for _, tt := range testCases {
 		t.Run(tt.Description, func(t *testing.T) {
-			res := modelutils.UnwindConditionalToModel(tt.UserConfig["conditional"].(map[string]any))
+			res := modelutils.UnwindConditionalToModel(tt.UserConfig["conditional"].(map[string]any), modelutils.Non_Change_Operator_Labels)
 			// Terraform attr.Value String method returns null as <null> and unknown as <unknown>
 			actual_string := strings.ReplaceAll(res.String(), "<null>", "\"null\"")
 			actual_string = strings.ReplaceAll(actual_string, "<unknown>", "\"unknown\"")

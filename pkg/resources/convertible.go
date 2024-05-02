@@ -14,12 +14,13 @@ type PipelineApiModel = client.Pipeline
 type SourceApiModel = client.Source
 type ProcessorApiModel = client.Processor
 type DestinationApiModel = client.Destination
+type AlertApiModel = client.Alert
 type BaseApiModel = client.BaseNode
 
 type ConvertibleResourceDef interface {
 	/// the terraform resource type. example: mezmo_http_source
 	TypeName() string
-	/// the pipeline service node type. example: demo_logs_source
+	/// the pipeline service node type. example: demo_logs_source, threshold_alert
 	NodeType() string
 	TerraformSchema() schema.Schema
 	ConvertToTerraformModel(component *reflect.Value) (*reflect.Value, error)

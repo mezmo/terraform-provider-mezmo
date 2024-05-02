@@ -1,6 +1,8 @@
 package modelutils
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -18,35 +20,37 @@ var ExpressionTypes = map[string]attr.Type{
 	"value_string": StringType{},
 }
 
-var ExpressionAttributes = map[string]schema.Attribute{
-	"field": schema.StringAttribute{
-		Required:    true,
-		Description: "The field path whose value will be used in the comparison",
-		Validators: []validator.String{
-			stringvalidator.LengthAtLeast(1),
+func expressionAttributes(operators []string) map[string]schema.Attribute {
+	return map[string]schema.Attribute{
+		"field": schema.StringAttribute{
+			Required:    true,
+			Description: "The field path whose value will be used in the comparison",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+			},
 		},
-	},
-	"operator": schema.StringAttribute{
-		Required:    true,
-		Description: "The comparison operator",
-		Validators: []validator.String{
-			stringvalidator.OneOf(Operators...),
+		"operator": schema.StringAttribute{
+			Required:    true,
+			Description: "The comparison operator",
+			Validators: []validator.String{
+				stringvalidator.OneOf(operators...),
+			},
 		},
-	},
-	"value_string": schema.StringAttribute{
-		Optional:    true,
-		Description: "The operand to compare the field value with, when the value is a string",
-		Validators: []validator.String{
-			stringvalidator.LengthAtLeast(1),
-			stringvalidator.ConflictsWith(
-				path.MatchRelative().AtParent().AtName("value_number"),
-			),
+		"value_string": schema.StringAttribute{
+			Optional:    true,
+			Description: "The operand to compare the field value with, when the value is a string",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+				stringvalidator.ConflictsWith(
+					path.MatchRelative().AtParent().AtName("value_number"),
+				),
+			},
 		},
-	},
-	"value_number": schema.Float64Attribute{
-		Optional:    true,
-		Description: "The operand to compare the field value with, when the value is a number",
-	},
+		"value_number": schema.Float64Attribute{
+			Optional:    true,
+			Description: "The operand to compare the field value with, when the value is a number",
+		},
+	}
 }
 
 var LogicalOperationAttribute = schema.StringAttribute{
@@ -58,31 +62,35 @@ var LogicalOperationAttribute = schema.StringAttribute{
 	},
 }
 
-var ExpressionListAttribute = schema.ListNestedAttribute{
-	Optional:    true,
-	Description: "Defines a list of expressions for field comparisons",
-	NestedObject: schema.NestedAttributeObject{
-		Attributes: ExpressionAttributes,
-	},
-	Validators: []validator.List{
-		listvalidator.SizeAtLeast(1),
-		listvalidator.ConflictsWith(
-			path.MatchRelative().AtParent().AtName("expressions_group"),
-		),
-	},
+func expressionListAttribute(operators []string) schema.ListNestedAttribute {
+	return schema.ListNestedAttribute{
+		Optional:    true,
+		Description: "Defines a list of expressions for field comparisons",
+		NestedObject: schema.NestedAttributeObject{
+			Attributes: expressionAttributes(operators),
+		},
+		Validators: []validator.List{
+			listvalidator.SizeAtLeast(1),
+			listvalidator.ConflictsWith(
+				path.MatchRelative().AtParent().AtName("expressions_group"),
+			),
+		},
+	}
 }
 
-var NestedExpressionAttribute = schema.NestedAttributeObject{
-	Attributes: ExpressionAttributes,
+func nestedExpressionAttribute(operators []string) schema.NestedAttributeObject {
+	return schema.NestedAttributeObject{
+		Attributes: expressionAttributes(operators),
+	}
 }
 
 var MAX_NESTED_LEVELS = 5
 var childExpressionGroups = make([]schema.NestedAttributeObject, MAX_NESTED_LEVELS+1, MAX_NESTED_LEVELS+1)
 
-func getChildExpressionGroupAttributes(level int) schema.NestedAttributeObject {
+func getChildExpressionGroupAttributes(level int, operators []string) schema.NestedAttributeObject {
 	// TODO: The addition of `route` can easily add a `label` attribute here
 	attributes := map[string]schema.Attribute{
-		"expressions":       ExpressionListAttribute,
+		"expressions":       expressionListAttribute(operators),
 		"logical_operation": LogicalOperationAttribute,
 	}
 
@@ -90,7 +98,7 @@ func getChildExpressionGroupAttributes(level int) schema.NestedAttributeObject {
 		attributes["expressions_group"] = schema.ListNestedAttribute{
 			Optional:     true,
 			Description:  "A group of expressions joined by a logical operator",
-			NestedObject: getChildExpressionGroupAttributes(level + 1),
+			NestedObject: getChildExpressionGroupAttributes(level+1, operators),
 		}
 	}
 
@@ -102,37 +110,39 @@ func getChildExpressionGroupAttributes(level int) schema.NestedAttributeObject {
 	return nestedAttribute
 }
 
-var ParentConditionalAttribute = schema.SingleNestedAttribute{
-	Optional:    true,
-	Description: "A group of expressions (optionally nested) joined by a logical operator",
-	Attributes: map[string]schema.Attribute{
-		"expressions": ExpressionListAttribute,
-		"expressions_group": schema.ListNestedAttribute{
-			Optional:     true,
-			Description:  "A group of expressions joined by a logical operator",
-			NestedObject: getChildExpressionGroupAttributes(0),
+func ParentConditionalAttribute(operators []string) schema.SingleNestedAttribute {
+	return schema.SingleNestedAttribute{
+		Optional:    true,
+		Description: "A group of expressions (optionally nested) joined by a logical operator",
+		Attributes: map[string]schema.Attribute{
+			"expressions": expressionListAttribute(operators),
+			"expressions_group": schema.ListNestedAttribute{
+				Optional:     true,
+				Description:  "A group of expressions joined by a logical operator",
+				NestedObject: getChildExpressionGroupAttributes(0, operators),
+			},
+			"logical_operation": LogicalOperationAttribute,
 		},
-		"logical_operation": LogicalOperationAttribute,
-	},
+	}
 }
 
-func GetAttributesByLevel(level int) map[string]schema.Attribute {
+func getAttributesByLevel(level int, operators []string) map[string]schema.Attribute {
 	if level == 0 {
-		return ParentConditionalAttribute.Attributes
+		return ParentConditionalAttribute(operators).Attributes
 	}
 	return childExpressionGroups[level-1].Attributes // Zero-based array, so subtract 1
 }
 
-func GetChildExpressionGroupTypeByLevel(level int) attr.Type {
+func getChildExpressionGroupTypeByLevel(level int) attr.Type {
 	return childExpressionGroups[level].Type()
 }
 
-func UnwindConditionalToModel(component map[string]any) ObjectValue {
-	value, _ := parseExpressionsItem(component, 0)
+func UnwindConditionalToModel(component map[string]any, operators []string) ObjectValue {
+	value, _ := parseExpressionsItem(component, 0, operators)
 	return value
 }
 
-func parseExpressionsItem(component map[string]any, level int) (value ObjectValue, isGroup bool) {
+func parseExpressionsItem(component map[string]any, level int, operators []string) (value ObjectValue, isGroup bool) {
 	logicalOperation := "AND" // Default
 	if operation, ok := component["logical_operation"].(string); ok {
 		logicalOperation = operation
@@ -141,11 +151,11 @@ func parseExpressionsItem(component map[string]any, level int) (value ObjectValu
 		// Branch
 		groupItems := make([]attr.Value, 0)
 		leafItems := make([]attr.Value, 0)
-		attributeTypes := ToAttrTypes(GetAttributesByLevel(level))
+		attributeTypes := ToAttrTypes(getAttributesByLevel(level, operators))
 
 		for _, e := range childExpressionArr {
 			child := e.(map[string]any)
-			value, isGroup := parseExpressionsItem(child, level+1)
+			value, isGroup := parseExpressionsItem(child, level+1, operators)
 
 			if isGroup {
 				groupItems = append(groupItems, value)
@@ -156,21 +166,21 @@ func parseExpressionsItem(component map[string]any, level int) (value ObjectValu
 
 		attributeValues := map[string]attr.Value{
 			"logical_operation": NewStringValue(logicalOperation),
-			"expressions":       NewListNull(NestedExpressionAttribute.Type()), // Default to match `plan` since there might only be group expressions on this level
+			"expressions":       NewListNull(nestedExpressionAttribute(operators).Type()), // Default to match `plan` since there might only be group expressions on this level
 		}
 
-		expressionGroupType := GetChildExpressionGroupTypeByLevel(level)
+		expressionGroupType := getChildExpressionGroupTypeByLevel(level)
 		mergeLeavesIntoGroups := len(leafItems) > 0 && len(groupItems) > 0
 		if mergeLeavesIntoGroups {
 			aTypes := expressionGroupType.(basetypes.ObjectType).AttributeTypes()
 			expressions := NewObjectValueMust(aTypes, map[string]attr.Value{
 				"logical_operation": NewStringValue("AND"),
-				"expressions":       NewListValueMust(NestedExpressionAttribute.Type(), leafItems),
+				"expressions":       NewListValueMust(nestedExpressionAttribute(operators).Type(), leafItems),
 				"expressions_group": NewListNull(aTypes["expressions_group"].(basetypes.ListType).ElementType()),
 			})
 			groupItems = append([]attr.Value{expressions}, groupItems...)
 		} else if len(leafItems) > 0 {
-			attributeValues["expressions"] = NewListValueMust(NestedExpressionAttribute.Type(), leafItems)
+			attributeValues["expressions"] = NewListValueMust(nestedExpressionAttribute(operators).Type(), leafItems)
 		}
 
 		if len(groupItems) > 0 {
@@ -196,4 +206,51 @@ func parseExpressionsItem(component map[string]any, level int) (value ObjectValu
 	}
 
 	return NewObjectValueMust(ExpressionTypes, attributeValues), false
+}
+
+func UnwindConditionalFromModel(v attr.Value) map[string]any {
+	conditional := map[string]any{
+		"expressions":       nil,
+		"logical_operation": "AND",
+	}
+	value, ok := v.(ObjectValue)
+	if !ok {
+		panic(fmt.Errorf("Expected an object but did not receive one: %+v", v))
+	}
+	attrs := value.Attributes()
+
+	if !attrs["logical_operation"].IsUnknown() {
+		conditional["logical_operation"] = attrs["logical_operation"].(StringValue).ValueString()
+	}
+
+	if expressions, ok := attrs["expressions"]; ok && !expressions.IsNull() {
+		// Loop and extract expressions into an array of map[strings]
+		elements := expressions.(ListValue).Elements()
+		result := make([]map[string]any, 0, len(elements))
+		for _, obj := range elements {
+			propVals := obj.(ObjectValue).Attributes()
+			elem := map[string]any{
+				"field":        propVals["field"].(StringValue).ValueString(),
+				"str_operator": propVals["operator"].(StringValue).ValueString(),
+			}
+			if propVals["value_number"].IsNull() {
+				elem["value"] = propVals["value_string"].(StringValue).ValueString()
+			} else {
+				elem["value"] = propVals["value_number"].(Float64Value).ValueFloat64()
+			}
+			result = append(result, elem)
+		}
+		conditional["expressions"] = result
+
+	} else if group, ok := attrs["expressions_group"]; ok && !group.IsNull() {
+		// This is a nested list of conditionals. Recursively unwind them.
+		conditionals := group.(ListValue).Elements()
+		result := make([]map[string]any, 0, len(conditionals))
+		for _, conditional := range conditionals {
+			result = append(result, UnwindConditionalFromModel(conditional))
+		}
+		conditional["expressions"] = result
+	}
+
+	return conditional
 }

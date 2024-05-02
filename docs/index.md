@@ -13,6 +13,15 @@ The Mezmo Terraform Provider allows organizations to manage Pipelines (sources, 
 ## Example Usage
 
 ```terraform
+terraform {
+  required_providers {
+    mezmo = {
+      source  = "mezmo/mezmo"
+      version = "~> 1.0"
+    }
+  }
+}
+
 provider "mezmo" {
   auth_key = "my secret"
 }

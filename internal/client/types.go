@@ -22,6 +22,17 @@ type BaseNode struct {
 	GenerationId int64          `json:"generation_id"`
 }
 
+// Represents an Alert, which is similar to a component, but not treated as such.
+type Alert struct {
+	Id            string         `json:"id,omitempty"`
+	PipelineId    string         `json:"pipeline_id,omitempty"`
+	ComponentKind string         `json:"component_kind,omitempty"`
+	ComponentId   string         `json:"component_id,omitempty"`
+	Inputs        []string       `json:"inputs,omitempty"`
+	AlertConfig   map[string]any `json:"alert_config,omitempty"`
+	Active        bool           `json:"active"`
+}
+
 type Source struct {
 	BaseNode
 	GatewayRouteId string `json:"gateway_route_id,omitempty"`
@@ -37,12 +48,4 @@ type Processor struct {
 
 type Destination struct {
 	BaseNode
-}
-
-// Represents a full pipeline response from the service.
-type pipelineResponse struct {
-	Id           string        `json:"id"`
-	Sources      []Source      `json:"sources"`
-	Processors   []Processor   `json:"transforms"`
-	Destinations []Destination `json:"sinks"`
 }

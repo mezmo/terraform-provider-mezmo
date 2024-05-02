@@ -61,7 +61,7 @@ var SampleProcessorResourceSchema = schema.Schema{
 					Description: "The comparison operator to check the value of the field or" +
 						" whether the first exists",
 					Validators: []validator.String{
-						stringvalidator.OneOf(Operators...),
+						stringvalidator.OneOf(Non_Change_Operator_Labels...),
 					},
 				},
 				"value_string": schema.StringAttribute{
