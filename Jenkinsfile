@@ -45,6 +45,7 @@ pipeline {
     timestamps()
     ansiColor 'xterm'
     withCredentials(CREDS)
+    disableConcurrentBuilds()
   }
 
   environment {
