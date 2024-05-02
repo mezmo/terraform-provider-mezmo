@@ -1,0 +1,44 @@
+{
+  "id": "4ce95aaa-0d53-11ef-a68e-0242ac1c0004",
+  "pipeline_id": "4ca1a020-0d53-11ef-a68e-0242ac1c0004",
+  "component_kind": "source",
+  "component_id": "4ca503dc-0d53-11ef-a68e-0242ac1c0004",
+  "inputs": [
+    "4ca503dc-0d53-11ef-a68e-0242ac1c0004"
+  ],
+  "alert_config": {
+    "alert_payload": {
+      "destination": {
+        "ingestion_key": "abc123"
+      },
+      "message": "You received a change alert",
+      "severity": "INFO",
+      "style": "static",
+      "subject": "Change Alert"
+    },
+    "evaluation": {
+      "alert_type": "change",
+      "conditional": {
+        "expressions": [
+          {
+            "field": ".some_value",
+            "str_operator": "value_change_greater",
+            "value": 500
+          }
+        ],
+        "logical_operation": "AND"
+      },
+      "event_type": "metric",
+      "group_by": [
+        ".thing"
+      ],
+      "operation": "SUM",
+      "window_duration_minutes": 5,
+      "window_type": "tumbling"
+    },
+    "general": {
+      "name": "my change alert"
+    }
+  },
+  "active": true
+}

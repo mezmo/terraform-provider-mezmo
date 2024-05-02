@@ -2,7 +2,6 @@ package processors
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -126,7 +125,7 @@ var ReduceProcessorResourceSchema = schema.Schema{
 						stringvalidator.OneOf("starts_when", "ends_when"),
 					},
 				},
-				"conditional": ParentConditionalAttribute,
+				"conditional": ParentConditionalAttribute(Non_Change_Operator_Labels),
 			},
 		},
 	}),
@@ -188,58 +187,11 @@ func ReduceProcessorFromModel(plan *ReduceProcessorModel, previousState *ReduceP
 		flushCondition := plan.FlushCondition.Attributes()
 		component.UserConfig["flush_condition"] = map[string]any{
 			"when":        GetAttributeValue[StringValue](flushCondition, "when").ValueString(),
-			"conditional": unwindConditionalFromModel(flushCondition["conditional"]),
+			"conditional": UnwindConditionalFromModel(flushCondition["conditional"]),
 		}
 	}
 
 	return &component, dd
-}
-
-func unwindConditionalFromModel(v attr.Value) map[string]any {
-	conditional := map[string]any{
-		"expressions":       nil,
-		"logical_operation": "AND",
-	}
-	value, ok := v.(ObjectValue)
-	if !ok {
-		panic(fmt.Errorf("Expected an object but did not receive one: %+v", v))
-	}
-	attrs := value.Attributes()
-
-	if !attrs["logical_operation"].IsUnknown() {
-		conditional["logical_operation"] = attrs["logical_operation"].(StringValue).ValueString()
-	}
-
-	if expressions, ok := attrs["expressions"]; ok && !expressions.IsNull() {
-		// Loop and extract expressions into an array of map[strings]
-		elements := expressions.(ListValue).Elements()
-		result := make([]map[string]any, 0, len(elements))
-		for _, obj := range elements {
-			propVals := obj.(ObjectValue).Attributes()
-			elem := map[string]any{
-				"field":        propVals["field"].(StringValue).ValueString(),
-				"str_operator": propVals["operator"].(StringValue).ValueString(),
-			}
-			if propVals["value_number"].IsNull() {
-				elem["value"] = propVals["value_string"].(StringValue).ValueString()
-			} else {
-				elem["value"] = propVals["value_number"].(Float64Value).ValueFloat64()
-			}
-			result = append(result, elem)
-		}
-		conditional["expressions"] = result
-
-	} else if group, ok := attrs["expressions_group"]; ok && !group.IsNull() {
-		// This is a nested list of conditionals. Recursively unwind them.
-		conditionals := group.(ListValue).Elements()
-		result := make([]map[string]any, 0, len(conditionals))
-		for _, conditional := range conditionals {
-			result = append(result, unwindConditionalFromModel(conditional))
-		}
-		conditional["expressions"] = result
-	}
-
-	return conditional
 }
 
 func ReduceProcessorToModel(plan *ReduceProcessorModel, component *Processor) {
@@ -305,7 +257,7 @@ func ReduceProcessorToModel(plan *ReduceProcessorModel, component *Processor) {
 		flushCondition := component.UserConfig["flush_condition"].(map[string]any)
 		whenValue := flushCondition["when"].(string)
 		if whenValue == "starts_when" || whenValue == "ends_when" {
-			conditional := UnwindConditionalToModel(flushCondition["conditional"].(map[string]any))
+			conditional := UnwindConditionalToModel(flushCondition["conditional"].(map[string]any), Non_Change_Operator_Labels)
 			plan.FlushCondition = NewObjectValueMust(map[string]attr.Type{
 				"when":        StringType{},
 				"conditional": conditional.Type(context.Background()),

@@ -158,6 +158,11 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewPrometheusRemoteWriteDestinationResource,
 		NewS3DestinationResource,
 		NewSplunkHecLogsDestinationResource,
+
+		// Alerts
+		NewThresholdAlertResource,
+		NewChangeAlertResource,
+		NewAbsenceAlertResource,
 	}
 }
 

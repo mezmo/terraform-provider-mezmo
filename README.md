@@ -50,3 +50,61 @@ terraform plan
 popd
 ```
 
+## Testing
+
+To run the full test suite, which will start Docker containers for the required services, run:
+
+```sh
+make test
+```
+
+### Testing Locally
+
+Docker containers for the required services can be started, then tests can run
+individually against them. The services will run in the foreground, which will display
+their logs.  Wait for `pipeline-service` to be up and running, indicated when the log
+shows the loaded API routes. In a separate window, run:
+
+```sh
+make start
+```
+Each test command will be preceeded by loading the proper environment variables. Depending
+on the noted shell, that is done by:
+
+```sh
+shell|bash> env $(cat env/local.env) #...rest of command
+fish> env (cat env/local.env) #...rest of command
+```
+
+### ENV vars
+Optional environment variables can be provided on the test command line to display
+additional debugging information.
+
+* `DEBUG_SOURCE=1` - Displays the API request/responses for sources
+* `DEBUG_PROCESSOR=1` - Displays the API request/responses for processors
+* `DEBUG_DESTINATION=1` - Displays the API request/responses for destinations
+* `DEBUG_ALERT=1` - Displays the API request/responses for alerts
+
+* `DEBUG_ATTRIBUTES=1` - Displays the loaded state attributes when using the `StateHasExpectedValues` assertion
+
+#### Examples
+* `-run` accepts a regex for the test name, and the path
+* The path given shoulid match where the test file resides
+
+**Run all tests**
+
+```sh
+make local-test
+``````
+**Run a singular test**
+
+```sh
+env $(cat env/local.env) DEBUG_ATTRIBUTES=1 DEBUG_ALERT=1 go test -v -run 'TestAbsenceAlert_success' ./internal/provider/models/alerts/test
+```
+
+**Run a group of tests**
+
+```sh
+env $(cat env/local.env) test -v -run 'TestChangeAlert.*_errors' ./internal/provider/models/alerts/test
+```
+

@@ -41,6 +41,12 @@ services:
     environment:
       SERVICES: s3
 
+# To build pipeline-service locally, set `context` equal to your `pipeline-service` location
+#    build:
+#      context: ../../pipeline-service
+#      target: release
+#      args:
+#        - GITHUB_TOKEN
   pipeline-service:
     image: us.gcr.io/logdna-k8s/pipeline-service:3-latest
     ports:

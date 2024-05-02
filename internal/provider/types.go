@@ -9,7 +9,7 @@ import (
 
 // Generic type representing a source / processor / destination model.
 type ComponentModel interface {
-	SourceModel | ProcessorModel | DestinationModel
+	SourceModel | ProcessorModel | DestinationModel | AlertModel
 }
 
 type idGetterFunc[T ComponentModel] func(*T) basetypes.StringValue
@@ -23,3 +23,6 @@ type processorFromModelFunc[T ComponentModel] func(model *T, previousState *T) (
 
 type destinationToModelFunc[T ComponentModel] func(model *T, component *Destination)
 type destinationFromModelFunc[T ComponentModel] func(model *T, previousState *T) (*Destination, diag.Diagnostics)
+
+type alertToModelFunc[T AlertModel] func(model *T, component *Alert)
+type alertFromModelFunc[T AlertModel] func(model *T, previousState *T) (*Alert, diag.Diagnostics)

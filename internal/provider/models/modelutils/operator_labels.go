@@ -1,6 +1,6 @@
 package modelutils
 
-var Operators = []string{
+var Non_Change_Operator_Labels = []string{
 	"contains",
 	"ends_with",
 	"equal",
@@ -24,4 +24,15 @@ var Operators = []string{
 	"not_regex_match",
 	"regex_match",
 	"starts_with",
+}
+
+var Change_Operator_Labels = []string{
+	"percent_change_greater",
+	"percent_change_greater_or_equal",
+	"percent_change_less",
+	"percent_change_less_or_equal",
+	"value_change_greater",
+	"value_change_greater_or_equal",
+	"value_change_less",
+	"value_change_less_or_equal",
 }

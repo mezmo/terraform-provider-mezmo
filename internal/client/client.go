@@ -28,6 +28,11 @@ type Client interface {
 	CreateProcessor(pipelineId string, component *Processor) (*Processor, error)
 	UpdateProcessor(pipelineId string, component *Processor) (*Processor, error)
 	DeleteProcessor(pipelineId string, id string) error
+
+	Alert(pipelineId string, id string) (*Alert, error)
+	CreateAlert(pipelineId string, alert *Alert) (*Alert, error) // POST
+	UpdateAlert(pipelineId string, alert *Alert) (*Alert, error) // PUT
+	DeleteAlert(pipelineId string, alert *Alert) error           // DELETE
 }
 
 func NewClient(endpoint string, authKey string, headers map[string]string) Client {
@@ -150,7 +155,7 @@ func (c *client) newRequest(method string, url string, body io.Reader) *http.Req
 	return req
 }
 
-// CreateSource implements Client.
+// POST Source
 func (c *client) CreateSource(pipelineId string, component *Source) (*Source, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source", c.endpoint, pipelineId)
 	reqBody, err := json.Marshal(component)
@@ -167,15 +172,14 @@ func (c *client) CreateSource(pipelineId string, component *Source) (*Source, er
 	return source, nil
 }
 
-// DeleteSource implements Client.
+// DELETE Source
 func (c *client) DeleteSource(pipelineId string, id string) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }
 
-// Source implements Client.
-// Gets a source from a pipeline.
+// GET Source
 func (c *client) Source(pipelineId string, id string) (*Source, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
@@ -188,7 +192,7 @@ func (c *client) Source(pipelineId string, id string) (*Source, error) {
 	return source, nil
 }
 
-// UpdateSource implements Client.
+// PUT Source
 func (c *client) UpdateSource(pipelineId string, component *Source) (*Source, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, component.Id)
 	reqBody, err := json.Marshal(component)
@@ -205,8 +209,7 @@ func (c *client) UpdateSource(pipelineId string, component *Source) (*Source, er
 	return source, nil
 }
 
-// Destination implements Client.
-// Gets a destination.
+// GET Destination (sink)
 func (c *client) Destination(pipelineId string, id string) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
@@ -219,7 +222,7 @@ func (c *client) Destination(pipelineId string, id string) (*Destination, error)
 	return destination, nil
 }
 
-// CreateDestination implements Client.
+// POST Destination (sink)
 func (c *client) CreateDestination(pipelineId string, component *Destination) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink", c.endpoint, pipelineId)
 	reqBody, err := json.Marshal(component)
@@ -236,14 +239,14 @@ func (c *client) CreateDestination(pipelineId string, component *Destination) (*
 	return destination, nil
 }
 
-// DeleteDestination implements Client.
+// DELETE Destination (sink)
 func (c *client) DeleteDestination(pipelineId string, id string) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }
 
-// UpdateDestination implements Client.
+// PUT Destination (sink)
 func (c *client) UpdateDestination(pipelineId string, component *Destination) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, component.Id)
 	reqBody, err := json.Marshal(component)
@@ -260,8 +263,7 @@ func (c *client) UpdateDestination(pipelineId string, component *Destination) (*
 	return destination, nil
 }
 
-// Processor implements Client.
-// Gets a Processor.
+// GET Processor (transform)
 func (c *client) Processor(pipelineId string, id string) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
@@ -274,7 +276,7 @@ func (c *client) Processor(pipelineId string, id string) (*Processor, error) {
 	return processor, nil
 }
 
-// CreateProcessor implements Client.
+// POST Processor (transform)
 func (c *client) CreateProcessor(pipelineId string, component *Processor) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform", c.endpoint, pipelineId)
 	reqBody, err := json.Marshal(component)
@@ -291,14 +293,14 @@ func (c *client) CreateProcessor(pipelineId string, component *Processor) (*Proc
 	return processor, nil
 }
 
-// DeleteProcessor implements Client.
+// DELETE Processor (transform)
 func (c *client) DeleteProcessor(pipelineId string, id string) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }
 
-// UpdateProcessor implements Client.
+// PUT Processor (transform)
 func (c *client) UpdateProcessor(pipelineId string, component *Processor) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, component.Id)
 	reqBody, err := json.Marshal(component)
@@ -313,4 +315,58 @@ func (c *client) UpdateProcessor(pipelineId string, component *Processor) (*Proc
 	}
 	processor := &envelope.Data
 	return processor, nil
+}
+
+// GET Alert (not used by the UI)
+func (c *client) Alert(pipelineId string, id string) (*Alert, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/alert/%s", c.endpoint, pipelineId, id)
+	req := c.newRequest(http.MethodGet, url, nil)
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[Alert]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	alert := &envelope.Data
+	return alert, nil
+}
+
+// POST Alert
+func (c *client) CreateAlert(pipelineId string, alert *Alert) (*Alert, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/%s/%s/alert", c.endpoint, pipelineId, alert.ComponentKind, alert.ComponentId)
+	reqBody, err := json.Marshal(alert)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[Alert]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	createdAlert := &envelope.Data
+	return createdAlert, nil
+}
+
+// PUT Alert
+func (c *client) UpdateAlert(pipelineId string, alert *Alert) (*Alert, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/%s/%s/alert/%s", c.endpoint, pipelineId, alert.ComponentKind, alert.ComponentId, alert.Id)
+	reqBody, err := json.Marshal(alert)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[Alert]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	updatedAlert := &envelope.Data
+	return updatedAlert, nil
+}
+
+// DELETE Alert
+func (c *client) DeleteAlert(pipelineId string, alert *Alert) error {
+	url := fmt.Sprintf("%s/v3/pipeline/%s/%s/%s/alert/%s", c.endpoint, pipelineId, alert.ComponentKind, alert.ComponentId, alert.Id)
+	req := c.newRequest(http.MethodDelete, url, nil)
+	return readBody(c.httpClient.Do(req))
 }

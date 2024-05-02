@@ -14,6 +14,7 @@ import (
 const AGGREGATE_PROCESSOR_NODE_NAME = "aggregate-v2"
 const AGGREGATE_PROCESSOR_TYPE_NAME = "aggregate_v2"
 
+// FIXME: Move to Aggregate_Operations? Why missing min, max
 var OPERATIONS = map[string]string{
 	"sum":                        "SUM",
 	"average":                    "AVG",
@@ -67,8 +68,8 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 		},
 		"conditional": schema.SingleNestedAttribute{
 			Optional:    true,
-			Description: "When method is set to sliding: " + ParentConditionalAttribute.Description,
-			Attributes:  ParentConditionalAttribute.Attributes,
+			Description: "When method is set to sliding: " + ParentConditionalAttribute(Non_Change_Operator_Labels).Description,
+			Attributes:  ParentConditionalAttribute(Non_Change_Operator_Labels).Attributes,
 		},
 		"group_by": schema.ListAttribute{
 			ElementType: basetypes.StringType{},
@@ -154,7 +155,7 @@ func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousStat
 	evaluateConfigFromModel(plan, user_config, &dd)
 
 	if !plan.Conditional.IsNull() {
-		user_config["conditional"] = unwindConditionalFromModel(plan.Conditional)
+		user_config["conditional"] = UnwindConditionalFromModel(plan.Conditional)
 	}
 
 	if !plan.GroupBy.IsNull() && len(plan.GroupBy.Elements()) > 0 {
@@ -199,7 +200,7 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 	}
 
 	if component.UserConfig["conditional"] != nil {
-		plan.Conditional = UnwindConditionalToModel(component.UserConfig["conditional"].(map[string]any))
+		plan.Conditional = UnwindConditionalToModel(component.UserConfig["conditional"].(map[string]any), Non_Change_Operator_Labels)
 	}
 
 	if component.UserConfig["group_by"] != nil {

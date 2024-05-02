@@ -1,0 +1,33 @@
+{
+  "id": "6e2f8bd0-0d71-11ef-87ce-0242ac1c0004",
+  "pipeline_id": "6d56b0ee-0d71-11ef-87ce-0242ac1c0004",
+  "component_kind": "source",
+  "component_id": "6d588ee6-0d71-11ef-87ce-0242ac1c0004",
+  "inputs": [
+    "6d588ee6-0d71-11ef-87ce-0242ac1c0004"
+  ],
+  "alert_config": {
+    "alert_payload": {
+      "destination": {
+        "ingestion_key": "abc123"
+      },
+      "message": "You received a absence alert for a Log event",
+      "severity": "INFO",
+      "style": "static",
+      "subject": "Absence Alert for Log event"
+    },
+    "evaluation": {
+      "alert_type": "absence",
+      "event_timestamp": ".timestamp",
+      "event_type": "log",
+      "operation": "CUSTOM",
+      "script": "function myFunc(a, e, m) { return a }",
+      "window_duration_minutes": 5,
+      "window_type": "tumbling"
+    },
+    "general": {
+      "name": "my absence alert"
+    }
+  },
+  "active": true
+}

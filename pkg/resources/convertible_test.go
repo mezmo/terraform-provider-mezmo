@@ -23,6 +23,7 @@ var (
 	processorsPath   = path.Join(testdataPath, "processors")
 	sourcesPath      = path.Join(testdataPath, "sources")
 	destinationsPath = path.Join(testdataPath, "destinations")
+	alertsPath       = path.Join(testdataPath, "alerts")
 )
 
 func loadJsonFile[T any](t *testing.T, baseDir string, filename string) *T {
@@ -40,7 +41,6 @@ func loadJsonFile[T any](t *testing.T, baseDir string, filename string) *T {
 
 func TestConvertToTerraformModel(t *testing.T) {
 	convResources, err := ConvertibleResources()
-
 	if err != nil {
 		t.Fatalf("error retrieving convertible resources. reason: %s", err)
 	}
@@ -54,7 +54,7 @@ func TestConvertToTerraformModel(t *testing.T) {
 			}
 			_, err := res.ConvertToTerraformModel(m)
 			if err != nil {
-				t.Errorf("failed to convert %s to terraform model. reason: %s", res.TypeName(), err)
+				t.Fatalf("failed to convert %s to terraform model. reason: %s", res.TypeName(), err)
 			}
 		})
 	}
@@ -72,6 +72,9 @@ func loadResources(t *testing.T) map[string]*reflect.Value {
 	}))
 	addToMap(t, resList, loadDirFiles[DestinationApiModel](t, destinationsPath, func(filename string) string {
 		return fmt.Sprintf("mezmo_%s_destination", filename)
+	}))
+	addToMap(t, resList, loadDirFiles[AlertApiModel](t, alertsPath, func(filename string) string {
+		return fmt.Sprintf("mezmo_%s_alert", filename)
 	}))
 	return resList
 }
@@ -97,7 +100,7 @@ func loadDirFiles[T any](t *testing.T, dirPath string, mapKeyFn func(filename st
 	return dirFiles
 }
 
-func addToMap[K string, T any](t *testing.T, target map[K]*T, source map[K]*T) {
+func addToMap[K string, T any](_ *testing.T, target map[K]*T, source map[K]*T) {
 	for k, v := range source {
 		target[k] = v
 	}
