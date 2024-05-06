@@ -187,6 +187,30 @@ func NewDatadogSourceResource() resource.Resource {
 	}
 }
 
+func NewOpenTelemetryLogsSourceResource() resource.Resource {
+	return &SourceResource[OpenTelemetryLogsSourceModel]{
+		typeName:          OPEN_TELEMETRY_LOGS_SOURCE_TYPE_NAME,
+		nodeName:          OPEN_TELEMETRY_LOGS_SOURCE_NODE_NAME,
+		fromModelFunc:     OpenTelemetryLogsSourceFromModel,
+		toModelFunc:       OpenTelemetryLogsSourceToModel,
+		getIdFunc:         func(m *OpenTelemetryLogsSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *OpenTelemetryLogsSourceModel) basetypes.StringValue { return m.PipelineId },
+		schema:            OpenTelemetryLogsSourceResourceSchema,
+	}
+}
+
+func NewOpenTelemetryMetricsSourceResource() resource.Resource {
+	return &SourceResource[OpenTelemetryMetricsSourceModel]{
+		typeName:          OPEN_TELEMETRY_METRICS_SOURCE_TYPE_NAME,
+		nodeName:          OPEN_TELEMETRY_METRICS_SOURCE_NODE_NAME,
+		fromModelFunc:     OpenTelemetryMetricsSourceFromModel,
+		toModelFunc:       OpenTelemetryMetricsSourceToModel,
+		getIdFunc:         func(m *OpenTelemetryMetricsSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *OpenTelemetryMetricsSourceModel) basetypes.StringValue { return m.PipelineId },
+		schema:            OpenTelemetryMetricsSourceResourceSchema,
+	}
+}
+
 func NewOpenTelemetryTracesSourceResource() resource.Resource {
 	return &SourceResource[OpenTelemetryTracesSourceModel]{
 		typeName:          OPEN_TELEMETRY_TRACES_SOURCE_TYPE_NAME,
