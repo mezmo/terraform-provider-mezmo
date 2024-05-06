@@ -20,10 +20,15 @@
     "compression": "none",
     "advanced_options": {
       "proxy": {
-        "enabled": false
+        "enabled": true,
+        "endpoint": "https://proxy.com",
+        "hosts_bypass_proxy": [
+            "bypas"
+        ]
       },
       "rate_limiting": {
-        "duration_secs": 1
+        "duration_secs": 1,
+        "request_limit": 444
       }
     },
     "headers": [

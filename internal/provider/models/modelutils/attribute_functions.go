@@ -107,6 +107,8 @@ func MapValuesToMapAny(obj interface{}, dd *diag.Diagnostics) map[string]any {
 			target[k] = v.ValueBool()
 		case String:
 			target[k] = v.ValueString()
+		case Int64:
+			target[k] = v.ValueInt64()
 		case List:
 			target[k] = StringListValueToStringSlice(v)
 		default:

@@ -61,6 +61,25 @@ func TestHttpDestination(t *testing.T) {
 				ExpectError: regexp.MustCompile("Bearer auth requires token field to be defined"),
 			},
 
+			// Error: must set both payload_prefix and payload_suffix
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_http_destination" "my_destination" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						uri = "https://example.com"
+						payload_prefix = "{\"extra_prop\": true"
+					}`,
+				ExpectError: regexp.MustCompile("If 'payload_prefix' is set, 'payload_suffix' must be as well."),
+			},
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_http_destination" "my_destination" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						uri = "https://example.com"
+						payload_suffix = "\"extra_prop2\": true }"
+					}`,
+				ExpectError: regexp.MustCompile("If 'payload_suffix' is set, 'payload_prefix' must be as well."),
+			},
 			// Create test defaults
 			{
 				Config: SetCachedConfig(cacheKey, `
@@ -132,24 +151,53 @@ func TestHttpDestination(t *testing.T) {
 							"x-my-header" = "first header"
 							"x-your-header" = "second header"
 						}
+						max_bytes = 5000
+						timeout_secs = 600
+						method = "post"
+						payload_prefix = "{\"extra_prop\": true"
+						payload_suffix = "\"extra_prop\": true }"
+						tls_protocols = ["h2"]
+						proxy = {
+							enabled = true
+							endpoint = "http://myproxy.com"
+							hosts_bypass_proxy = ["0.0.0.0", "1.1.1.1"]
+						}
+						rate_limiting = {
+							request_limit = 600
+							duration_secs = 900
+						}
 					}
 					`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_http_destination.my_destination", map[string]any{
-						"pipeline_id":           "#mezmo_pipeline.test_parent.id",
-						"title":                 "new title",
-						"description":           "new description",
-						"generation_id":         "1",
-						"encoding":              "json",
-						"compression":           "gzip",
-						"ack_enabled":           "false",
-						"inputs.#":              "1",
-						"inputs.0":              "#mezmo_http_source.my_source.id",
-						"auth.strategy":         "basic",
-						"auth.user":             "me",
-						"auth.password":         "ssshhh",
-						"headers.x-my-header":   "first header",
-						"headers.x-your-header": "second header",
+						"pipeline_id":                 "#mezmo_pipeline.test_parent.id",
+						"title":                       "new title",
+						"description":                 "new description",
+						"generation_id":               "1",
+						"encoding":                    "json",
+						"compression":                 "gzip",
+						"ack_enabled":                 "false",
+						"inputs.#":                    "1",
+						"inputs.0":                    "#mezmo_http_source.my_source.id",
+						"auth.strategy":               "basic",
+						"auth.user":                   "me",
+						"auth.password":               "ssshhh",
+						"headers.x-my-header":         "first header",
+						"headers.x-your-header":       "second header",
+						"max_bytes":                   "5000",
+						"timeout_secs":                "600",
+						"method":                      "post",
+						"payload_prefix":              "{\"extra_prop\": true",
+						"payload_suffix":              "\"extra_prop\": true }",
+						"tls_protocols.#":             "1",
+						"tls_protocols.0":             "h2",
+						"proxy.enabled":               "true",
+						"proxy.endpoint":              "http://myproxy.com",
+						"proxy.hosts_bypass_proxy.#":  "2",
+						"proxy.hosts_bypass_proxy.0":  "0.0.0.0",
+						"proxy.hosts_bypass_proxy.1":  "1.1.1.1",
+						"rate_limiting.request_limit": "600",
+						"rate_limiting.duration_secs": "900",
 					}),
 				),
 			},
