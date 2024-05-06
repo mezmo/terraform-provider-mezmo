@@ -1,0 +1,12 @@
+{
+  "id": "0bf994e6-5c7e-11ee-b816-26dab111111f",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "title": "open telemetry metrics source",
+  "description": "open telemetry metrics description",
+  "type": "open-telemetry-metrics",
+  "generation_id": 0,
+  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab111111f",
+  "user_config": {
+    "capture_metadata": true
+  }
+}

@@ -1,6 +1,7 @@
 package providertest
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -22,6 +24,21 @@ const authUserEmail = "info@mezmo.com"
 var setupMutex sync.Mutex
 var isAccountCreated bool
 var testConfigCache = make(map[string]string, 0)
+
+// IDRegex expression for Pipeline IDs
+var IDRegex = regexp.MustCompile(`[\w-]{36}`)
+
+// ParsedAccConfig applies config to tpl for acceptance tests
+func ParsedAccConfig(config any, tpl string) (string, error) {
+	var buf bytes.Buffer
+	tmpl, _ := template.New("test").Parse(tpl)
+	err := tmpl.Execute(&buf, config)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
 
 func SetCachedConfig(key string, body string) string {
 	toCache := GetProviderConfig() + body

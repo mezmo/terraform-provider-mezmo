@@ -117,7 +117,9 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewSplunkHecSourceResource,
 		NewSQSSourceResource,
 		NewWebhookSourceResource,
+		NewOpenTelemetryLogsSourceResource,
 		NewOpenTelemetryTracesSourceResource,
+		NewOpenTelemetryMetricsSourceResource,
 
 		// Processors
 		NewAggregateV2ProcessorResource,
