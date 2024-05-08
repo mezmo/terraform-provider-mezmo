@@ -56,4 +56,19 @@ resource "mezmo_http_destination" "some_api" {
   headers = {
     x-some-header = "some header value"
   }
+  max_bytes = 5000
+  timeout_secs = 600
+  method = "post"
+  payload_prefix = "{\"extra_prop\": true"
+  payload_suffix = "\"extra_prop2\": true }"
+  tls_protocols = ["TLSPPP"]
+  proxy = {
+    enabled = true
+    endpoint = "http://myproxy.com"
+    hosts_bypass_proxy = ["0.0.0.0", "1.1.1.1"]
+  }
+  rate_limiting = {
+    request_limit = 600
+    duration_secs = 900
+  }
 }
