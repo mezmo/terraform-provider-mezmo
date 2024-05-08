@@ -1,0 +1,24 @@
+version: '2.4'
+
+services:
+  pipeline-service:
+    ports:
+    - '13000:3000'
+
+  timescaledb-service:
+    ports:
+    - '15432:5432'
+
+  timescaledb-metrics:
+    logging:
+      driver: none
+    ports:
+    - '15433:5432'
+
+  localstack:
+    logging:
+      driver: none
+
+  account-service:
+    logging:
+      driver: none

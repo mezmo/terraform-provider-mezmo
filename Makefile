@@ -13,7 +13,18 @@ generate-doc:
 
 .PHONY: test
 test:
-	docker-compose -f compose/base.yml pull && docker-compose -p terraform-provider-mezmo-$(BUILD_TAG) -f compose/base.yml -f compose/test.yml up --remove-orphans --exit-code-from terraform-provider-mezmo --build
+	docker-compose -f compose/base.yml pull && docker-compose \
+	-p terraform-provider-mezmo-$(BUILD_TAG) \
+	-f compose/base.yml -f compose/test.yml \
+	up --remove-orphans --exit-code-from terraform-provider-mezmo --build
+
+.PHONY: start
+start:
+	docker-compose -f compose/base.yml pull && docker-compose \
+	-p mezmo-tf \
+	-f compose/base.yml \
+	-f compose/dev.yml \
+	up --remove-orphans --build
 
 # Builds a binary using goreleaser. Uses the systems GOOS/GOARCH unless one is
 # already specified.
