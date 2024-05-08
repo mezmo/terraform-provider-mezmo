@@ -50,7 +50,7 @@ func TestConvertToTerraformModel(t *testing.T) {
 		t.Run(fmt.Sprintf("convert %s resource", res.TypeName()), func(t *testing.T) {
 			m, ok := resList[res.TypeName()]
 			if !ok {
-				t.Errorf("resource %s not found", res.TypeName())
+				t.Fatalf("resource %s not found", res.TypeName())
 			}
 			_, err := res.ConvertToTerraformModel(m)
 			if err != nil {
