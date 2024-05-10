@@ -1,7 +1,8 @@
 library 'magic-butler-catalogue'
 def PROJECT_NAME = 'terraform-provider-mezmo'
 def DEFAULT_BRANCH = 'main'
-def CURRENT_BRANCH = [env.CHANGE_BRANCH, env.BRANCH_NAME]?.find{branch -> branch != null}
+def WORKSPACE_PATH = "/tmp/workspace/${env.BUILD_TAG.replace('%2F', '/')}"
+def CURRENT_BRANCH = currentBranch()
 
 def CREDS = [
     aws(
@@ -14,19 +15,15 @@ def CREDS = [
       variable: 'GITHUB_TOKEN'
     )
 ]
-
-def slugify(str) {
-  def s = str.toLowerCase()
-  s = s.replaceAll(/[^a-z0-9\s-\/]/, "").replaceAll(/\s+/, " ").trim()
-  s = s.replaceAll(/[\/\s]/, '-').replaceAll(/-{2,}/, '-')
-  s
-}
+def NPMRC = [
+    configFile(fileId: 'npmrc', variable: 'NPM_CONFIG_USERCONFIG')
+]
 
 pipeline {
   agent {
     node {
       label 'ec2-fleet'
-      customWorkspace("/tmp/workspace/${env.BUILD_TAG}")
+      customWorkspace(WORKSPACE_PATH)
     }
   }
 
@@ -48,8 +45,71 @@ pipeline {
     disableConcurrentBuilds()
   }
 
-  environment {
-    FEATURE_TAG = slugify("${CURRENT_BRANCH}-${BUILD_NUMBER}")
+  stages {
+    stage('Validate PR Author') {
+      when {
+        expression { env.CHANGE_FORK }
+        not {
+          triggeredBy 'issueCommentCause'
+        }
+      }
+      steps {
+        error("A maintainer needs to approve this PR for CI by commenting")
+      }
+    }
+
+    stage('Format') {
+      tools {
+        nodejs 'NodeJS 20'
+      }
+      steps {
+        script {
+          if (env.SANITY_BUILD == 'true') {
+            currentBuild.description = "SANITY=${env.SANITY_BUILD}"
+          }
+        }
+        sh 'FILES_TO_FORMAT=$(gofmt -l .) && echo -e "Files with formatting errors: $FILES_TO_FORMAT" && [ -z "$FILES_TO_FORMAT" ]'
+      }
+    }
+
+    stage('Lint'){
+      tools {
+        nodejs 'NodeJS 20'
+      }
+      environment {
+        GIT_BRANCH = "${CURRENT_BRANCH}"
+        // This is not populated on PR builds and is needed for the release dry runs
+        BRANCH_NAME = "${CURRENT_BRANCH}"
+        CHANGE_ID = ""
+      }
+      steps {
+        script {
+          configFileProvider(NPMRC) {
+            sh 'npm ci --ignore-scripts'
+            sh 'npm run commitlint'
+            // goreleaser handles releases with `make build`
+          }
+        }
+      }
+    }
+
+    stage('Test') {
+      parallel {
+        stage('Integration Tests') {
+          tools {
+            nodejs 'NodeJS 20'
+          }
+          steps {
+            sh 'make test'
+          }
+        }
+        stage('Example Validation') {
+          steps {
+            sh 'make -j8 -k -O examples'
+          }
+        }
+      }
+    }
   }
 
   post {
@@ -63,63 +123,6 @@ pipeline {
             [channel: '#pipeline-bots'],
             "`${PROJECT_NAME}` sanity build took ${currentBuild.durationString.replaceFirst(' and counting', '')}."
           )
-        }
-      }
-    }
-  }
-
-  stages {
-    stage('Format') {
-      tools {
-        nodejs 'NodeJS 16'
-      }
-      agent {
-        node {
-          label 'ec2-fleet'
-          customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}-integration_tests"
-        }
-      }
-      steps {
-        script {
-          currentBuild.description = "SANITY=${env.SANITY_BUILD}"
-        }
-
-        sh 'FILES_TO_FORMAT=$(gofmt -l .) && echo -e "Files with formatting errors: $FILES_TO_FORMAT" && [ -z "$FILES_TO_FORMAT" ]'
-      }
-    }
-
-    stage('Test') {
-      when {
-        not {
-          changelog '\\[skip ci\\]'
-        }
-      }
-
-      parallel {
-        stage('Integration Tests') {
-          tools {
-            nodejs 'NodeJS 16'
-          }
-          agent {
-            node {
-              label 'ec2-fleet'
-              customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}-integration_tests"
-            }
-          }
-          steps {
-            sh 'make test'
-          }
-        }
-        stage('Example Validation') {
-          agent {
-            node {
-              label 'ec2-fleet'
-              customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}-example_validation"
-            }
-          }
-          steps {
-            sh 'make -j8 -k -O examples'
-          }
         }
       }
     }
