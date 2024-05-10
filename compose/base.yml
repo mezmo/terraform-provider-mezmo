@@ -4,8 +4,7 @@ services:
 
   timescaledb-service:
     image: timescale/timescaledb:latest-pg14
-    ports:
-      - "54320:5432"
+
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
@@ -49,8 +48,6 @@ services:
 #        - GITHUB_TOKEN
   pipeline-service:
     image: us.gcr.io/logdna-k8s/pipeline-service:3-latest
-    ports:
-      - "19095:3000"
     depends_on:
       timescaledb-service:
         condition: service_healthy
