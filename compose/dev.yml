@@ -1,6 +1,14 @@
 version: '2.4'
 
 services:
+  pipeline-service:
+    ports:
+      - "19095:3000"
+
+  timescaledb-service:
+    ports:
+      - "54320:5432"
+
   timescaledb-metrics:
     logging:
       driver: none
