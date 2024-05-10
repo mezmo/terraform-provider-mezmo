@@ -29,16 +29,15 @@ Represents an HTTP destination.
 - `encoding` (String) The encoding to apply to the data
 - `headers` (Map of String) A key/value object describing a header name and its value
 - `inputs` (List of String) The ids of the input components
-- `title` (String) A user-defined title for the destination
 - `max_bytes` (Number) The maximum number of uncompressed bytes when batching data to the destination
-- `timeout_secs` (Number) The number of seconds before a destination write timeout.
-- `method` (String) The HTTP method to use for the destination.  Valid values are: `post`, `put`, `patch`, `delete`, `get`, `head`, `options`, `trace`)
+- `method` (String) The HTTP method to use for the destination.
 - `payload_prefix` (String) Add a prefix to the payload. Only used for serialized JSON chunks. This option also requires 'Payload Suffix' to form a valid JSON string.
 - `payload_suffix` (String) Used in combination with 'Payload Prefix' to form valid JSON from the payload.
-- `tls_protocols` (List of String) A list of ALPN protocols to use during TLS negotiation. They are attempted in the order they appear.
 - `proxy` (Attributes) Proxy Settings (see [below for nested schema](#nestedatt--proxy))
 - `rate_limiting` (Attributes) Settings for controlling rate limiting to the destination. (see [below for nested schema](#nestedatt--rate_limiting))
-
+- `timeout_secs` (Number) The number of seconds before a destination write timeout.
+- `title` (String) A user-defined title for the destination
+- `tls_protocols` (List of String) A list of ALPN protocols to use during TLS negotiation. They are attempted in the order they appear.
 
 ### Read-Only
 
@@ -56,22 +55,23 @@ Optional:
 
 - `password` (String, Sensitive)
 - `token` (String, Sensitive)
-- `user` (String) HTTP or HTTPS Endpoint to use for traffic.
-- `hosts_bypass_proxy` (List of String) A list of hosts to bypass proxying. Can be specified as a domain name, IP address, or CIDR block. Wildcards are supported as a dot (.) in domain names, or as a star (*) to match all hosts.
+- `user` (String)
 
-<a id=`nestedatt--auth`></a>
+
+<a id="nestedatt--proxy"></a>
 ### Nested Schema for `proxy`
 
 Optional:
 
 - `enabled` (Boolean) Turns Proxying on/off.
-- `endpoint` (String) 
-- `user` (String)
+- `endpoint` (String) HTTP or HTTPS Endpoint to use for traffic.
+- `hosts_bypass_proxy` (List of String) A list of hosts to bypass proxying. Can be specified as a domain name, IP address, or CIDR block. Wildcards are supported as a dot (.) in domain names, or as a star (*) to match all hosts.
+
 
 <a id="nestedatt--rate_limiting"></a>
 ### Nested Schema for `rate_limiting`
 
 Optional:
 
-- `request_limit` (Number) The max number of requests allowed within the specified.
 - `duration_secs` (Number) The window of time used to apply 'Request Limit.
+- `request_limit` (Number) The max number of requests allowed within the specified.

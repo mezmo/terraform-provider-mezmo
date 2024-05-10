@@ -165,7 +165,7 @@ var HttpDestinationResourceSchema = schema.Schema{
 				},
 				"hosts_bypass_proxy": schema.ListAttribute{
 					ElementType: types.StringType,
-					Required:    true,
+					Optional:    true,
 					Description: "A list of hosts to bypass proxying. Can be specified as a " +
 						"domain name, IP address, or CIDR block. Wildcards are supported as " +
 						"a dot (.) in domain names, or as a star (*) to match all hosts.",
