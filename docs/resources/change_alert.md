@@ -117,7 +117,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: percent_change_greater, percent_change_greater_or_equal, percent_change_less, percent_change_less_or_equal, value_change_greater, value_change_greater_or_equal, value_change_less or value_change_less_or_equal.
 
 Optional:
 
@@ -140,7 +140,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: percent_change_greater, percent_change_greater_or_equal, percent_change_less, percent_change_less_or_equal, value_change_greater, value_change_greater_or_equal, value_change_less or value_change_less_or_equal.
 
 Optional:
 
@@ -163,7 +163,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: percent_change_greater, percent_change_greater_or_equal, percent_change_less, percent_change_less_or_equal, value_change_greater, value_change_greater_or_equal, value_change_less or value_change_less_or_equal.
 
 Optional:
 
@@ -186,7 +186,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: percent_change_greater, percent_change_greater_or_equal, percent_change_less, percent_change_less_or_equal, value_change_greater, value_change_greater_or_equal, value_change_less or value_change_less_or_equal.
 
 Optional:
 
@@ -209,7 +209,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: percent_change_greater, percent_change_greater_or_equal, percent_change_less, percent_change_less_or_equal, value_change_greater, value_change_greater_or_equal, value_change_less or value_change_less_or_equal.
 
 Optional:
 
@@ -232,7 +232,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: percent_change_greater, percent_change_greater_or_equal, percent_change_less, percent_change_less_or_equal, value_change_greater, value_change_greater_or_equal, value_change_less or value_change_less_or_equal.
 
 Optional:
 
@@ -254,7 +254,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: percent_change_greater, percent_change_greater_or_equal, percent_change_less, percent_change_less_or_equal, value_change_greater, value_change_greater_or_equal, value_change_less or value_change_less_or_equal.
 
 Optional:
 

@@ -117,7 +117,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
 
 Optional:
 
@@ -140,7 +140,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
 
 Optional:
 
@@ -163,7 +163,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
 
 Optional:
 
@@ -186,7 +186,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
 
 Optional:
 
@@ -209,7 +209,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
 
 Optional:
 
@@ -232,7 +232,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
 
 Optional:
 
@@ -254,7 +254,7 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
 
 Optional:
 
