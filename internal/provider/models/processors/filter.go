@@ -29,7 +29,7 @@ var FilterProcessorResourceSchema = schema.Schema{
 	Description: "Define condition(s) to include or exclude events from the pipeline",
 	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
 		"action": schema.StringAttribute{
-			Description: "How to handle events matching this criteria",
+			Description: "How to handle events matching this criteria. Possible values are: allow or drop",
 			Required:    true,
 			Validators: []validator.String{
 				stringvalidator.OneOf("allow", "drop"),

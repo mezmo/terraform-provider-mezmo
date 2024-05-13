@@ -2,6 +2,7 @@ package modelutils
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -21,6 +22,8 @@ var ExpressionTypes = map[string]attr.Type{
 }
 
 func expressionAttributes(operators []string) map[string]schema.Attribute {
+	possibleValues := strings.Join(operators[:len(operators)-1], ", ") + " or " + operators[len(operators)-1]
+
 	return map[string]schema.Attribute{
 		"field": schema.StringAttribute{
 			Required:    true,
@@ -31,7 +34,7 @@ func expressionAttributes(operators []string) map[string]schema.Attribute {
 		},
 		"operator": schema.StringAttribute{
 			Required:    true,
-			Description: "The comparison operator",
+			Description: "The comparison operator. Possible values are: " + possibleValues + ".",
 			Validators: []validator.String{
 				stringvalidator.OneOf(operators...),
 			},
