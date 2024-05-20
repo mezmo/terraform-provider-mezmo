@@ -37,7 +37,7 @@ func TestAbsenceAlert_success(t *testing.T) {
 						event_type = "metric"
 						operation = "sum"
 						subject = "Absence Alert"
-						message = "You received a absence alert"
+						body = "You received a absence alert"
 						ingestion_key = "abc123"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -53,7 +53,7 @@ func TestAbsenceAlert_success(t *testing.T) {
 						"component_kind":          "source",
 						"event_type":              "metric",
 						"ingestion_key":           "abc123",
-						"message":                 "You received a absence alert",
+						"body":                    "You received a absence alert",
 						"name":                    "my absence alert",
 						"operation":               "sum",
 						"severity":                "INFO",
@@ -83,7 +83,7 @@ func TestAbsenceAlert_success(t *testing.T) {
 						group_by = [".other"]
 						severity = "WARNING"
 						subject = "updated subject"
-						message = "updated message"
+						body = "updated body"
 						ingestion_key = "abc123"
 						active = false
 					}`,
@@ -93,7 +93,7 @@ func TestAbsenceAlert_success(t *testing.T) {
 						"description":             "updated description",
 						"group_by.#":              "1",
 						"group_by.0":              ".other",
-						"message":                 "updated message",
+						"body":                    "updated body",
 						"name":                    "updated name",
 						"operation":               "custom",
 						"script":                  "function myFunc(a, e, m) { return a }",
@@ -120,7 +120,7 @@ func TestAbsenceAlert_success(t *testing.T) {
 						event_timestamp = ".timestamp"
 						group_by = [".name", ".namespace", ".tags"]
 						subject = "Absence Alert for Log event"
-						message = "You received a absence alert for a Log event"
+						body = "You received a absence alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -147,7 +147,7 @@ func TestAbsenceAlert_success(t *testing.T) {
 						"severity":                "INFO",
 						"style":                   "static",
 						"subject":                 "Absence Alert for Log event",
-						"message":                 "You received a absence alert for a Log event",
+						"body":                    "You received a absence alert for a Log event",
 						"window_duration_minutes": "5",
 						"window_type":             "tumbling",
 					}),
@@ -191,7 +191,7 @@ func TestAbsenceAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Absence Alert for Log event"
-						message = "This will not work"
+						body = "This will not work"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*An argument named "conditional" is not expected her`),

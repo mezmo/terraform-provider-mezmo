@@ -47,7 +47,7 @@ func TestThresholdAlert_success(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert"
-						message = "You received a threshold alert"
+						body = "You received a threshold alert"
 						ingestion_key = "abc123"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -69,7 +69,7 @@ func TestThresholdAlert_success(t *testing.T) {
 						"conditional.logical_operation":          "AND",
 						"event_type":                             "metric",
 						"ingestion_key":                          "abc123",
-						"message":                                "You received a threshold alert",
+						"body":                                   "You received a threshold alert",
 						"name":                                   "my threshold alert",
 						"operation":                              "sum",
 						"severity":                               "INFO",
@@ -107,7 +107,7 @@ func TestThresholdAlert_success(t *testing.T) {
 						}
 						severity = "WARNING"
 						subject = "updated subject"
-						message = "updated message"
+						body = "updated body"
 						ingestion_key = "abc123"
 						active = false
 					}`,
@@ -115,7 +115,7 @@ func TestThresholdAlert_success(t *testing.T) {
 					StateHasExpectedValues("mezmo_threshold_alert.default_metric", map[string]any{
 						"active":                  "false",
 						"description":             "updated description",
-						"message":                 "updated message",
+						"body":                    "updated body",
 						"name":                    "updated name",
 						"operation":               "custom",
 						"script":                  "function myFunc(a, e, m) { return a }",
@@ -151,7 +151,7 @@ func TestThresholdAlert_success(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -184,7 +184,7 @@ func TestThresholdAlert_success(t *testing.T) {
 						"severity":                               "INFO",
 						"style":                                  "static",
 						"subject":                                "Threshold Alert for Log event",
-						"message":                                "You received a threshold alert for a Log event",
+						"body":                                   "You received a threshold alert for a Log event",
 						"window_duration_minutes":                "5",
 						"window_type":                            "tumbling",
 					}),
@@ -216,7 +216,7 @@ func TestThresholdAlert_root_required_errors(t *testing.T) {
 				`The argument "event_type" is required`,
 				`The argument "operation" is required`,
 				`The argument "subject" is required`,
-				`The argument "message" is required`,
+				`The argument "body" is required`,
 				`The argument "ingestion_key" is required`,
 				`The argument "conditional" is required`,
 			}
@@ -278,7 +278,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*operator value must be one of.*"),
@@ -304,7 +304,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*Attribute pipeline_id string length must be at least 1"),
@@ -330,7 +330,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*Attribute component_id string length must be at least 1"),
@@ -356,7 +356,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute component_kind value must be one of: \["source" "transform"\]`),
@@ -382,7 +382,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute inputs list must contain at least 1 elements`),
@@ -408,7 +408,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute inputs\[0\] string length must be at least 1`),
@@ -440,7 +440,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 			// 				],
 			// 			}
 			// 			subject = "Threshold Alert for Log event"
-			// 			message = "You received a threshold alert for a Log event"
+			// 			body = "You received a threshold alert for a Log event"
 			// 			ingestion_key = "abc123"
 			// 		}`,
 			// 	ExpectError: regexp.MustCompile(`(?s).*inputs = \[.*This attribute contains duplicate values of`),
@@ -466,7 +466,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*Attribute name string length must be at least 1"),
@@ -492,7 +492,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute event_type value must be one of: \["log" "metric"\]`),
@@ -519,7 +519,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 						}
 						window_type = "badwindow"
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute window_type value must be one of: \["tumbling" "sliding"\]`),
@@ -545,7 +545,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 						severity = "invalid"
 					}`,
@@ -572,7 +572,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).Attribute operation value must be one of:`),
@@ -599,7 +599,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 						}
 						style = "NOPE"
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).Attribute style value must be one of:`),
@@ -641,7 +641,7 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*A 'custom' operation requires a valid JS `script` function"),
@@ -668,7 +668,7 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*`script` cannot be set when `operation` is not 'custom'"),
@@ -694,7 +694,7 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*A 'log' event type requires a 'custom' `operation` and a valid JS `script`"),
@@ -721,7 +721,7 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 							],
 						}
 						subject = "Threshold Alert for Log event"
-						message = "You received a threshold alert for a Log event"
+						body = "You received a threshold alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*A 'metric' event type cannot have an `event_timestamp` field"),

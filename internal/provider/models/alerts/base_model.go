@@ -173,7 +173,7 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 		},
 		Description: "The subject line to use when the alert is sent.", // TODO: Add details about templates when added
 	},
-	"message": schema.StringAttribute{
+	"body": schema.StringAttribute{
 		Required: true,
 		Validators: []validator.String{
 			stringvalidator.LengthAtLeast(1),
