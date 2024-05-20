@@ -46,7 +46,7 @@ func TestChangeAlert_success(t *testing.T) {
 							],
 						}
 						subject = "Change Alert"
-						message = "You received a change alert"
+						body = "You received a change alert"
 						ingestion_key = "abc123"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -68,7 +68,7 @@ func TestChangeAlert_success(t *testing.T) {
 						"conditional.logical_operation":          "AND",
 						"event_type":                             "metric",
 						"ingestion_key":                          "abc123",
-						"message":                                "You received a change alert",
+						"body":                                   "You received a change alert",
 						"name":                                   "my change alert",
 						"operation":                              "sum",
 						"severity":                               "INFO",
@@ -107,7 +107,7 @@ func TestChangeAlert_success(t *testing.T) {
 						}
 						severity = "WARNING"
 						subject = "updated subject"
-						message = "updated message"
+						body = "updated body"
 						ingestion_key = "abc123"
 						active = false
 					}`,
@@ -117,7 +117,7 @@ func TestChangeAlert_success(t *testing.T) {
 						"description":                            "updated description",
 						"group_by.#":                             "1",
 						"group_by.0":                             ".other",
-						"message":                                "updated message",
+						"body":                                   "updated body",
 						"name":                                   "updated name",
 						"operation":                              "custom",
 						"conditional.expressions.0.field":        ".other_value",
@@ -156,7 +156,7 @@ func TestChangeAlert_success(t *testing.T) {
 							],
 						}
 						subject = "Change Alert for Log event"
-						message = "You received a change alert for a Log event"
+						body = "You received a change alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -189,7 +189,7 @@ func TestChangeAlert_success(t *testing.T) {
 						"severity":                               "INFO",
 						"style":                                  "static",
 						"subject":                                "Change Alert for Log event",
-						"message":                                "You received a change alert for a Log event",
+						"body":                                   "You received a change alert for a Log event",
 						"window_duration_minutes":                "5",
 						"window_type":                            "tumbling",
 					}),
@@ -233,7 +233,7 @@ func TestChangeAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						subject = "Change Alert for Log event"
-						message = "You received a change alert for a Log event"
+						body = "You received a change alert for a Log event"
 						ingestion_key = "abc123"
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*operator value must be one of.*percent_change_less"),

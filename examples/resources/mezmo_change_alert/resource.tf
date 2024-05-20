@@ -50,6 +50,6 @@ resource "mezmo_change_alert" "order_spike" {
   window_duration_minutes = 15
   subject                 = "Spike in ordering!"
   severity                = "WARNING"
-  message                 = "There has been a > 20% increase in orders over the last 15 minutes. Check application scaling."
+  body                    = "There has been a > 20% increase in orders over the last 15 minutes. Check application scaling."
   ingestion_key           = "abc123"
 }

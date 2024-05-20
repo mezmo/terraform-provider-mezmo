@@ -31,7 +31,7 @@ type ChangeAlertModel struct {
 	Severity          StringValue `tfsdk:"severity" user_config:"true"`
 	Style             StringValue `tfsdk:"style" user_config:"true"`
 	Subject           StringValue `tfsdk:"subject" user_config:"true"`
-	Message           StringValue `tfsdk:"message" user_config:"true"`
+	Body              StringValue `tfsdk:"body" user_config:"true"`
 	IngestionKey      StringValue `tfsdk:"ingestion_key" user_config:"true"`
 }
 
@@ -86,7 +86,7 @@ func ChangeAlertFromModel(plan *ChangeAlertModel, previousState *ChangeAlertMode
 			},
 			"alert_payload": map[string]any{
 				"subject": plan.Subject.ValueString(),
-				"message": plan.Message.ValueString(),
+				"body":    plan.Body.ValueString(),
 				"destination": map[string]any{
 					"ingestion_key": plan.IngestionKey.ValueString(),
 				},
@@ -182,6 +182,6 @@ func ChangeAlertToModel(plan *ChangeAlertModel, component *Alert) {
 	plan.Severity = NewStringValue(alertPayload["severity"].(string))
 	plan.Style = NewStringValue(alertPayload["style"].(string))
 	plan.Subject = NewStringValue(alertPayload["subject"].(string))
-	plan.Message = NewStringValue(alertPayload["message"].(string))
+	plan.Body = NewStringValue(alertPayload["body"].(string))
 	plan.IngestionKey = NewStringValue(destination["ingestion_key"].(string))
 }

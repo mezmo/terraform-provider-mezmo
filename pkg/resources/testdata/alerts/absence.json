@@ -11,7 +11,7 @@
       "destination": {
         "ingestion_key": "abc123"
       },
-      "message": "You received a absence alert for a Log event",
+      "body": "You received a absence alert for a Log event",
       "severity": "INFO",
       "style": "static",
       "subject": "Absence Alert for Log event"

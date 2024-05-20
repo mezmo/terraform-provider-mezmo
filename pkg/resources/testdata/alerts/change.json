@@ -11,7 +11,7 @@
       "destination": {
         "ingestion_key": "abc123"
       },
-      "message": "You received a change alert",
+      "body": "You received a change alert",
       "severity": "INFO",
       "style": "static",
       "subject": "Change Alert"
