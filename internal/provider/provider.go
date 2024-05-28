@@ -163,6 +163,9 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewThresholdAlertResource,
 		NewChangeAlertResource,
 		NewAbsenceAlertResource,
+
+		// Access Keys
+		NewAccessKeyResource,
 	}
 }
 

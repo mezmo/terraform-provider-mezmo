@@ -33,6 +33,9 @@ type Client interface {
 	CreateAlert(pipelineId string, alert *Alert) (*Alert, error) // POST
 	UpdateAlert(pipelineId string, alert *Alert) (*Alert, error) // PUT
 	DeleteAlert(pipelineId string, alert *Alert) error           // DELETE
+
+	CreateAccessKey(accessKey *AccessKey) (*AccessKey, error)
+	DeleteAccessKey(accessKey *AccessKey) error
 }
 
 func NewClient(endpoint string, authKey string, headers map[string]string) Client {
@@ -367,6 +370,30 @@ func (c *client) UpdateAlert(pipelineId string, alert *Alert) (*Alert, error) {
 // DELETE Alert
 func (c *client) DeleteAlert(pipelineId string, alert *Alert) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/%s/%s/alert/%s", c.endpoint, pipelineId, alert.ComponentKind, alert.ComponentId, alert.Id)
+	req := c.newRequest(http.MethodDelete, url, nil)
+	return readBody(c.httpClient.Do(req))
+}
+
+// POST Access Key
+func (c *client) CreateAccessKey(accessKey *AccessKey) (*AccessKey, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key", c.endpoint, accessKey.GatewayRouteId)
+	reqBody, err := json.Marshal(accessKey)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[AccessKey]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	createdAccessKey := &envelope.Data
+	return createdAccessKey, nil
+}
+
+// DELETE access key
+func (c *client) DeleteAccessKey(accessKey *AccessKey) error {
+	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key/%s", c.endpoint, accessKey.GatewayRouteId, accessKey.Id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }

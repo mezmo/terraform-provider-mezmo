@@ -49,3 +49,11 @@ type Processor struct {
 type Destination struct {
 	BaseNode
 }
+
+type AccessKey struct {
+	Id             string `json:"id"`
+	Title          string `json:"title"`
+	GatewayRouteId string `json:"gateway_route_id"`
+	Type           string `json:"type"`
+	Key            string `json:"key,omitempty"`
+}
