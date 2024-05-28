@@ -26,6 +26,10 @@ type ConvertibleResourceDef interface {
 	ConvertToTerraformModel(component *reflect.Value) (*reflect.Value, error)
 }
 
+type NotConvertibleResourceDef interface {
+	NotConvertible() bool
+}
+
 func ConvertibleResources() ([]ConvertibleResourceDef, error) {
 	p := provider.MezmoProvider{}
 	terraformRes := p.Resources(context.Background())
@@ -34,8 +38,16 @@ func ConvertibleResources() ([]ConvertibleResourceDef, error) {
 		tfRes := tfResFn()
 		cRes, ok := tfRes.(ConvertibleResourceDef)
 		if !ok {
-			err := fmt.Errorf("terraform resource %T does not implement ConvertibleResourceDef", tfRes)
-			return nil, err
+			not_convertible, ok := tfRes.(NotConvertibleResourceDef)
+			if !ok {
+				err := fmt.Errorf("terraform resource %T does not implement ConvertibleResourceDef nor NotConvertibleResourcedef", tfRes)
+				return nil, err
+			}
+			if !not_convertible.NotConvertible() {
+				err := fmt.Errorf("terraform resource %T must return `true` from `NotConvertible()`", tfRes)
+				return nil, err
+			}
+			continue
 		}
 		convertibleRes[i] = cRes
 	}

@@ -64,7 +64,7 @@ resource "mezmo_threshold_alert" "order_count" {
   window_duration_minutes = 60
   subject                 = "Lots of orders coming in the last hour!"
   severity                = "WARNING"
-  message                 = "Check to make sure there are no errors in pricing, and no unexpected special offers were released."
+  body                    = "Check to make sure there are no errors in pricing, and no unexpected special offers were released."
   ingestion_key           = "abc123"
 }
 ```

@@ -47,6 +47,10 @@ func TestConvertToTerraformModel(t *testing.T) {
 	resList := loadResources(t)
 
 	for _, res := range convResources {
+		// Skip resources that are not importable, which have a null entry here
+		if res == nil {
+			continue
+		}
 		t.Run(fmt.Sprintf("convert %s resource", res.TypeName()), func(t *testing.T) {
 			m, ok := resList[res.TypeName()]
 			if !ok {
@@ -112,6 +116,9 @@ func TestConvertibleResources(t *testing.T) {
 	p := provider.MezmoProvider{}
 	for _, resFn := range p.Resources(context.Background()) {
 		res := resFn()
+		if _, ok := res.(NotConvertibleResourceDef); ok {
+			continue
+		}
 		resTy := reflect.TypeOf(res).String()
 		unmatchedResources[resTy] = false
 	}
@@ -122,6 +129,10 @@ func TestConvertibleResources(t *testing.T) {
 		return
 	}
 	for _, convRes := range actual {
+		// Skip resources that are not importable, which have a null entry here
+		if convRes == nil {
+			continue
+		}
 		convResTy := reflect.TypeOf(convRes).String()
 		if _, ok := unmatchedResources[convResTy]; ok {
 			delete(unmatchedResources, convResTy)
