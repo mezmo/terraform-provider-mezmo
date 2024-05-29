@@ -1,0 +1,6 @@
+{
+  "id": "fcd62202-1dea-11ef-ac74-0242ac130004",
+  "title": "HTTP Shared",
+  "description": "This source can be shared across pipelines",
+  "type": "http"
+}

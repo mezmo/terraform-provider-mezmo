@@ -47,10 +47,6 @@ func TestConvertToTerraformModel(t *testing.T) {
 	resList := loadResources(t)
 
 	for _, res := range convResources {
-		// Skip resources that are not importable, which have a null entry here
-		if res == nil {
-			continue
-		}
 		t.Run(fmt.Sprintf("convert %s resource", res.TypeName()), func(t *testing.T) {
 			m, ok := resList[res.TypeName()]
 			if !ok {
@@ -66,8 +62,13 @@ func TestConvertToTerraformModel(t *testing.T) {
 
 func loadResources(t *testing.T) map[string]*reflect.Value {
 	resList := make(map[string]*reflect.Value)
+
+	// Add flat resources
 	pipeline := reflect.ValueOf(*loadJsonFile[PipelineApiModel](t, testdataPath, "pipeline.json"))
 	resList["mezmo_pipeline"] = &pipeline
+	shared_source := reflect.ValueOf(*loadJsonFile[SharedSourceApiModel](t, testdataPath, "shared_source.json"))
+	resList["mezmo_shared_source"] = &shared_source
+
 	addToMap(t, resList, loadDirFiles[ProcessorApiModel](t, processorsPath, func(filename string) string {
 		return fmt.Sprintf("mezmo_%s_processor", filename)
 	}))
@@ -129,10 +130,6 @@ func TestConvertibleResources(t *testing.T) {
 		return
 	}
 	for _, convRes := range actual {
-		// Skip resources that are not importable, which have a null entry here
-		if convRes == nil {
-			continue
-		}
 		convResTy := reflect.TypeOf(convRes).String()
 		if _, ok := unmatchedResources[convResTy]; ok {
 			delete(unmatchedResources, convResTy)
