@@ -74,7 +74,6 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 		"group_by": schema.ListAttribute{
 			ElementType: basetypes.StringType{},
 			Optional:    true,
-			Computed:    true,
 			Description: "Group events based on matching data from each of these field paths. Supports nesting via dot-notation.",
 		},
 		"event_timestamp": schema.StringAttribute{
