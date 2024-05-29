@@ -16,6 +16,7 @@ type ProcessorApiModel = client.Processor
 type DestinationApiModel = client.Destination
 type AlertApiModel = client.Alert
 type BaseApiModel = client.BaseNode
+type SharedSourceApiModel = client.SharedSource
 
 type ConvertibleResourceDef interface {
 	/// the terraform resource type. example: mezmo_http_source
@@ -33,8 +34,8 @@ type NotConvertibleResourceDef interface {
 func ConvertibleResources() ([]ConvertibleResourceDef, error) {
 	p := provider.MezmoProvider{}
 	terraformRes := p.Resources(context.Background())
-	convertibleRes := make([]ConvertibleResourceDef, len(terraformRes))
-	for i, tfResFn := range terraformRes {
+	convertibleRes := []ConvertibleResourceDef{}
+	for _, tfResFn := range terraformRes {
 		tfRes := tfResFn()
 		cRes, ok := tfRes.(ConvertibleResourceDef)
 		if !ok {
@@ -49,7 +50,7 @@ func ConvertibleResources() ([]ConvertibleResourceDef, error) {
 			}
 			continue
 		}
-		convertibleRes[i] = cRes
+		convertibleRes = append(convertibleRes, cRes)
 	}
 	return convertibleRes, nil
 }

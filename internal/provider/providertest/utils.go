@@ -2,6 +2,7 @@ package providertest
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -298,4 +299,21 @@ func makeDeleteRequest(urlPath string) error {
 		return nil
 	}
 	return fmt.Errorf("received status code %d for %s", resp.StatusCode, urlPath)
+}
+
+func CheckMultipleErrors(err_strings []string) resource.ErrorCheckFunc {
+	return func(err error) error {
+		// Testing multiple regex errors is not possible with `ExpectError`, so we use
+		// this custom function. Because this option is a `TestCase` option,
+		// this test only has 1 `TestStep`.
+		error_bytes := []byte(err.Error())
+
+		for _, err_string := range err_strings {
+			found, _ := regexp.Match(err_string, error_bytes)
+			if !found {
+				return errors.New("The expected error was not found: " + err_string)
+			}
+		}
+		return nil
+	}
 }

@@ -36,6 +36,11 @@ type Client interface {
 
 	CreateAccessKey(accessKey *AccessKey) (*AccessKey, error)
 	DeleteAccessKey(accessKey *AccessKey) error
+
+	SharedSource(id string) (*SharedSource, error)
+	CreateSharedSource(source *SharedSource) (*SharedSource, error)
+	UpdateSharedSource(source *SharedSource) (*SharedSource, error)
+	DeleteSharedSource(source *SharedSource) error
 }
 
 func NewClient(endpoint string, authKey string, headers map[string]string) Client {
@@ -394,6 +399,60 @@ func (c *client) CreateAccessKey(accessKey *AccessKey) (*AccessKey, error) {
 // DELETE access key
 func (c *client) DeleteAccessKey(accessKey *AccessKey) error {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key/%s", c.endpoint, accessKey.GatewayRouteId, accessKey.Id)
+	req := c.newRequest(http.MethodDelete, url, nil)
+	return readBody(c.httpClient.Do(req))
+}
+
+// POST Shared Source
+func (c *client) CreateSharedSource(source *SharedSource) (*SharedSource, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/gateway-route", c.endpoint)
+	reqBody, err := json.Marshal(source)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[SharedSource]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	createdSharedSource := &envelope.Data
+	return createdSharedSource, nil
+}
+
+// GET shared source
+func (c *client) SharedSource(id string) (*SharedSource, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s", c.endpoint, id)
+	req := c.newRequest(http.MethodGet, url, nil)
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[SharedSource]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	source := &envelope.Data
+	return source, nil
+}
+
+// PUT shared source
+func (c *client) UpdateSharedSource(source *SharedSource) (*SharedSource, error) {
+	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s", c.endpoint, source.Id)
+	reqBody, err := json.Marshal(source)
+	if err != nil {
+		return nil, err
+	}
+	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
+	resp, err := c.httpClient.Do(req)
+	var envelope apiResponseEnvelope[SharedSource]
+	if err := readJson(&envelope, resp, err); err != nil {
+		return nil, err
+	}
+	updatedSharedSource := &envelope.Data
+	return updatedSharedSource, nil
+}
+
+// DELETE shared source
+func (c *client) DeleteSharedSource(source *SharedSource) error {
+	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s", c.endpoint, source.Id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }

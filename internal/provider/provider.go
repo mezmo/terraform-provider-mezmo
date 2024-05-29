@@ -166,6 +166,9 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 
 		// Access Keys
 		NewAccessKeyResource,
+
+		// Shared Sources
+		NewSharedSourceResource,
 	}
 }
 

@@ -1,7 +1,6 @@
 package alerts
 
 import (
-	"errors"
 	"regexp"
 	"testing"
 
@@ -202,33 +201,18 @@ func TestThresholdAlert_root_required_errors(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
-		ErrorCheck: func(err error) error {
-			// Testing multiple regex errors is not possible with `ExpectError`, so we use
-			// this custom function. Because this option is a `TestCase` option,
-			// this test only has 1 `TestStep`.
-			error_bytes := []byte(err.Error())
-
-			err_strings := []string{
-				`The argument "pipeline_id" is required`,
-				`The argument "component_kind" is required`,
-				`The argument "component_id" is required`,
-				`The argument "name" is required`,
-				`The argument "event_type" is required`,
-				`The argument "operation" is required`,
-				`The argument "subject" is required`,
-				`The argument "body" is required`,
-				`The argument "ingestion_key" is required`,
-				`The argument "conditional" is required`,
-			}
-
-			for _, err_string := range err_strings {
-				found, _ := regexp.Match(err_string, error_bytes)
-				if !found {
-					return errors.New("The expected error was not found: " + err_string)
-				}
-			}
-			return nil
-		},
+		ErrorCheck: CheckMultipleErrors([]string{
+			`The argument "pipeline_id" is required`,
+			`The argument "component_kind" is required`,
+			`The argument "component_id" is required`,
+			`The argument "name" is required`,
+			`The argument "event_type" is required`,
+			`The argument "operation" is required`,
+			`The argument "subject" is required`,
+			`The argument "body" is required`,
+			`The argument "ingestion_key" is required`,
+			`The argument "conditional" is required`,
+		}),
 		Steps: []resource.TestStep{
 			{
 				Config: `
