@@ -47,7 +47,7 @@ resource "mezmo_fluent_source" "webhook" {
   pipeline_id      = mezmo_pipeline.pipeline1.id
   title            = "A shared source"
   description      = "This Fluent source uses the webhook data"
-  gateway_route_id = mezmo_http_source.webhook.gateway_route_id
+  shared_source_id = mezmo_http_source.webhook.shared_source_id
 }
 ```
 
@@ -63,7 +63,7 @@ resource "mezmo_fluent_source" "webhook" {
 - `capture_metadata` (Boolean) Enable the inclusion of all http headers and query string parameters that were sent from the source
 - `decoding` (String) The decoding method for converting frames into data events
 - `description` (String) A user-defined value describing the source component
-- `gateway_route_id` (String) The uuid of a pre-existing source to be used as the input for this component. This can only be provided on resource creation (not update).
+- `shared_source_id` (String) The uuid of a pipeline source or shared source to be used as the input for this component. This can only be provided on resource creation (not update).
 - `title` (String) A user-defined title for the source component
 
 ### Read-Only

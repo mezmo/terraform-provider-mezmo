@@ -93,7 +93,7 @@ func TestKinesisFirehoseSourceResource(t *testing.T) {
 					}),
 				),
 			},
-			// Supply gateway_route_id
+			// Supply shared_source_id
 			{
 				Config: providertest.SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
@@ -108,7 +108,7 @@ func TestKinesisFirehoseSourceResource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "shared"
 						description = "shared kinesis source"
-						gateway_route_id = mezmo_kinesis_firehose_source.parent_source.id
+						shared_source_id = mezmo_kinesis_firehose_source.parent_source.id
 					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
@@ -121,32 +121,32 @@ func TestKinesisFirehoseSourceResource(t *testing.T) {
 						"decoding":         "json",
 						"capture_metadata": "false",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
-						"gateway_route_id": "#mezmo_kinesis_firehose_source.parent_source.gateway_route_id",
+						"shared_source_id": "#mezmo_kinesis_firehose_source.parent_source.shared_source_id",
 					}),
 				),
 			},
-			// Updating gateway_route_id is not allowed
+			// Updating shared_source_id is not allowed
 			{
 				Config: providertest.GetCachedConfig(cacheKey) + `
 					resource "mezmo_kinesis_firehose_source" "shared_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
-						gateway_route_id =  mezmo_pipeline.test_parent.id
+						shared_source_id =  mezmo_pipeline.test_parent.id
 					}`,
 				ExpectError: regexp.MustCompile("This field is immutable after resource creation."),
 			},
-			// gateway_route_id can be specified if it's the same value
+			// shared_source_id can be specified if it's the same value
 			{
 				Config: providertest.GetCachedConfig(cacheKey) + `
 					resource "mezmo_kinesis_firehose_source" "shared_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "another title update"
-						gateway_route_id = mezmo_kinesis_firehose_source.parent_source.gateway_route_id
+						shared_source_id = mezmo_kinesis_firehose_source.parent_source.shared_source_id
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					providertest.StateHasExpectedValues("mezmo_kinesis_firehose_source.shared_source", map[string]any{
 						"title":            "another title update",
 						"generation_id":    "1",
-						"gateway_route_id": "#mezmo_kinesis_firehose_source.parent_source.gateway_route_id",
+						"shared_source_id": "#mezmo_kinesis_firehose_source.parent_source.shared_source_id",
 					}),
 				),
 			},

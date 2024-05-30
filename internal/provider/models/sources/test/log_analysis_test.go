@@ -37,7 +37,7 @@ func TestLogAnalysisSource(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_log_analysis_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 
-					resource.TestCheckNoResourceAttr("mezmo_log_analysis_source.my_source", "gateway_route_id"),
+					resource.TestCheckNoResourceAttr("mezmo_log_analysis_source.my_source", "shared_source_id"),
 
 					StateHasExpectedValues("mezmo_log_analysis_source.my_source", map[string]any{
 						"description":   "my source description",

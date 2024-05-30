@@ -25,5 +25,5 @@ resource "mezmo_datadog_source" "shared_datadog_source" {
   pipeline_id      = mezmo_pipeline.pipeline1.id
   title            = "A shared Datadog source"
   description      = "This source uses the same data as datadog1"
-  gateway_route_id = mezmo_datadog_source.datadog1.gateway_route_id
+  shared_source_id = mezmo_datadog_source.datadog1.shared_source_id
 }

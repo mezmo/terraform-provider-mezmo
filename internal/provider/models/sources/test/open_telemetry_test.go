@@ -20,7 +20,7 @@ type resourceOpenTelemetrySourceConfig struct {
 	SourceDesc      string
 	CaptureMetadata bool
 
-	// Will include a shared source which means setting the gateway_route_id on
+	// Will include a shared source which means setting the shared_source_id on
 	// source A to the ID of source B.
 	GatewayResourceID string
 }
@@ -43,7 +43,7 @@ resource "mezmo_open_telemetry_{{.Type}}_source" "{{.SourceName}}" {
 {{if .GatewayResourceID}}
 resource "mezmo_open_telemetry_{{.Type}}_source" "{{.SourceName}}-gateway" {
 	pipeline_id      = mezmo_pipeline.{{.PipelineName}}.id
-	gateway_route_id = {{.GatewayResourceID}}
+	shared_source_id = {{.GatewayResourceID}}
 }
 {{end}}
 `
@@ -93,7 +93,7 @@ func TestAccOpenTelemetrySources(t *testing.T) {
 			SourceName:        sourceName,
 			SourceTitle:       sourceTitle,
 			SourceDesc:        sourceDesc,
-			GatewayResourceID: resourceName + ".gateway_route_id",
+			GatewayResourceID: resourceName + ".shared_source_id",
 		}, resourceOpenTelemetrySourceConfigTpl)
 		if err != nil {
 			t.Fatalf("error parsing config template: %s", err)
@@ -133,7 +133,7 @@ func TestAccOpenTelemetrySources(t *testing.T) {
 					Config: GetProviderConfig() + config,
 					Check: resource.ComposeTestCheckFunc([]resource.TestCheckFunc{
 						resource.TestMatchResourceAttr(resourceName, "id", IDRegex),
-						resource.TestMatchResourceAttr(resourceName, "gateway_route_id", IDRegex),
+						resource.TestMatchResourceAttr(resourceName, "shared_source_id", IDRegex),
 						resource.TestCheckResourceAttr(resourceName, "description", "my open telemetry description"),
 						resource.TestCheckResourceAttr(resourceName, "generation_id", "0"),
 						resource.TestCheckResourceAttr(resourceName, "title", "my open telemetry title"),
@@ -158,19 +158,19 @@ func TestAccOpenTelemetrySources(t *testing.T) {
 						resource.TestCheckResourceAttr(resourceName, "capture_metadata", "true"),
 					}...),
 				},
-				// Supply gateway_route_id
+				// Supply shared_source_id
 				{
 					Config: GetProviderConfig() + configGateway,
 					Check: resource.ComposeTestCheckFunc([]resource.TestCheckFunc{
 						resource.TestCheckResourceAttrPair(
 							resourceNameGateway,
-							"gateway_route_id",
+							"shared_source_id",
 							resourceName,
-							"gateway_route_id",
+							"shared_source_id",
 						),
 					}...),
 				},
-				// Updating gateway_route_id is not allowed
+				// Updating shared_source_id is not allowed
 				{
 					Config:      GetProviderConfig() + configGatewayUpdateErr,
 					ExpectError: regexp.MustCompile("This field is immutable after resource creation."),

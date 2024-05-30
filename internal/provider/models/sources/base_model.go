@@ -48,10 +48,10 @@ var addSchemas = map[string]schema.Attribute{
 		Description: "Enable the inclusion of all http headers and query string parameters " +
 			"that were sent from the source",
 	},
-	"gateway_route_id": schema.StringAttribute{
+	"shared_source_id": schema.StringAttribute{
 		Computed: true,
 		Optional: true,
-		Description: "The uuid of a pre-existing source to be used as the input for this " +
+		Description: "The uuid of a pipeline source or shared source to be used as the input for this " +
 			"component. This can only be provided on resource creation (not update).",
 	},
 }
