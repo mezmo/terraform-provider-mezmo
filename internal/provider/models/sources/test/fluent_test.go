@@ -46,7 +46,7 @@ func TestFluentSource(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_fluent_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 					resource.TestMatchResourceAttr(
-						"mezmo_fluent_source.my_source", "gateway_route_id", regexp.MustCompile(`[\w-]{36}`)),
+						"mezmo_fluent_source.my_source", "shared_source_id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_fluent_source.my_source", map[string]any{
 						"description":      "my description",
 						"title":            "my title",
@@ -93,7 +93,7 @@ func TestFluentSource(t *testing.T) {
 				),
 			},
 
-			// Supply gateway_route_id
+			// Supply shared_source_id
 			{
 				Config: SetCachedConfig(cacheKey, `
 					resource "mezmo_pipeline" "test_parent" {
@@ -107,47 +107,47 @@ func TestFluentSource(t *testing.T) {
 					resource "mezmo_fluent_source" "shared_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "A shared source"
-						description = "This source provides gateway_route_id"
-						gateway_route_id = mezmo_fluent_source.parent_source.gateway_route_id
+						description = "This source provides shared_source_id"
+						shared_source_id = mezmo_fluent_source.parent_source.shared_source_id
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_fluent_source.shared_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_fluent_source.shared_source", map[string]any{
-						"description":      "This source provides gateway_route_id",
+						"description":      "This source provides shared_source_id",
 						"title":            "A shared source",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 						"generation_id":    "0",
 						"decoding":         "json",
 						"capture_metadata": "false",
-						"gateway_route_id": "#mezmo_fluent_source.parent_source.gateway_route_id",
+						"shared_source_id": "#mezmo_fluent_source.parent_source.shared_source_id",
 					}),
 				),
 			},
 
-			// Updating gateway_route_id is not allowed
+			// Updating shared_source_id is not allowed
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_fluent_source" "shared_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
-						gateway_route_id = mezmo_pipeline.test_parent.id
+						shared_source_id = mezmo_pipeline.test_parent.id
 					}`,
 				ExpectError: regexp.MustCompile("This field is immutable after resource creation."),
 			},
 
-			// gateway_route_id can be specified if it's the same value
+			// shared_source_id can be specified if it's the same value
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_fluent_source" "shared_source" {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "Updated title"
-						gateway_route_id = mezmo_fluent_source.parent_source.gateway_route_id
+						shared_source_id = mezmo_fluent_source.parent_source.shared_source_id
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_fluent_source.shared_source", map[string]any{
 						"title":            "Updated title",
 						"generation_id":    "1",
-						"gateway_route_id": "#mezmo_fluent_source.parent_source.gateway_route_id",
+						"shared_source_id": "#mezmo_fluent_source.parent_source.shared_source_id",
 					}),
 				),
 			},

@@ -24,7 +24,7 @@ Receive Kinesis Firehose data
 - `capture_metadata` (Boolean) Enable the inclusion of all http headers and query string parameters that were sent from the source
 - `decoding` (String) This specifies what the data format will be after it is base64 decoded. If it is JSON, it will be automatically parsed.
 - `description` (String) A user-defined value describing the source component
-- `gateway_route_id` (String) The uuid of a pre-existing source to be used as the input for this component. This can only be provided on resource creation (not update).
+- `shared_source_id` (String) The uuid of a pipeline source or shared source to be used as the input for this component. This can only be provided on resource creation (not update).
 - `title` (String) A user-defined title for the source component
 
 ### Read-Only

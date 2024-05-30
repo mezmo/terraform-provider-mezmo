@@ -35,7 +35,7 @@ type Alert struct {
 
 type Source struct {
 	BaseNode
-	GatewayRouteId string `json:"gateway_route_id,omitempty"`
+	SharedSourceId string `json:"gateway_route_id,omitempty"`
 }
 
 type Processor struct {
@@ -53,7 +53,7 @@ type Destination struct {
 type AccessKey struct {
 	Id             string `json:"id"`
 	Title          string `json:"title"`
-	GatewayRouteId string `json:"gateway_route_id"`
+	SharedSourceId string `json:"gateway_route_id"`
 	Type           string `json:"type"`
 	Key            string `json:"key,omitempty"`
 }

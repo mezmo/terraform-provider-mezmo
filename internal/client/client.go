@@ -412,7 +412,7 @@ func (c *client) DeleteAlert(pipelineId string, alert *Alert) error {
 
 // POST Access Key
 func (c *client) CreateAccessKey(accessKey *AccessKey) (*AccessKey, error) {
-	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key", c.endpoint, accessKey.GatewayRouteId)
+	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key", c.endpoint, accessKey.SharedSourceId)
 	reqBody, err := json.Marshal(accessKey)
 	if err != nil {
 		return nil, err
@@ -431,7 +431,7 @@ func (c *client) CreateAccessKey(accessKey *AccessKey) (*AccessKey, error) {
 
 // DELETE access key
 func (c *client) DeleteAccessKey(accessKey *AccessKey) error {
-	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key/%s", c.endpoint, accessKey.GatewayRouteId, accessKey.Id)
+	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key/%s", c.endpoint, accessKey.SharedSourceId, accessKey.Id)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	return readBody(c.httpClient.Do(req))
 }

@@ -22,7 +22,7 @@ type KinesisFirehoseSourceModel struct {
 	Title           String `tfsdk:"title"`
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
-	GatewayRouteId  String `tfsdk:"gateway_route_id"`
+	SharedSourceId  String `tfsdk:"shared_source_id"`
 	Decoding        String `tfsdk:"decoding" user_config:"true"`
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
@@ -40,7 +40,7 @@ var KinesisFirehoseSourceResourceSchema = schema.Schema{
 				stringvalidator.OneOf("text", "json"),
 			},
 		},
-	}, []string{"capture_metadata", "gateway_route_id"}),
+	}, []string{"capture_metadata", "shared_source_id"}),
 }
 
 func KinesisFirehoseSourceFromModel(plan *KinesisFirehoseSourceModel, previousState *KinesisFirehoseSourceModel) (*Source, diag.Diagnostics) {
@@ -58,17 +58,17 @@ func KinesisFirehoseSourceFromModel(plan *KinesisFirehoseSourceModel, previousSt
 	}
 
 	if previousState == nil {
-		if !plan.GatewayRouteId.IsUnknown() {
-			component.GatewayRouteId = plan.GatewayRouteId.ValueString()
+		if !plan.SharedSourceId.IsUnknown() {
+			component.SharedSourceId = plan.SharedSourceId.ValueString()
 		}
 	} else {
 		component.Id = previousState.Id.ValueString()
 		component.GenerationId = previousState.GenerationId.ValueInt64()
 
-		if !plan.GatewayRouteId.IsUnknown() && plan.GatewayRouteId.ValueString() != previousState.GatewayRouteId.ValueString() {
+		if !plan.SharedSourceId.IsUnknown() && plan.SharedSourceId.ValueString() != previousState.SharedSourceId.ValueString() {
 			details := fmt.Sprintf(
-				"Cannot update \"gateway_route_id\" to %s. This field is immutable after resource creation.",
-				plan.GatewayRouteId,
+				"Cannot update \"shared_source_id\" to %s. This field is immutable after resource creation.",
+				plan.SharedSourceId,
 			)
 			dd.AddError("Error in plan", details)
 			return nil, dd
@@ -89,5 +89,5 @@ func KinesisFirehoseSourceToModel(plan *KinesisFirehoseSourceModel, component *S
 	plan.Decoding = StringValue(component.UserConfig["format"].(string))
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
-	plan.GatewayRouteId = StringValue(component.GatewayRouteId)
+	plan.SharedSourceId = StringValue(component.SharedSourceId)
 }

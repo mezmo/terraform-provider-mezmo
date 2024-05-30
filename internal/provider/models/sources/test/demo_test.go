@@ -63,7 +63,7 @@ func TestDemoSourceResource(t *testing.T) {
 						"title":            "my source title",
 						"format":           "json",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
-						"gateway_route_id": nil,
+						"shared_source_id": nil,
 					}),
 					resource.TestCheckResourceAttrSet("mezmo_demo_source.my_source", "generation_id"),
 				),

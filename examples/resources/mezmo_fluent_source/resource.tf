@@ -32,5 +32,5 @@ resource "mezmo_fluent_source" "webhook" {
   pipeline_id      = mezmo_pipeline.pipeline1.id
   title            = "A shared source"
   description      = "This Fluent source uses the webhook data"
-  gateway_route_id = mezmo_http_source.webhook.gateway_route_id
+  shared_source_id = mezmo_http_source.webhook.shared_source_id
 }

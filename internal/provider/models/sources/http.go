@@ -21,7 +21,7 @@ type HttpSourceModel struct {
 	Title           String `tfsdk:"title"`
 	Description     String `tfsdk:"description"`
 	GenerationId    Int64  `tfsdk:"generation_id"`
-	GatewayRouteId  String `tfsdk:"gateway_route_id"`
+	SharedSourceId  String `tfsdk:"shared_source_id"`
 	Decoding        String `tfsdk:"decoding" user_config:"true"`
 	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
 }
@@ -39,7 +39,7 @@ var HttpSourceResourceSchema = schema.Schema{
 				stringvalidator.OneOf("bytes", "json", "ndjson", "auto"),
 			},
 		},
-	}, []string{"capture_metadata", "gateway_route_id"}),
+	}, []string{"capture_metadata", "shared_source_id"}),
 }
 
 func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) (*Source, diag.Diagnostics) {
@@ -58,20 +58,20 @@ func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) 
 	}
 
 	if previousState == nil {
-		if !plan.GatewayRouteId.IsUnknown() {
+		if !plan.SharedSourceId.IsUnknown() {
 			// Let them specify gateway route id on POST only
-			component.GatewayRouteId = plan.GatewayRouteId.ValueString()
+			component.SharedSourceId = plan.SharedSourceId.ValueString()
 		}
 	} else {
 		// Set generated fields
 		component.Id = previousState.Id.ValueString()
 		component.GenerationId = previousState.GenerationId.ValueInt64()
 
-		// If they have specified gateway_route_id, then it *cannot* be a different value that what's in state
-		if !plan.GatewayRouteId.IsUnknown() && plan.GatewayRouteId.ValueString() != previousState.GatewayRouteId.ValueString() {
+		// If they have specified shared_source_id, then it *cannot* be a different value that what's in state
+		if !plan.SharedSourceId.IsUnknown() && plan.SharedSourceId.ValueString() != previousState.SharedSourceId.ValueString() {
 			details := fmt.Sprintf(
-				"Cannot update \"gateway_route_id\" to %s. This field is immutable after resource creation.",
-				plan.GatewayRouteId,
+				"Cannot update \"shared_source_id\" to %s. This field is immutable after resource creation.",
+				plan.SharedSourceId,
 			)
 			dd.AddError("Error in plan", details)
 			return nil, dd
@@ -92,5 +92,5 @@ func HttpSourceToModel(plan *HttpSourceModel, component *Source) {
 	plan.Decoding = StringValue(component.UserConfig["decoding"].(string))
 	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	plan.GenerationId = Int64Value(component.GenerationId)
-	plan.GatewayRouteId = StringValue(component.GatewayRouteId)
+	plan.SharedSourceId = StringValue(component.SharedSourceId)
 }

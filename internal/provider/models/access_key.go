@@ -58,7 +58,7 @@ func AccessKeyResourceSchema() schema.Schema {
 func AccessKeyFromModel(plan *AccessKeyResourceModel) *AccessKey {
 	accessKey := AccessKey{
 		Title:          plan.Title.ValueString(),
-		GatewayRouteId: plan.SourceId.ValueString(),
+		SharedSourceId: plan.SourceId.ValueString(),
 		Type:           AccessKeyType,
 	}
 	if !plan.Id.IsUnknown() {
@@ -72,6 +72,6 @@ func AccessKeyFromModel(plan *AccessKeyResourceModel) *AccessKey {
 func AccessKeyToModel(plan *AccessKeyResourceModel, accessKey *AccessKey) {
 	plan.Id = NewStringValue(accessKey.Id)
 	plan.Title = NewStringValue(accessKey.Title)
-	plan.SourceId = NewStringValue(accessKey.GatewayRouteId)
+	plan.SourceId = NewStringValue(accessKey.SharedSourceId)
 	plan.Key = NewStringValue(accessKey.Key)
 }

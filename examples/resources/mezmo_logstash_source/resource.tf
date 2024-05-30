@@ -33,5 +33,5 @@ resource "mezmo_logstash_source" "shared_source" {
   pipeline_id      = mezmo_pipeline.pipeline1.id
   title            = "Logstash from HTTP"
   description      = "This source uses the same data from the HTTP source (in Logstash format)"
-  gateway_route_id = mezmo_http_source.webhook.gateway_route_id
+  shared_source_id = mezmo_http_source.webhook.shared_source_id
 }

@@ -27,5 +27,5 @@ resource "mezmo_http_source" "shared_source" {
   title            = "A shared HTTP source"
   description      = "This source uses the same data as source1"
   decoding         = "json"
-  gateway_route_id = mezmo_http_source.source1.gateway_route_id
+  shared_source_id = mezmo_http_source.source1.shared_source_id
 }
