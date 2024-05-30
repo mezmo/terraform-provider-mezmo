@@ -77,6 +77,8 @@ func (c *client) CreatePipeline(pipeline *Pipeline) (*Pipeline, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	created := &envelope.Data
 	return created, nil
 }
@@ -97,6 +99,8 @@ func (c *client) Pipeline(id string) (*Pipeline, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	pipeline := &envelope.Data
 	return pipeline, nil
 }
@@ -114,6 +118,8 @@ func (c *client) UpdatePipeline(pipeline *Pipeline) (*Pipeline, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	updated := &envelope.Data
 	return updated, nil
 }
@@ -126,6 +132,7 @@ func readBody(resp *http.Response, err error) error {
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
 		return newAPIError(resp)
 	}
+	defer resp.Body.Close()
 
 	return err
 }
@@ -176,6 +183,8 @@ func (c *client) CreateSource(pipelineId string, component *Source) (*Source, er
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	source := &envelope.Data
 	return source, nil
 }
@@ -196,6 +205,8 @@ func (c *client) Source(pipelineId string, id string) (*Source, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	source := &envelope.Data
 	return source, nil
 }
@@ -213,6 +224,8 @@ func (c *client) UpdateSource(pipelineId string, component *Source) (*Source, er
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	source := &envelope.Data
 	return source, nil
 }
@@ -226,6 +239,8 @@ func (c *client) Destination(pipelineId string, id string) (*Destination, error)
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	destination := &envelope.Data
 	return destination, nil
 }
@@ -243,6 +258,8 @@ func (c *client) CreateDestination(pipelineId string, component *Destination) (*
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	destination := &envelope.Data
 	return destination, nil
 }
@@ -267,6 +284,8 @@ func (c *client) UpdateDestination(pipelineId string, component *Destination) (*
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	destination := &envelope.Data
 	return destination, nil
 }
@@ -280,6 +299,8 @@ func (c *client) Processor(pipelineId string, id string) (*Processor, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	processor := &envelope.Data
 	return processor, nil
 }
@@ -297,6 +318,8 @@ func (c *client) CreateProcessor(pipelineId string, component *Processor) (*Proc
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	processor := &envelope.Data
 	return processor, nil
 }
@@ -321,6 +344,8 @@ func (c *client) UpdateProcessor(pipelineId string, component *Processor) (*Proc
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	processor := &envelope.Data
 	return processor, nil
 }
@@ -334,6 +359,8 @@ func (c *client) Alert(pipelineId string, id string) (*Alert, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	alert := &envelope.Data
 	return alert, nil
 }
@@ -351,6 +378,8 @@ func (c *client) CreateAlert(pipelineId string, alert *Alert) (*Alert, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	createdAlert := &envelope.Data
 	return createdAlert, nil
 }
@@ -368,6 +397,8 @@ func (c *client) UpdateAlert(pipelineId string, alert *Alert) (*Alert, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	updatedAlert := &envelope.Data
 	return updatedAlert, nil
 }
@@ -392,6 +423,8 @@ func (c *client) CreateAccessKey(accessKey *AccessKey) (*AccessKey, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	createdAccessKey := &envelope.Data
 	return createdAccessKey, nil
 }
@@ -416,6 +449,8 @@ func (c *client) CreateSharedSource(source *SharedSource) (*SharedSource, error)
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	createdSharedSource := &envelope.Data
 	return createdSharedSource, nil
 }
@@ -429,6 +464,8 @@ func (c *client) SharedSource(id string) (*SharedSource, error) {
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	source := &envelope.Data
 	return source, nil
 }
@@ -446,6 +483,8 @@ func (c *client) UpdateSharedSource(source *SharedSource) (*SharedSource, error)
 	if err := readJson(&envelope, resp, err); err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
+
 	updatedSharedSource := &envelope.Data
 	return updatedSharedSource, nil
 }
