@@ -157,11 +157,13 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 		Default: stringdefault.StaticString("INFO"),
 	},
 	"style": schema.StringAttribute{
-		Optional:    true,
-		Computed:    true,
-		Description: "Configuration for how the alert message will be constructed.",
+		Optional: true,
+		Computed: true,
+		Description: "Configuration for how the alert message will be constructed. For " +
+			"`static`, exact strings will be used. For `template`, the alert subjec and body " +
+			"will allow for placeholders to substitute values from the event.",
 		Validators: []validator.String{
-			stringvalidator.OneOf("static"),
+			stringvalidator.OneOf("static", "template"),
 		},
 		Default: stringdefault.StaticString("static"),
 	},
@@ -171,7 +173,9 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 			stringvalidator.LengthAtLeast(1),
 			stringvalidator.LengthAtMost(200),
 		},
-		Description: "The subject line to use when the alert is sent.", // TODO: Add details about templates when added
+		MarkdownDescription: "The subject line to use when the alert is sent. For a `template` style, " +
+			"surround the field path in double curly braces.\n" +
+			"```\n" + `{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}` + "\n```",
 	},
 	"body": schema.StringAttribute{
 		Required: true,
@@ -179,7 +183,9 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 			stringvalidator.LengthAtLeast(1),
 			stringvalidator.LengthAtMost(1024),
 		},
-		Description: "The message body to use when the alert is sent.", // TODO: Add details about templates when added
+		Description: "The message body to use when the alert is sent. For a `template` style, " +
+			"surround the field path in double curly braces.\n" +
+			"```\n" + `{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}` + "\n```",
 	},
 	"ingestion_key": schema.StringAttribute{
 		Required: true,

@@ -74,7 +74,10 @@ resource "mezmo_threshold_alert" "order_count" {
 
 ### Required
 
-- `body` (String) The message body to use when the alert is sent.
+- `body` (String) The message body to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
+```
+{{.my_field}} had a count of {{metadata.aggregate.event_count}}
+```
 - `component_id` (String) The uuid of the component that the alert is attached to
 - `component_kind` (String) The kind of component that the alert is attached to
 - `conditional` (Attributes) A group of expressions (optionally nested) joined by a logical operator (see [below for nested schema](#nestedatt--conditional))
@@ -84,7 +87,10 @@ resource "mezmo_threshold_alert" "order_count" {
 - `name` (String) The name of the alert.
 - `operation` (String) Specifies the type of aggregation operation to use with the window type and duration. This value must be `custom` for a Log event type.
 - `pipeline_id` (String) The uuid of the pipeline
-- `subject` (String) The subject line to use when the alert is sent.
+- `subject` (String) The subject line to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
+```
+{{.my_field}} had a count of {{metadata.aggregate.event_count}}
+```
 
 ### Optional
 
@@ -94,7 +100,7 @@ resource "mezmo_threshold_alert" "order_count" {
 - `group_by` (List of String) When aggregating, group events based on matching values from each of these field paths. Supports nesting via dot-notation. This value is optional for Metric event types, and SHOULD be used for Log event types.
 - `script` (String) A custom JavaScript function that will control the aggregation. At the time of flushing, this aggregation will become the emitted event. This script is required when choosing a `custom` operation.
 - `severity` (String) The severity level of the alert.
-- `style` (String) Configuration for how the alert message will be constructed.
+- `style` (String) Configuration for how the alert message will be constructed. For `static`, exact strings will be used. For `template`, the alert subjec and body will allow for placeholders to substitute values from the event.
 - `window_duration_minutes` (Number) The duration of the aggregation window in minutes.
 - `window_type` (String) Sliding windows can overlap, whereas tumbling windows are disjoint. For example, a tumbling window has a fixed time span and any events that fall within the "window duration" will be used in the aggregate. In a sliding window, the aggregation occurs every "window duration" seconds after an event is encountered.
 
