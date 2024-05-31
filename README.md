@@ -11,44 +11,45 @@ You can download this repo to create your own local provider or you can use the 
 - [Go](https://golang.org/doc/install) >= 1.20
 
 ## Building the Provider Locally
-
+Building the provider will build the provider binary in the project root. It's not very useful in most
+cases, so see the instructions in [Running the Provider Locally](#running-the-provider-locally).
 ```shell
 go build ./...
 ```
 
-## Generating the Docs
+## Running the Provider Locally
 
-To generate or update documentation, run `go generate`.
+To build and install the provider locally, run `go install .`. This will build the provider and put the provider
+binary in the `$GOPATH/bin` directory. You will reference this location in the next step.
 
-## Using the Provider
+### Adding the Provider Override
 
-To install the provider in development, run `go install .`. This will build the provider and put the provider
-binary in the `$GOPATH/bin` directory.
-
-## Adding the Provider override
-
-If you want to use the local provider, you need to reference it by placing a file in your home folder under `~/.terraformrc` as follows:
+If you want to use the local provider, you need to reference it by placing a file in your `$HOME` directory called `.terraformrc`.
+This setting tells terraform to override the remote registry where the provider is usually downloaded from in favor of a local directory.
+The value of this setting should be your `$GOPATH`, which is where the installed binary gets placed.
+This value is usually `$HOME/go/bin`.
 ```
 provider_installation {
-
   dev_overrides {
       "registry.terraform.io/mezmo/mezmo" = "/Users/<YOUR USERNAME>/go/bin"
   }
-
-  # For all other providers, install them directly from their origin provider
-  # registries as normal. If you omit this, Terraform will _only_ use
-  # the dev_overrides block, and so no other providers will be available.
-  direct {}
 }
 ```
 
-Then, you can `plan` or `apply` a terraform files:
+Then, you can `plan` or `apply` a terraform files. This example assumes that there are `.tf`
+files in `my-terraform-test` ready to be used.
 
 ```bash
-pushd examples/pipeline
+cd my-terraform-test
+terraform init
 terraform plan
-popd
+terraform apply
 ```
+
+## Generating the Docs
+
+When schemas are changed (descriptions, types) during development, the documentation for the components must be re-generated.
+To do this, run `go generate` to make sure all changes are documented.
 
 ## Testing
 

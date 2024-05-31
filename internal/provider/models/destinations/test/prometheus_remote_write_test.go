@@ -140,6 +140,7 @@ func TestPrometheusDestinationResource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_http_source.my_source.id]
 						endpoint = "https://google.com"
+						ack_enabled = false
 						auth = {
 							strategy = "basic"
 							user = "my_user"
@@ -156,7 +157,7 @@ func TestPrometheusDestinationResource(t *testing.T) {
 						"title":         "My destination",
 						"description":   "my destination description",
 						"generation_id": "1",
-						"ack_enabled":   "true",
+						"ack_enabled":   "false",
 						"inputs.#":      "1",
 						"inputs.0":      "#mezmo_http_source.my_source.id",
 						"endpoint":      "https://google.com",

@@ -92,6 +92,10 @@ func PrometheusRemoteWriteDestinationFromModel(plan *PrometheusRemoteWriteDestin
 		},
 	}
 
+	if !plan.AckEnabled.IsUnknown() {
+		component.UserConfig["ack_enabled"] = plan.AckEnabled.ValueBool()
+	}
+
 	if !plan.Auth.IsNull() {
 		auth := MapValuesToMapAny(plan.Auth, &dd)
 		component.UserConfig["auth"] = auth
