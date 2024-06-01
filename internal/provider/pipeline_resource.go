@@ -89,7 +89,7 @@ func (r *PipelineResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	pipeline := PipelineFromModel(&plan)
-	stored, err := r.client.CreatePipeline(pipeline)
+	stored, err := r.client.CreatePipeline(pipeline, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating pipeline",
@@ -113,7 +113,7 @@ func (r *PipelineResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 
 	// Delete existing order
-	err := r.client.DeletePipeline(state.Id.ValueString())
+	err := r.client.DeletePipeline(state.Id.ValueString(), ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting Pipeline",
@@ -136,7 +136,7 @@ func (r *PipelineResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	pipeline, err := r.client.Pipeline(state.Id.ValueString())
+	pipeline, err := r.client.Pipeline(state.Id.ValueString(), ctx)
 	// force re-creation of manually deleted resources
 	if client.IsNotFoundError(err) {
 		resp.State.RemoveResource(ctx)
@@ -151,6 +151,7 @@ func (r *PipelineResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	PipelineToModel(&state, pipeline)
+	resp.State.Set(ctx, state)
 }
 
 // Schema implements resource.Resource.
@@ -173,7 +174,7 @@ func (r *PipelineResource) Update(ctx context.Context, req resource.UpdateReques
 	pipeline := PipelineFromModel(&plan)
 	// Set id from the current state (not in plan)
 	pipeline.Id = state.Id.ValueString()
-	stored, err := r.client.UpdatePipeline(pipeline)
+	stored, err := r.client.UpdatePipeline(pipeline, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating Pipeline",

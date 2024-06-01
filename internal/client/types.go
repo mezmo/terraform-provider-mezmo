@@ -9,6 +9,7 @@ type Pipeline struct {
 	Id        string     `json:"id,omitempty"`
 	Title     string     `json:"title"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 // Represents a source, processor or destination.
@@ -63,4 +64,9 @@ type SharedSource struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Type        string `json:"type"`
+}
+
+type PublishPipeline struct {
+	PipelineId string     `json:"id"`
+	UpdatedAt  *time.Time `json:"updated_at"`
 }

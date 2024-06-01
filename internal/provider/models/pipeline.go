@@ -12,6 +12,7 @@ type PipelineResourceModel struct {
 	Id        String `tfsdk:"id"`
 	Title     String `tfsdk:"title"`
 	CreatedAt String `tfsdk:"created_at"`
+	UpdatedAt String `tfsdk:"updated_at"`
 }
 
 func PipelineResourceSchema() schema.Schema {
@@ -24,6 +25,9 @@ func PipelineResourceSchema() schema.Schema {
 				Required: true,
 			},
 			"created_at": schema.StringAttribute{
+				Computed: true,
+			},
+			"updated_at": schema.StringAttribute{
 				Computed: true,
 			},
 		},
@@ -45,6 +49,11 @@ func PipelineToModel(plan *PipelineResourceModel, pipeline *Pipeline) {
 	plan.Id = StringValue(pipeline.Id)
 	plan.Title = StringValue(pipeline.Title)
 	if pipeline.CreatedAt != nil {
-		plan.CreatedAt = StringValue(pipeline.CreatedAt.Format(time.RFC3339))
+		plan.CreatedAt = StringValue(pipeline.CreatedAt.Format(time.RFC3339Nano))
+	}
+	if pipeline.UpdatedAt != nil {
+		plan.UpdatedAt = StringValue(pipeline.UpdatedAt.Format(time.RFC3339Nano))
+	} else {
+		plan.UpdatedAt = StringValue(pipeline.CreatedAt.Format(time.RFC3339Nano))
 	}
 }

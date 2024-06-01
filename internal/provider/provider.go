@@ -169,6 +169,9 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 
 		// Shared Sources
 		NewSharedSourceResource,
+
+		// Publishing
+		NewPublishPipelineResource,
 	}
 }
 

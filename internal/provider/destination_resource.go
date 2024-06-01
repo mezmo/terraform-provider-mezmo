@@ -114,10 +114,10 @@ func (r *DestinationResource[T]) Create(ctx context.Context, req resource.Create
 	}
 
 	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		PrintJSON("----- Destination TO Create api ---", component)
+		fmt.Println(Json("----- Destination TO Create api ---", component))
 	}
 
-	stored, err := r.client.CreateDestination(r.getPipelineIdFunc(&plan).ValueString(), component)
+	stored, err := r.client.CreateDestination(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating destination",
@@ -127,7 +127,7 @@ func (r *DestinationResource[T]) Create(ctx context.Context, req resource.Create
 	}
 
 	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		PrintJSON("----- Destination FROM Create api ---", stored)
+		fmt.Println(Json("----- Destination FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -147,7 +147,7 @@ func (r *DestinationResource[T]) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete existing order
-	err := r.client.DeleteDestination(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	err := r.client.DeleteDestination(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString(), ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error deleting destination",
@@ -170,7 +170,7 @@ func (r *DestinationResource[T]) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
-	component, err := r.client.Destination(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	component, err := r.client.Destination(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString(), ctx)
 	// force re-creation of manually deleted resources
 	if client.IsNotFoundError(err) {
 		resp.State.RemoveResource(ctx)
@@ -210,11 +210,11 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 	}
 
 	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		PrintJSON("----- Destination TO Update api ---", component)
+		fmt.Println(Json("----- Destination TO Update api ---", component))
 	}
 
 	// Set id from the current state (not in plan)
-	stored, err := r.client.UpdateDestination(r.getPipelineIdFunc(&state).ValueString(), component)
+	stored, err := r.client.UpdateDestination(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error updating destination",
@@ -224,7 +224,7 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 	}
 
 	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		PrintJSON("----- Destination FROM Update api ---", stored)
+		fmt.Println(Json("----- Destination FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)

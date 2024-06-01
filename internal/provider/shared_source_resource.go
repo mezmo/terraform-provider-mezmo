@@ -99,12 +99,12 @@ func (r *SharedSourceResource) Create(ctx context.Context, req resource.CreateRe
 	source := SharedSourceFromModel(&plan)
 
 	if os.Getenv("DEBUG_SHARED_SOURCE") == "1" {
-		PrintJSON("----- Shared Source TO Create api ---", source)
+		fmt.Println(Json("----- Shared Source TO Create api ---", source))
 	}
-	stored, err := r.client.CreateSharedSource(source)
+	stored, err := r.client.CreateSharedSource(source, ctx)
 
 	if os.Getenv("DEBUG_SHARED_SOURCE") == "1" {
-		PrintJSON("----- Shared Source FROM Create api ---", stored)
+		fmt.Println(Json("----- Shared Source FROM Create api ---", stored))
 	}
 
 	if err != nil {
@@ -127,7 +127,7 @@ func (r *SharedSourceResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	source, err := r.client.SharedSource(state.Id.ValueString())
+	source, err := r.client.SharedSource(state.Id.ValueString(), ctx)
 	// force re-creation of manually deleted resources
 	if client.IsNotFoundError(err) {
 		resp.State.RemoveResource(ctx)
@@ -160,13 +160,13 @@ func (r *SharedSourceResource) Update(ctx context.Context, req resource.UpdateRe
 	source.Id = state.Id.ValueString()
 
 	if os.Getenv("DEBUG_SHARED_SOURCE") == "1" {
-		PrintJSON("----- Shared Source TO Update api ---", source)
+		fmt.Println(Json("----- Shared Source TO Update api ---", source))
 	}
 
-	stored, err := r.client.UpdateSharedSource(source)
+	stored, err := r.client.UpdateSharedSource(source, ctx)
 
 	if os.Getenv("DEBUG_SHARED_SOURCE") == "1" {
-		PrintJSON("----- Shared Source FROM Update api ---", stored)
+		fmt.Println(Json("----- Shared Source FROM Update api ---", stored))
 	}
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -190,7 +190,7 @@ func (r *SharedSourceResource) Delete(ctx context.Context, req resource.DeleteRe
 
 	source := SharedSourceFromModel(&state)
 
-	err := r.client.DeleteSharedSource(source)
+	err := r.client.DeleteSharedSource(source, ctx)
 	if client.IsNotFoundError(err) {
 		// If not found, just ignore and let TF clean up state on its own
 		return

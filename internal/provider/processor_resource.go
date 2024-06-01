@@ -118,10 +118,10 @@ func (r *ProcessorResource[T]) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		PrintJSON("----- Processor TO Create api ---", component)
+		fmt.Println(Json("----- Processor TO Create api ---", component))
 	}
 
-	stored, err := r.client.CreateProcessor(r.getPipelineIdFunc(&plan).ValueString(), component)
+	stored, err := r.client.CreateProcessor(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating processor",
@@ -131,7 +131,7 @@ func (r *ProcessorResource[T]) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		PrintJSON("----- Processor FROM Create api ---", stored)
+		fmt.Println(Json("----- Processor FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -151,7 +151,7 @@ func (r *ProcessorResource[T]) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete existing order
-	err := r.client.DeleteProcessor(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	err := r.client.DeleteProcessor(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString(), ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error deleting processor",
@@ -174,7 +174,7 @@ func (r *ProcessorResource[T]) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	component, err := r.client.Processor(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	component, err := r.client.Processor(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString(), ctx)
 	// force re-creation of manually deleted resources
 	if client.IsNotFoundError(err) {
 		resp.State.RemoveResource(ctx)
@@ -214,10 +214,10 @@ func (r *ProcessorResource[T]) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		PrintJSON("----- Processor TO Update api ---", component)
+		fmt.Println(Json("----- Processor TO Update api ---", component))
 	}
 
-	stored, err := r.client.UpdateProcessor(r.getPipelineIdFunc(&state).ValueString(), component)
+	stored, err := r.client.UpdateProcessor(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error updating processor",
@@ -227,7 +227,7 @@ func (r *ProcessorResource[T]) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		PrintJSON("----- Processor FROM Update api ---", stored)
+		fmt.Println(Json("----- Processor FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
