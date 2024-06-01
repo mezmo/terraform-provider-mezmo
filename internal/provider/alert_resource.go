@@ -100,10 +100,10 @@ func (r *AlertResource[T]) Create(ctx context.Context, req resource.CreateReques
 
 	if os.Getenv("DEBUG_ALERT") == "1" {
 		fmt.Printf("----- Plan ----- %+v\n", plan)
-		PrintJSON("----- Alert TO Create api ---", component)
+		fmt.Println(Json("----- Alert TO Create api ---", component))
 	}
 
-	stored, err := r.client.CreateAlert(r.getPipelineIdFunc(&plan).ValueString(), component)
+	stored, err := r.client.CreateAlert(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating alert",
@@ -113,7 +113,7 @@ func (r *AlertResource[T]) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	if os.Getenv("DEBUG_ALERT") == "1" {
-		PrintJSON("----- Alert FROM Create api ---", stored)
+		fmt.Println(Json("----- Alert FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -144,7 +144,7 @@ func (r *AlertResource[T]) Delete(ctx context.Context, req resource.DeleteReques
 		fmt.Printf("----- Delete Alert ----- %+v\n", alert)
 	}
 
-	err := r.client.DeleteAlert(r.getPipelineIdFunc(&state).ValueString(), alert)
+	err := r.client.DeleteAlert(r.getPipelineIdFunc(&state).ValueString(), alert, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting Alert",
@@ -167,7 +167,7 @@ func (r *AlertResource[T]) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	component, err := r.client.Alert(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	component, err := r.client.Alert(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString(), ctx)
 	// force re-creation of manually deleted resources
 	if client.IsNotFoundError(err) {
 		resp.State.RemoveResource(ctx)
@@ -208,10 +208,10 @@ func (r *AlertResource[T]) Update(ctx context.Context, req resource.UpdateReques
 
 	if os.Getenv("DEBUG_ALERT") == "1" {
 		fmt.Printf("----- Plan ----- %+v\n", plan)
-		PrintJSON("----- Alert TO Update api ---", component)
+		fmt.Println(Json("----- Alert TO Update api ---", component))
 	}
 
-	stored, err := r.client.UpdateAlert(r.getPipelineIdFunc(&state).ValueString(), component)
+	stored, err := r.client.UpdateAlert(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating Alert",
@@ -221,7 +221,7 @@ func (r *AlertResource[T]) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	if os.Getenv("DEBUG_ALERT") == "1" {
-		PrintJSON("----- Alert FROM Update api ---", stored)
+		fmt.Println(Json("----- Alert FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)

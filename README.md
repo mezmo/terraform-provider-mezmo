@@ -77,16 +77,23 @@ shell|bash> env $(cat env/local.env) #...rest of command
 fish> env (cat env/local.env) #...rest of command
 ```
 
-### ENV vars
+### ENV vars for Unit Tests
 Optional environment variables can be provided on the test command line to display
-additional debugging information.
+additional debugging information when writing tests. Note that `fmt.Println` does not
+work when running the provider directly, so these variables have no effect then. See
+[Trace Logging During Execution](#trace-logging-during-execution) for logging while using the provider.
 
 * `DEBUG_SOURCE=1` - Displays the API request/responses for sources
 * `DEBUG_PROCESSOR=1` - Displays the API request/responses for processors
 * `DEBUG_DESTINATION=1` - Displays the API request/responses for destinations
 * `DEBUG_ALERT=1` - Displays the API request/responses for alerts
-
 * `DEBUG_ATTRIBUTES=1` - Displays the loaded state attributes when using the `StateHasExpectedValues` assertion
+
+### Trace Logging During Execution
+
+When running the provider, the APIs and their results can be printed to the screen.
+For this, set `TF_LOG_PROVIDER=TRACE`, but be aware that it could print sensitive information.
+This should only be used when debugging provider execution locally!
 
 #### Examples
 * `-run` accepts a regex for the test name, and the path

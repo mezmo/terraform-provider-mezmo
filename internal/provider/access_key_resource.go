@@ -69,7 +69,7 @@ func (r *AccessKeyResource) Create(ctx context.Context, req resource.CreateReque
 	}
 	accessKey := AccessKeyFromModel(&plan)
 
-	stored, err := r.client.CreateAccessKey(accessKey)
+	stored, err := r.client.CreateAccessKey(accessKey, ctx)
 
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -93,7 +93,7 @@ func (r *AccessKeyResource) Delete(ctx context.Context, req resource.DeleteReque
 
 	accessKey := AccessKeyFromModel(&state)
 
-	err := r.client.DeleteAccessKey(accessKey)
+	err := r.client.DeleteAccessKey(accessKey, ctx)
 	if client.IsNotFoundError(err) {
 		// If the key wasn't found, just ignore and let TF clean up state on its own
 		return

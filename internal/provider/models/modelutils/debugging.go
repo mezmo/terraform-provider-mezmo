@@ -6,10 +6,10 @@ import (
 	"log"
 )
 
-func PrintJSON(label string, obj any) {
+func Json(label string, obj any) string {
 	json, err := json.MarshalIndent(obj, "", "  ")
 	if err != nil {
 		log.Fatalf(err.Error())
 	}
-	fmt.Println(label, string(json))
+	return fmt.Sprintf("%s %s", label, string(json))
 }

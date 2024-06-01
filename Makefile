@@ -54,16 +54,17 @@ set-test-example-target:
 .PHONY: build-test-example-binary
 build-test-example-binary: set-test-example-target build-snapshot-binary
 
-examples: $(wildcard examples/*/*/*.tf)
+examples: $(wildcard examples/*/*/)
 
-examples/%.tf: build-test-example-binary
-	@docker run \
+examples/%: build-test-example-binary
+	docker run \
 		-v $(PWD):/opt/app \
-		-v $(PWD)/$@:/opt/example/$(notdir $@) \
+		-v $(PWD)/$@:/opt/example/$@ \
 		-e TF_CLI_CONFIG_FILE=/opt/app/tf-dev-config \
-		-w /opt/example/ \
+		-w /opt/example/$(dir $@) \
+		--entrypoint "" \
 		hashicorp/terraform:latest \
-		validate -compact-warnings | \
+		/bin/sh -c "[ -d modules ] && terraform init ; terraform validate -compact-warnings" | \
 		awk '/Provider development overrides are in effect/ {next} {print}' ; \
 		exit $${PIPESTATUS[0]}
 

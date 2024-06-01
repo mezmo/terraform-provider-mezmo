@@ -116,10 +116,10 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	if os.Getenv("DEBUG_SOURCE") == "1" {
-		PrintJSON("----- Destination TO Create api ---", component)
+		fmt.Println(Json("----- Destination TO Create api ---", component))
 	}
 
-	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component)
+	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating source",
@@ -129,7 +129,7 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 	}
 
 	if os.Getenv("DEBUG_SOURCE") == "1" {
-		PrintJSON("----- Destination FROM Create api ---", stored)
+		fmt.Println(Json("----- Destination FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -149,7 +149,7 @@ func (r *SourceResource[T]) Delete(ctx context.Context, req resource.DeleteReque
 	}
 
 	// Delete existing order
-	err := r.client.DeleteSource(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	err := r.client.DeleteSource(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString(), ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting Source",
@@ -172,7 +172,7 @@ func (r *SourceResource[T]) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
-	component, err := r.client.Source(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString())
+	component, err := r.client.Source(r.getPipelineIdFunc(&state).ValueString(), r.getIdFunc(&state).ValueString(), ctx)
 	// force re-creation of manually deleted resources
 	if client.IsNotFoundError(err) {
 		resp.State.RemoveResource(ctx)
@@ -212,10 +212,10 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	if os.Getenv("DEBUG_SOURCE") == "1" {
-		PrintJSON("----- Destination TO Update api ---", component)
+		fmt.Println(Json("----- Destination TO Update api ---", component))
 	}
 
-	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component)
+	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating Source",
@@ -225,7 +225,7 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 	}
 
 	if os.Getenv("DEBUG_SOURCE") == "1" {
-		PrintJSON("----- Destination FROM Update api ---", stored)
+		fmt.Println(Json("----- Destination FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)

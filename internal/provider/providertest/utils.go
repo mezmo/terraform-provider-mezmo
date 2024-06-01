@@ -148,7 +148,7 @@ func StateHasExpectedValues(resourceName string, expected map[string]any) resour
 		attributes := resource.Primary.Attributes
 
 		if os.Getenv("DEBUG_ATTRIBUTES") == "1" {
-			modelutils.PrintJSON(fmt.Sprintf("------ %s STATE ATTRIBUTES ------", resourceName), attributes)
+			fmt.Println(modelutils.Json(fmt.Sprintf("------ %s STATE ATTRIBUTES ------", resourceName), attributes))
 		}
 
 		for expectedKey, expectedVal := range expected {
@@ -185,7 +185,7 @@ func StateDoesNotHaveFields(resourceName string, fields []string) resource.TestC
 		attributes := resource.Primary.Attributes
 
 		if os.Getenv("DEBUG_ATTRIBUTES") == "1" {
-			modelutils.PrintJSON(fmt.Sprintf("------ %s STATE ATTRIBUTES ------", resourceName), attributes)
+			fmt.Println(modelutils.Json(fmt.Sprintf("------ %s STATE ATTRIBUTES ------", resourceName), attributes))
 		}
 
 		for _, field := range fields {
