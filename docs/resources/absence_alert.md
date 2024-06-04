@@ -41,7 +41,6 @@ resource "mezmo_absence_alert" "no_data_alert" {
   inputs                  = [mezmo_prometheus_remote_write_source.metrics_source.id]
   name                    = "metrics absence alert"
   event_type              = "metric"
-  operation               = "sum"
   window_duration_minutes = 15
   subject                 = "No data received!"
   severity                = "WARNING"
@@ -65,7 +64,6 @@ resource "mezmo_absence_alert" "no_data_alert" {
 - `ingestion_key` (String) The key required to ingest the alert into Log Analysis
 - `inputs` (List of String) The ids of the input components. This could be the id of a match arm for a route processor, or simply the id of the component.
 - `name` (String) The name of the alert.
-- `operation` (String) Specifies the type of aggregation operation to use with the window type and duration. This value must be `custom` for a Log event type.
 - `pipeline_id` (String) The uuid of the pipeline
 - `subject` (String) The subject line to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
 ```
@@ -78,7 +76,6 @@ resource "mezmo_absence_alert" "no_data_alert" {
 - `description` (String) An optional description describing what the alert is for.
 - `event_timestamp` (String) The path to a field on the event that contains an epoch timestamp value. If an event does not have a timestamp field, events will be associated to the wall clock value when the event is processed. Required for Log event types and disallowed for Metric event types.
 - `group_by` (List of String) When aggregating, group events based on matching values from each of these field paths. Supports nesting via dot-notation. This value is optional for Metric event types, and SHOULD be used for Log event types.
-- `script` (String) A custom JavaScript function that will control the aggregation. At the time of flushing, this aggregation will become the emitted event. This script is required when choosing a `custom` operation.
 - `severity` (String) The severity level of the alert.
 - `style` (String) Configuration for how the alert message will be constructed. For `static`, exact strings will be used. For `template`, the alert subjec and body will allow for placeholders to substitute values from the event.
 - `window_duration_minutes` (Number) The duration of the aggregation window in minutes.

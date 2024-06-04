@@ -26,7 +26,6 @@ resource "mezmo_absence_alert" "no_data_alert" {
   inputs                  = [mezmo_prometheus_remote_write_source.metrics_source.id]
   name                    = "metrics absence alert"
   event_type              = "metric"
-  operation               = "sum"
   window_duration_minutes = 15
   subject                 = "No data received!"
   severity                = "WARNING"

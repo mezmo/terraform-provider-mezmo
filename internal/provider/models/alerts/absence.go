@@ -22,10 +22,8 @@ type AbsenceAlertModel struct {
 	Description       StringValue `tfsdk:"description" user_config:"true"`
 	EventType         StringValue `tfsdk:"event_type" user_config:"true"`
 	GroupBy           ListValue   `tfsdk:"group_by" user_config:"true"`
-	Operation         StringValue `tfsdk:"operation" user_config:"true"`
 	WindowType        StringValue `tfsdk:"window_type" user_config:"true"`
 	WindowDurationMin Int64Value  `tfsdk:"window_duration_minutes" user_config:"true"`
-	Script            StringValue `tfsdk:"script" user_config:"true"`
 	EventTimestamp    StringValue `tfsdk:"event_timestamp" user_config:"true"`
 	Severity          StringValue `tfsdk:"severity" user_config:"true"`
 	Style             StringValue `tfsdk:"style" user_config:"true"`
@@ -44,9 +42,7 @@ func AbsenceAlertFromModel(plan *AbsenceAlertModel, previousState *AbsenceAlertM
 	dd := diag.Diagnostics{}
 
 	CustomErrorChecks(&CheckedFields{
-		Operation:      plan.Operation,
 		EventType:      plan.EventType,
-		Script:         plan.Script,
 		EventTimestamp: plan.EventTimestamp,
 		GroupBy:        plan.GroupBy,
 	}, &dd)
@@ -74,7 +70,6 @@ func AbsenceAlertFromModel(plan *AbsenceAlertModel, previousState *AbsenceAlertM
 			"evaluation": map[string]any{
 				"alert_type": ALERT_TYPE_ABSENCE, // Required for the API, but hidden from the user here
 				"event_type": plan.EventType.ValueString(),
-				"operation":  Aggregate_Operations[plan.Operation.ValueString()],
 			},
 			"alert_payload": map[string]any{
 				"subject": plan.Subject.ValueString(),
@@ -117,9 +112,6 @@ func AbsenceAlertFromModel(plan *AbsenceAlertModel, previousState *AbsenceAlertM
 	if !plan.EventTimestamp.IsNull() {
 		evaluation["event_timestamp"] = plan.EventTimestamp.ValueString()
 	}
-	if !plan.Script.IsNull() {
-		evaluation["script"] = plan.Script.ValueString()
-	}
 	if !plan.Severity.IsUnknown() {
 		alertPayload["severity"] = plan.Severity.ValueString()
 	}
@@ -158,13 +150,9 @@ func AbsenceAlertToModel(plan *AbsenceAlertModel, component *Alert) {
 	if evaluation["group_by"] != nil {
 		plan.GroupBy = SliceToStringListValue(evaluation["group_by"].([]any))
 	}
-	plan.Operation = NewStringValue(FindKey(Aggregate_Operations, evaluation["operation"].(string)))
 	plan.WindowType = NewStringValue(evaluation["window_type"].(string))
 
 	plan.WindowDurationMin = NewInt64Value(int64(evaluation["window_duration_minutes"].(float64)))
-	if evaluation["script"] != nil {
-		plan.Script = NewStringValue(evaluation["script"].(string))
-	}
 	if evaluation["event_timestamp"] != nil {
 		plan.EventTimestamp = NewStringValue(evaluation["event_timestamp"].(string))
 	}

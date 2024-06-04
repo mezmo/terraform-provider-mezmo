@@ -1,9 +1,11 @@
 package alerts
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
@@ -43,6 +45,24 @@ var ThresholdAlertResourceSchema = schema.Schema{
 			Description: ParentConditionalAttribute(Non_Change_Operator_Labels).Description,
 			Attributes:  ParentConditionalAttribute(Non_Change_Operator_Labels).Attributes,
 		},
+		"operation": schema.StringAttribute{
+			Required: true,
+			Description: "Specifies the type of aggregation operation to use with the window type and duration. " +
+				"This value must be `custom` for a Log event type.",
+			Validators: []validator.String{
+				stringvalidator.OneOf(MapKeys(Aggregate_Operations)...),
+			},
+		},
+		"script": schema.StringAttribute{
+			Optional: true,
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
+				stringvalidator.LengthAtMost(5000),
+			},
+			Description: "A custom JavaScript function that will control the aggregation. At the " +
+				"time of flushing, this aggregation will become the emitted event. This script " +
+				"is required when choosing a `custom` operation.",
+		},
 	}),
 }
 
@@ -50,13 +70,15 @@ var ThresholdAlertResourceSchema = schema.Schema{
 func ThresholdAlertFromModel(plan *ThresholdAlertModel, previousState *ThresholdAlertModel) (*Alert, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
 
-	CustomErrorChecks(&CheckedFields{
+	checkFields := CheckedFields{
 		Operation:      plan.Operation,
 		EventType:      plan.EventType,
 		Script:         plan.Script,
 		EventTimestamp: plan.EventTimestamp,
 		GroupBy:        plan.GroupBy,
-	}, &dd)
+	}
+	CustomErrorChecks(&checkFields, &dd)
+	OperationAndScriptErrorChecks(&checkFields, &dd)
 
 	if dd.HasError() {
 		return nil, dd
