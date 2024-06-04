@@ -20,8 +20,6 @@
       "alert_type": "absence",
       "event_timestamp": ".timestamp",
       "event_type": "log",
-      "operation": "CUSTOM",
-      "script": "function myFunc(a, e, m) { return a }",
       "window_duration_minutes": 5,
       "window_type": "tumbling"
     },

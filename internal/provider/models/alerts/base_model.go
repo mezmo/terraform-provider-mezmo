@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type SchemaAttributes map[string]schema.Attribute
@@ -97,14 +96,6 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 			"these field paths. Supports nesting via dot-notation. This value is " +
 			"optional for Metric event types, and SHOULD be used for Log event types.",
 	},
-	"operation": schema.StringAttribute{
-		Required: true,
-		Description: "Specifies the type of aggregation operation to use with the window type and duration. " +
-			"This value must be `custom` for a Log event type.",
-		Validators: []validator.String{
-			stringvalidator.OneOf(MapKeys(Aggregate_Operations)...),
-		},
-	},
 	"window_type": schema.StringAttribute{
 		Optional:   true,
 		Computed:   true,
@@ -125,16 +116,6 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 			int64validator.AtMost(1440),
 		},
 		Description: "The duration of the aggregation window in minutes.",
-	},
-	"script": schema.StringAttribute{
-		Optional: true,
-		Validators: []validator.String{
-			stringvalidator.LengthAtLeast(1),
-			stringvalidator.LengthAtMost(5000),
-		},
-		Description: "A custom JavaScript function that will control the aggregation. At the " +
-			"time of flushing, this aggregation will become the emitted event. This script " +
-			"is required when choosing a `custom` operation.",
 	},
 	"event_timestamp": schema.StringAttribute{
 		Optional: true,
@@ -204,7 +185,7 @@ type CheckedFields struct {
 	GroupBy        ListValue
 }
 
-func CustomErrorChecks(plan *CheckedFields, dd *diag.Diagnostics) *diag.Diagnostics {
+func OperationAndScriptErrorChecks(plan *CheckedFields, dd *diag.Diagnostics) *diag.Diagnostics {
 	operation := plan.Operation.ValueString()
 	eventType := plan.EventType.ValueString()
 
@@ -230,6 +211,14 @@ func CustomErrorChecks(plan *CheckedFields, dd *diag.Diagnostics) *diag.Diagnost
 				"A 'log' event type requires a 'custom' `operation` and a valid JS `script` function",
 			)
 		}
+	}
+	return dd
+}
+
+func CustomErrorChecks(plan *CheckedFields, dd *diag.Diagnostics) *diag.Diagnostics {
+	eventType := plan.EventType.ValueString()
+
+	if eventType == "log" {
 		if plan.EventTimestamp.IsNull() {
 			dd.AddWarning(
 				"A 'log' event should specify an `event_timestamp` field",

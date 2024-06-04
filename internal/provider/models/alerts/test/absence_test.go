@@ -35,7 +35,6 @@ func TestAbsenceAlert_success(t *testing.T) {
 						inputs = [mezmo_http_source.my_source.id]
 						name = "my absence alert"
 						event_type = "metric"
-						operation = "sum"
 						subject = "Absence Alert"
 						body = "You received a absence alert"
 						ingestion_key = "abc123"
@@ -55,7 +54,6 @@ func TestAbsenceAlert_success(t *testing.T) {
 						"ingestion_key":           "abc123",
 						"body":                    "You received a absence alert",
 						"name":                    "my absence alert",
-						"operation":               "sum",
 						"severity":                "INFO",
 						"style":                   "static",
 						"subject":                 "Absence Alert",
@@ -76,8 +74,6 @@ func TestAbsenceAlert_success(t *testing.T) {
 						name = "updated name"
 						description = "updated description"
 						event_type = "metric"
-						operation = "custom"
-						script = "function myFunc(a, e, m) { return a }"
 						window_type = "sliding"
 						window_duration_minutes = 10
 						group_by = [".other"]
@@ -95,8 +91,6 @@ func TestAbsenceAlert_success(t *testing.T) {
 						"group_by.0":              ".other",
 						"body":                    "updated body",
 						"name":                    "updated name",
-						"operation":               "custom",
-						"script":                  "function myFunc(a, e, m) { return a }",
 						"severity":                "WARNING",
 						"subject":                 "updated subject",
 						"window_duration_minutes": "10",
@@ -115,8 +109,6 @@ func TestAbsenceAlert_success(t *testing.T) {
 						inputs = [mezmo_http_source.my_source.id]
 						name = "my absence alert"
 						event_type = "log"
-						operation = "custom"
-						script = "function myFunc(a, e, m) { return a }"
 						event_timestamp = ".timestamp"
 						group_by = [".name", ".namespace", ".tags"]
 						subject = "Absence Alert for Log event"
@@ -142,8 +134,6 @@ func TestAbsenceAlert_success(t *testing.T) {
 						"group_by.2":              ".tags",
 						"ingestion_key":           "abc123",
 						"name":                    "my absence alert",
-						"operation":               "custom",
-						"script":                  "function myFunc(a, e, m) { return a }",
 						"severity":                "INFO",
 						"style":                   "static",
 						"subject":                 "Absence Alert for Log event",
@@ -179,7 +169,6 @@ func TestAbsenceAlert_schema_validation_errors(t *testing.T) {
 						inputs = [mezmo_http_source.my_source.id]
 						name = "my bad absence alert"
 						event_type = "metric"
-						operation = "sum"
 						group_by = [".timestamp"]
 						conditional = {
 							expressions = [
