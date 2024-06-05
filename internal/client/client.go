@@ -71,21 +71,16 @@ func readBody(resp *http.Response, err error) error {
 	return err
 }
 
-func readJson(result any, resp *http.Response, err error, ctx context.Context) error {
-	if err != nil {
-		return err
-	}
-
+func readJson(result any, resp *http.Response, ctx context.Context) error {
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
 		return newAPIError(resp)
 	}
-
-	error := json.NewDecoder(resp.Body).Decode(result)
 
 	// TF_LOG_PROVIDER=TRACE - Beware that this may print sensitive information
 	msg := Json(fmt.Sprintf("%s %s", resp.Request.Method, resp.Request.URL), result)
 	tflog.Trace(ctx, msg)
 
+	error := json.NewDecoder(resp.Body).Decode(result)
 	return error
 }
 
@@ -110,8 +105,11 @@ func (c *client) CreatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipel
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Pipeline]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -132,8 +130,11 @@ func (c *client) Pipeline(id string, ctx context.Context) (*Pipeline, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Pipeline]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -151,8 +152,11 @@ func (c *client) UpdatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipel
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Pipeline]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -191,8 +195,11 @@ func (c *client) CreateSource(pipelineId string, component *Source, ctx context.
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Source]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -213,8 +220,11 @@ func (c *client) Source(pipelineId string, id string, ctx context.Context) (*Sou
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Source]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -232,8 +242,11 @@ func (c *client) UpdateSource(pipelineId string, component *Source, ctx context.
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Source]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -247,8 +260,11 @@ func (c *client) Destination(pipelineId string, id string, ctx context.Context) 
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Destination]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -266,8 +282,11 @@ func (c *client) CreateDestination(pipelineId string, component *Destination, ct
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Destination]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -292,8 +311,11 @@ func (c *client) UpdateDestination(pipelineId string, component *Destination, ct
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Destination]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -307,8 +329,11 @@ func (c *client) Processor(pipelineId string, id string, ctx context.Context) (*
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Processor]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -326,8 +351,11 @@ func (c *client) CreateProcessor(pipelineId string, component *Processor, ctx co
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Processor]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -352,8 +380,11 @@ func (c *client) UpdateProcessor(pipelineId string, component *Processor, ctx co
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Processor]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -367,8 +398,11 @@ func (c *client) Alert(pipelineId string, id string, ctx context.Context) (*Aler
 	url := fmt.Sprintf("%s/v3/pipeline/%s/alert/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Alert]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -386,8 +420,11 @@ func (c *client) CreateAlert(pipelineId string, alert *Alert, ctx context.Contex
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Alert]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -405,8 +442,11 @@ func (c *client) UpdateAlert(pipelineId string, alert *Alert, ctx context.Contex
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[Alert]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -431,8 +471,11 @@ func (c *client) CreateAccessKey(accessKey *AccessKey, ctx context.Context) (*Ac
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[AccessKey]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -457,8 +500,11 @@ func (c *client) CreateSharedSource(source *SharedSource, ctx context.Context) (
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[SharedSource]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -472,8 +518,11 @@ func (c *client) SharedSource(id string, ctx context.Context) (*SharedSource, er
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s", c.endpoint, id)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[SharedSource]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -491,8 +540,11 @@ func (c *client) UpdateSharedSource(source *SharedSource, ctx context.Context) (
 	}
 	req := c.newRequest(http.MethodPut, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[SharedSource]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -518,8 +570,11 @@ func (c *client) PublishPipeline(pipelineId string, ctx context.Context) (*Publi
 	}
 	req := c.newRequest(http.MethodPost, url, bytes.NewReader(reqBody))
 	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	var envelope apiResponseEnvelope[PublishPipeline]
-	if err := readJson(&envelope, resp, err, ctx); err != nil {
+	if err := readJson(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
