@@ -23,6 +23,7 @@ website/node_modules
 *.iml
 *.test
 *.iml
+node_modules
 
 website/vendor
 
@@ -36,3 +37,6 @@ website/vendor
 # Binary
 /terraform-provider-mezmo
 /terraform-provider-mezmo.exe
+
+# Test report
+results.xml

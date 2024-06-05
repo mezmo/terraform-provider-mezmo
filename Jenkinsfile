@@ -59,9 +59,6 @@ pipeline {
     }
 
     stage('Format') {
-      tools {
-        nodejs 'NodeJS 20'
-      }
       steps {
         script {
           if (env.SANITY_BUILD == 'true') {
@@ -96,11 +93,13 @@ pipeline {
     stage('Test') {
       parallel {
         stage('Integration Tests') {
-          tools {
-            nodejs 'NodeJS 20'
-          }
           steps {
             sh 'make test'
+          }
+          post {
+            always {
+              junit testResults: 'results.xml', allowEmptyResults: true
+            }
           }
         }
         stage('Example Validation') {
