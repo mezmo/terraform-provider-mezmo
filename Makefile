@@ -36,7 +36,7 @@ build-snapshot-binary:
 	-e GOARCH \
 	-v $(PWD):/opt/app \
 	-w /opt/app \
-	goreleaser/goreleaser \
+	goreleaser/goreleaser:v1.26.2 \
 		build \
 		--single-target \
 		--snapshot \
