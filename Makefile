@@ -36,7 +36,7 @@ build-snapshot-binary:
 	-e GOARCH \
 	-v $(PWD):/opt/app \
 	-w /opt/app \
-	goreleaser/goreleaser \
+	goreleaser/goreleaser:v2.0.0 \
 		build \
 		--single-target \
 		--snapshot \
@@ -57,7 +57,8 @@ build-test-example-binary: set-test-example-target build-snapshot-binary
 examples: $(wildcard examples/*/*/)
 
 examples/%: build-test-example-binary
-	docker run \
+	@echo $@
+	@docker run \
 		-v $(PWD):/opt/app \
 		-v $(PWD)/$@:/opt/example/$@ \
 		-e TF_CLI_CONFIG_FILE=/opt/app/tf-dev-config \
