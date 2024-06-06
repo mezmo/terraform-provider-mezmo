@@ -219,7 +219,7 @@ resource "mezmo_blackhole_destination" "destination3" {
 
 Required:
 
-- `label` (String) A label for the expresion group
+- `label` (String) A label for the expression group
 
 Optional:
 

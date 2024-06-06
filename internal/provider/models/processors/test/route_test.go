@@ -102,6 +102,28 @@ func TestRouteProcessor(t *testing.T) {
 				ExpectError: regexp.MustCompile("(?s)Inappropriate value for attribute \"conditionals\": element 1: attribute.*\"label\" is required"),
 			},
 
+			// Error: label length too long
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_route_processor" "my_processor" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+
+						conditionals = [
+							{
+								expressions = [
+									{
+										field = ".status"
+										operator = "equal"
+										value_number = 200
+									}
+								]
+								label = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+							}
+						]
+					}`,
+				ExpectError: regexp.MustCompile("(?s).*label string length must be at most 255.*"),
+			},
+
 			// Error: value_string and value_number are mutually exclusive
 			{
 				Config: GetCachedConfig(cacheKey) + `

@@ -41,10 +41,10 @@ var RouteProcessorResourceSchema = schema.Schema{
 				Attributes: ExtendSchemaAttributes(ParentConditionalAttribute(Non_Change_Operator_Labels).Attributes, map[string]schema.Attribute{
 					"label": schema.StringAttribute{
 						Required:    true,
-						Description: "A label for the expresion group",
+						Description: "A label for the expression group",
 						Validators: []validator.String{
 							stringvalidator.LengthAtLeast(1),
-							stringvalidator.LengthAtMost(20),
+							stringvalidator.LengthAtMost(255),
 						},
 					},
 					"output_name": schema.StringAttribute{
