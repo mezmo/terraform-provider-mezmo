@@ -153,7 +153,7 @@ func (r *SourceResource[T]) Delete(ctx context.Context, req resource.DeleteReque
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting Source",
-			"Could not source, unexpected error: "+err.Error(),
+			"Could not delete source, unexpected error: "+err.Error(),
 		)
 		return
 	}
@@ -219,7 +219,7 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Updating Source",
-			"Could not updated source, unexpected error: "+err.Error(),
+			"Could not update source, unexpected error: "+err.Error(),
 		)
 		return
 	}

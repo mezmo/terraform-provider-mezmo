@@ -218,7 +218,7 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error updating destination",
-			"Could not updated destination, unexpected error: "+err.Error(),
+			"Could not update destination, unexpected error: "+err.Error(),
 		)
 		return
 	}

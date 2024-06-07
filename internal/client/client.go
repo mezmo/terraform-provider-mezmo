@@ -58,30 +58,46 @@ func NewClient(endpoint string, authKey string, headers map[string]string) Clien
 	}
 }
 
-func readBody(resp *http.Response, err error) error {
+func (c *client) newRequest(method string, url string, body io.Reader) *http.Request {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		// Creating a request only fails if the method is invalid
+		panic(err)
+	}
+	if c.authKey != "" {
+		req.Header.Add("Authorization", fmt.Sprintf("Token %s", c.authKey))
+	}
+	if len(c.headers) > 0 {
+		for k, v := range c.headers {
+			req.Header.Add(k, v)
+		}
+	}
+
+	if method != http.MethodGet {
+		req.Header.Add("Content-Type", "application/json")
+	}
+	return req
+}
+
+func readBody(result any, resp *http.Response, ctx context.Context) error {
+	defer resp.Body.Close()
+	bodyBuffer, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
-		return newAPIError(resp)
+		return newAPIError(resp.StatusCode, bodyBuffer, nil)
 	}
-	defer resp.Body.Close()
-
-	return err
-}
-
-func readJson(result any, resp *http.Response, ctx context.Context) error {
-	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
-		return newAPIError(resp)
+	if result == nil || len(bodyBuffer) == 0 {
+		return nil
 	}
-
 	// TF_LOG_PROVIDER=TRACE - Beware that this may print sensitive information
-	msg := Json(fmt.Sprintf("%s %s", resp.Request.Method, resp.Request.URL), result)
-	tflog.Trace(ctx, msg)
-
-	error := json.NewDecoder(resp.Body).Decode(result)
-	return error
+	err = json.Unmarshal(bodyBuffer, result)
+	if err == nil {
+		msg := Json(fmt.Sprintf("%s %s", resp.Request.Method, resp.Request.URL), result)
+		tflog.Trace(ctx, msg)
+	}
+	return err
 }
 
 // Envelope is {meta, data}, but meta is not used
@@ -109,11 +125,9 @@ func (c *client) CreatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipel
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Pipeline]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	created := &envelope.Data
 	return created, nil
 }
@@ -122,7 +136,11 @@ func (c *client) CreatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipel
 func (c *client) DeletePipeline(id string, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
-	return readBody(c.httpClient.Do(req))
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return readBody(nil, resp, ctx)
 }
 
 // Pipeline implements Client.
@@ -134,11 +152,9 @@ func (c *client) Pipeline(id string, ctx context.Context) (*Pipeline, error) {
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Pipeline]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	pipeline := &envelope.Data
 	return pipeline, nil
 }
@@ -156,34 +172,11 @@ func (c *client) UpdatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipel
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Pipeline]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	updated := &envelope.Data
 	return updated, nil
-}
-
-func (c *client) newRequest(method string, url string, body io.Reader) *http.Request {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		// Creating a request only fails if the method is invalid
-		panic(err)
-	}
-	if c.authKey != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("Token %s", c.authKey))
-	}
-	if len(c.headers) > 0 {
-		for k, v := range c.headers {
-			req.Header.Add(k, v)
-		}
-	}
-
-	if method != http.MethodGet {
-		req.Header.Add("Content-Type", "application/json")
-	}
-	return req
 }
 
 // POST Source
@@ -199,10 +192,9 @@ func (c *client) CreateSource(pipelineId string, component *Source, ctx context.
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Source]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	source := &envelope.Data
 	return source, nil
@@ -212,7 +204,11 @@ func (c *client) CreateSource(pipelineId string, component *Source, ctx context.
 func (c *client) DeleteSource(pipelineId string, id string, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
-	return readBody(c.httpClient.Do(req))
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return readBody(nil, resp, ctx)
 }
 
 // GET Source
@@ -224,11 +220,9 @@ func (c *client) Source(pipelineId string, id string, ctx context.Context) (*Sou
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Source]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	source := &envelope.Data
 	return source, nil
 }
@@ -246,7 +240,7 @@ func (c *client) UpdateSource(pipelineId string, component *Source, ctx context.
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Source]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -264,7 +258,7 @@ func (c *client) Destination(pipelineId string, id string, ctx context.Context) 
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Destination]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -286,7 +280,7 @@ func (c *client) CreateDestination(pipelineId string, component *Destination, ct
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Destination]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -299,7 +293,11 @@ func (c *client) CreateDestination(pipelineId string, component *Destination, ct
 func (c *client) DeleteDestination(pipelineId string, id string, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
-	return readBody(c.httpClient.Do(req))
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return readBody(nil, resp, ctx)
 }
 
 // PUT Destination (sink)
@@ -315,11 +313,9 @@ func (c *client) UpdateDestination(pipelineId string, component *Destination, ct
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Destination]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	destination := &envelope.Data
 	return destination, nil
 }
@@ -333,11 +329,9 @@ func (c *client) Processor(pipelineId string, id string, ctx context.Context) (*
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Processor]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	processor := &envelope.Data
 	return processor, nil
 }
@@ -355,11 +349,9 @@ func (c *client) CreateProcessor(pipelineId string, component *Processor, ctx co
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Processor]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	processor := &envelope.Data
 	return processor, nil
 }
@@ -368,7 +360,11 @@ func (c *client) CreateProcessor(pipelineId string, component *Processor, ctx co
 func (c *client) DeleteProcessor(pipelineId string, id string, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
 	req := c.newRequest(http.MethodDelete, url, nil)
-	return readBody(c.httpClient.Do(req))
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return readBody(nil, resp, ctx)
 }
 
 // PUT Processor (transform)
@@ -384,11 +380,9 @@ func (c *client) UpdateProcessor(pipelineId string, component *Processor, ctx co
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Processor]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	processor := &envelope.Data
 	return processor, nil
 }
@@ -402,11 +396,9 @@ func (c *client) Alert(pipelineId string, id string, ctx context.Context) (*Aler
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Alert]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	alert := &envelope.Data
 	return alert, nil
 }
@@ -424,11 +416,9 @@ func (c *client) CreateAlert(pipelineId string, alert *Alert, ctx context.Contex
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Alert]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	createdAlert := &envelope.Data
 	return createdAlert, nil
 }
@@ -446,11 +436,9 @@ func (c *client) UpdateAlert(pipelineId string, alert *Alert, ctx context.Contex
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[Alert]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	updatedAlert := &envelope.Data
 	return updatedAlert, nil
 }
@@ -459,7 +447,11 @@ func (c *client) UpdateAlert(pipelineId string, alert *Alert, ctx context.Contex
 func (c *client) DeleteAlert(pipelineId string, alert *Alert, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/%s/%s/alert/%s", c.endpoint, pipelineId, alert.ComponentKind, alert.ComponentId, alert.Id)
 	req := c.newRequest(http.MethodDelete, url, nil)
-	return readBody(c.httpClient.Do(req))
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return readBody(nil, resp, ctx)
 }
 
 // POST Access Key
@@ -475,11 +467,9 @@ func (c *client) CreateAccessKey(accessKey *AccessKey, ctx context.Context) (*Ac
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[AccessKey]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	createdAccessKey := &envelope.Data
 	return createdAccessKey, nil
 }
@@ -488,7 +478,11 @@ func (c *client) CreateAccessKey(accessKey *AccessKey, ctx context.Context) (*Ac
 func (c *client) DeleteAccessKey(accessKey *AccessKey, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key/%s", c.endpoint, accessKey.SharedSourceId, accessKey.Id)
 	req := c.newRequest(http.MethodDelete, url, nil)
-	return readBody(c.httpClient.Do(req))
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return readBody(nil, resp, ctx)
 }
 
 // POST Shared Source
@@ -504,11 +498,9 @@ func (c *client) CreateSharedSource(source *SharedSource, ctx context.Context) (
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[SharedSource]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	createdSharedSource := &envelope.Data
 	return createdSharedSource, nil
 }
@@ -522,11 +514,9 @@ func (c *client) SharedSource(id string, ctx context.Context) (*SharedSource, er
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[SharedSource]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	source := &envelope.Data
 	return source, nil
 }
@@ -544,11 +534,9 @@ func (c *client) UpdateSharedSource(source *SharedSource, ctx context.Context) (
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[SharedSource]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	updatedSharedSource := &envelope.Data
 	return updatedSharedSource, nil
 }
@@ -557,7 +545,11 @@ func (c *client) UpdateSharedSource(source *SharedSource, ctx context.Context) (
 func (c *client) DeleteSharedSource(source *SharedSource, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s", c.endpoint, source.Id)
 	req := c.newRequest(http.MethodDelete, url, nil)
-	return readBody(c.httpClient.Do(req))
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	return readBody(nil, resp, ctx)
 }
 
 // POST publish pipeline
@@ -574,11 +566,9 @@ func (c *client) PublishPipeline(pipelineId string, ctx context.Context) (*Publi
 		return nil, err
 	}
 	var envelope apiResponseEnvelope[PublishPipeline]
-	if err := readJson(&envelope, resp, ctx); err != nil {
+	if err := readBody(&envelope, resp, ctx); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
 	created := &envelope.Data
 	return created, nil
 }

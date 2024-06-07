@@ -242,7 +242,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						operation 		= "average"
 						interval        = 305325235325
 					}`,
-				ExpectError: regexp.MustCompile("/interval/maximum"),
+				ExpectError: regexp.MustCompile("(?s).*/user_config/window/interval"),
 			},
 
 			// Error: window min
