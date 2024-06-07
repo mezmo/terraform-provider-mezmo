@@ -64,7 +64,7 @@ func readBody(resp *http.Response, err error) error {
 	}
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
-		return newAPIError(resp)
+		return newAPIError(resp, nil)
 	}
 	defer resp.Body.Close()
 
@@ -73,7 +73,7 @@ func readBody(resp *http.Response, err error) error {
 
 func readJson(result any, resp *http.Response, ctx context.Context) error {
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
-		return newAPIError(resp)
+		return newAPIError(resp, ctx)
 	}
 
 	// TF_LOG_PROVIDER=TRACE - Beware that this may print sensitive information
