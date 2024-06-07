@@ -11,17 +11,17 @@ type validationError struct {
 	Path    string `json:"instancePath,omitempty"`
 	Message string `json:"message,omitempty"`
 }
-type apiResponseError struct {
+type ApiResponseError struct {
 	Message string            `json:"message"`
 	Code    string            `json:"code,omitempty"`
 	Status  uint16            `json:"status"`
 	Errors  []validationError `json:"errors,omitempty"`
 }
 
-func newAPIError(resp *http.Response, _ context.Context) apiResponseError {
+func newAPIError(resp *http.Response, _ context.Context) ApiResponseError {
 	defer resp.Body.Close()
 
-	var result apiResponseError
+	var result ApiResponseError
 	err := json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		result.Message = fmt.Sprintf("failed to read response body. reason: %s", err.Error())
@@ -31,7 +31,7 @@ func newAPIError(resp *http.Response, _ context.Context) apiResponseError {
 }
 
 // implement errors.Error interface
-func (e apiResponseError) Error() string {
+func (e ApiResponseError) Error() string {
 	errString := fmt.Sprintf("%d %s: %s", e.Status, e.Code, e.Message)
 	if len(e.Errors) > 0 {
 		errors := make([]validationError, 0)
@@ -51,7 +51,7 @@ func (e apiResponseError) Error() string {
 }
 
 func IsNotFoundError(target error) bool {
-	err, ok := target.(apiResponseError)
+	err, ok := target.(ApiResponseError)
 	return ok && err.Status == http.StatusNotFound
 }
 

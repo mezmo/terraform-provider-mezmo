@@ -77,7 +77,7 @@ func (r *PublishPipelineResource) Create(ctx context.Context, req resource.Creat
 	// and sees that the `updated_at` timestamp has changed on the server.
 	_, err := r.client.PublishPipeline(publish.PipelineId, ctx)
 
-	if err != nil {
+	if err != nil && err.(client.ApiResponseError).Code != "ENOCHANGES" {
 		resp.Diagnostics.AddError(
 			"Error publishing pipeline",
 			"Could not publish pipeline, unexpected error: "+err.Error(),
