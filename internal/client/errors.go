@@ -12,15 +12,15 @@ type validationError struct {
 	Path    string `json:"instancePath,omitempty"`
 	Message string `json:"message,omitempty"`
 }
-type apiResponseError struct {
+type ApiResponseError struct {
 	Message string            `json:"message"`
 	Code    string            `json:"code,omitempty"`
 	Status  uint16            `json:"status"`
 	Errors  []validationError `json:"errors,omitempty"`
 }
 
-func newAPIError(status int, bodyBuffer []byte, _ context.Context) apiResponseError {
-	result := apiResponseError{
+func newAPIError(status int, bodyBuffer []byte, _ context.Context) ApiResponseError {
+	result := ApiResponseError{
 		Status: uint16(status),
 	}
 	if len(bodyBuffer) == 0 {
@@ -34,7 +34,7 @@ func newAPIError(status int, bodyBuffer []byte, _ context.Context) apiResponseEr
 }
 
 // implement errors.Error interface
-func (e apiResponseError) Error() string {
+func (e ApiResponseError) Error() string {
 	errString := fmt.Sprintf("%d %s: %s", e.Status, e.Code, e.Message)
 	if len(e.Errors) > 0 {
 		errors := make([]validationError, 0)
@@ -64,7 +64,7 @@ func JSONMarshal(t any) ([]byte, error) {
 }
 
 func IsNotFoundError(target error) bool {
-	err, ok := target.(apiResponseError)
+	err, ok := target.(ApiResponseError)
 	return ok && err.Status == http.StatusNotFound
 }
 
