@@ -16,6 +16,5 @@ module "pipeline" {
 
 resource "mezmo_publish_pipeline" "publisher" {
   pipeline_id = module.pipeline.my_pipeline.id
-  updated_at  = module.pipeline.my_pipeline.updated_at
   depends_on  = [module.pipeline]
 }

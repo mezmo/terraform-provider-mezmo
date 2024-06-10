@@ -1,8 +1,6 @@
 package models
 
 import (
-	"time"
-
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -12,7 +10,6 @@ import (
 
 type PublishPipelineResourceModel struct {
 	PipelineId StringValue `tfsdk:"pipeline_id"`
-	UpdatedAt  StringValue `tfsdk:"updated_at"`
 }
 
 func PublishPipelineResourceSchema() schema.Schema {
@@ -55,26 +52,14 @@ resource "mezmo_pipeline" "my_pipeline" {
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"updated_at": schema.StringAttribute{
-				Description: "The timestamp of the pipeline's last update. This should always " +
-					"be a reference to the `updated_at` field of the child module's `output` of the pipeline " +
-					"to be pusblished.",
-				Required: true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
-			},
 		},
 	}
 }
 
 // From terraform schema/model to a struct for sending to the API
 func PublishPipelineFromModel(plan *PublishPipelineResourceModel) *PublishPipeline {
-	updatedAt, _ := time.Parse(time.RFC3339Nano, plan.UpdatedAt.ValueString())
-
 	publishPipeline := PublishPipeline{
 		PipelineId: plan.PipelineId.ValueString(),
-		UpdatedAt:  &updatedAt,
 	}
 	return &publishPipeline
 }
@@ -82,7 +67,4 @@ func PublishPipelineFromModel(plan *PublishPipelineResourceModel) *PublishPipeli
 // From an API response to a terraform model
 func PublishPipelineToModel(plan *PublishPipelineResourceModel, publishPipeline *PublishPipeline) {
 	plan.PipelineId = NewStringValue(publishPipeline.PipelineId)
-	if publishPipeline.UpdatedAt != nil {
-		plan.UpdatedAt = NewStringValue(publishPipeline.UpdatedAt.Format(time.RFC3339Nano))
-	}
 }
