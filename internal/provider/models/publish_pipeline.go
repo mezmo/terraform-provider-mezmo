@@ -18,10 +18,10 @@ func PublishPipelineResourceSchema() schema.Schema {
 			"\n## Configuration\n" +
 			"To make sure a pipeline and its components exist before publishing, the configuration of this resource " +
 			"requires the use of child modules and `depends_on`. The pipeline's configuration should exist in a " +
-			"child module with an `output` of the pipeline's `id` and `updated_at` fields. This resource will then reference " +
-			"those fields, and be able to publish as needed when the pipeline changes.\n" +
-			"\nThe `output` can be done however the user chooses, as long as the id and timestamp are accessible in the root module. " +
-			"In other words, `output` can be an object of the entire pipeline, or individual fields for clearer naming.\n" +
+			"child module with an `output` of the pipeline's `id` field. This resource will then reference " +
+			"this field as `pipeline_id`, and be able to publish as needed when the pipeline changes.\n" +
+			"\nThe `output` can be done however the user chooses, as long as the pipeline's `id` is accessible in the root module. " +
+			"In other words, `output` can be an object of the entire pipeline, or just the `id`.\n" +
 			"\n## Example Child Module\n" +
 			"```terraform\n" +
 			`
