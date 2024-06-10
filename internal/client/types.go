@@ -67,6 +67,5 @@ type SharedSource struct {
 }
 
 type PublishPipeline struct {
-	PipelineId string     `json:"id"`
-	UpdatedAt  *time.Time `json:"updated_at"`
+	PipelineId string `json:"id"`
 }

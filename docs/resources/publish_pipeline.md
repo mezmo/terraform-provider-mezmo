@@ -78,7 +78,6 @@ module "pipeline" {
 
 resource "mezmo_publish_pipeline" "publisher" {
   pipeline_id = module.pipeline.my_pipeline.id
-  updated_at  = module.pipeline.my_pipeline.updated_at
   depends_on  = [module.pipeline]
 }
 ```
@@ -89,4 +88,3 @@ resource "mezmo_publish_pipeline" "publisher" {
 ### Required
 
 - `pipeline_id` (String) The id of the pipeline to monitor for publishing. Any changes to its components will trigger a publish. This pipeline must be configured in a child module with an `output`.
-- `updated_at` (String) The timestamp of the pipeline's last update. This should always be a reference to the `updated_at` field of the child module's `output` of the pipeline to be pusblished.

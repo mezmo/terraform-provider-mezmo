@@ -23,14 +23,13 @@ func TestPublishPipelineResource(t *testing.T) {
 					}
 					resource "mezmo_publish_pipeline" "my_publish_pipeline" {
 						pipeline_id = mezmo_pipeline.my_pipeline.id
-            updated_at = mezmo_pipeline.my_pipeline.updated_at
           }
 					`,
+				ExpectNonEmptyPlan: true, // We always re-create which causes a non-empty plan.
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("mezmo_pipeline.my_pipeline", "title", "pipeline"),
 					StateHasExpectedValues("mezmo_publish_pipeline.my_publish_pipeline", map[string]any{
 						"pipeline_id": "#mezmo_pipeline.my_pipeline.id",
-						"updated_at":  "#mezmo_pipeline.my_pipeline.updated_at",
 					}),
 				),
 			},
@@ -42,14 +41,13 @@ func TestPublishPipelineResource(t *testing.T) {
 					}
 					resource "mezmo_publish_pipeline" "my_publish_pipeline" {
 						pipeline_id = mezmo_pipeline.my_pipeline.id
-            updated_at = mezmo_pipeline.my_pipeline.updated_at
           }
 					`,
+				ExpectNonEmptyPlan: true,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("mezmo_pipeline.my_pipeline", "title", "Updated Pipeline"),
 					StateHasExpectedValues("mezmo_publish_pipeline.my_publish_pipeline", map[string]any{
 						"pipeline_id": "#mezmo_pipeline.my_pipeline.id",
-						"updated_at":  "#mezmo_pipeline.my_pipeline.updated_at",
 					}),
 				),
 			},
