@@ -62,7 +62,7 @@ type AccessKey struct {
 type SharedSource struct {
 	Id          string `json:"id"`
 	Title       string `json:"title"`
-	Description string `json:"description"`
+	Description string `json:"description,omitempty"`
 	Type        string `json:"type"`
 }
 

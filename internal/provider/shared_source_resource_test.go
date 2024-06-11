@@ -27,7 +27,6 @@ func TestSharedSourceResource(t *testing.T) {
 					}`) + `
 					resource "mezmo_shared_source" "my_source" {
 						title = "HTTP Shared"
-            description = "This source can be shared across pipelines"
             type = "http"
           }
 				`,
@@ -35,9 +34,8 @@ func TestSharedSourceResource(t *testing.T) {
 					resource.TestMatchOutput("shared_source_key", regexp.MustCompile(`\w+`)),
 					resource.TestMatchResourceAttr("mezmo_shared_source.my_source", "id", IDRegex),
 					StateHasExpectedValues("mezmo_shared_source.my_source", map[string]any{
-						"title":       "HTTP Shared",
-						"description": "This source can be shared across pipelines",
-						"type":        "http",
+						"title": "HTTP Shared",
+						"type":  "http",
 					}),
 				),
 			},
@@ -64,7 +62,6 @@ func TestSharedSourceResource(t *testing.T) {
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_shared_source" "my_source" {
 						title = "updated title"
-            description = "updated description"
 						type = "kinesis-firehose"
           }
 				`,
@@ -73,9 +70,8 @@ func TestSharedSourceResource(t *testing.T) {
 					resource.TestMatchResourceAttr("mezmo_shared_source.my_source", "id", IDRegex),
 					resource.TestCheckResourceAttrPair("mezmo_access_key.shared", "source_id", "mezmo_shared_source.my_source", "id"),
 					StateHasExpectedValues("mezmo_shared_source.my_source", map[string]any{
-						"title":       "updated title",
-						"description": "updated description",
-						"type":        "kinesis-firehose",
+						"title": "updated title",
+						"type":  "kinesis-firehose",
 					}),
 				),
 			},
