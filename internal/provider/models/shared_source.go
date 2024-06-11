@@ -49,7 +49,7 @@ func SharedSourceResourceSchema() schema.Schema {
 			},
 			"description": schema.StringAttribute{
 				Description: "Details describing the shared source.",
-				Required:    true,
+				Optional:    true,
 				Validators: []validator.String{
 					stringvalidator.LengthAtLeast(1),
 				},
@@ -73,12 +73,14 @@ func SharedSourceResourceSchema() schema.Schema {
 // From terraform schema/model to a struct for sending to the API
 func SharedSourceFromModel(plan *SharedSourceResourceModel) *SharedSource {
 	source := SharedSource{
-		Title:       plan.Title.ValueString(),
-		Description: plan.Description.ValueString(),
-		Type:        plan.Type.ValueString(),
+		Title: plan.Title.ValueString(),
+		Type:  plan.Type.ValueString(),
 	}
 	if !plan.Id.IsUnknown() {
 		source.Id = plan.Id.ValueString()
+	}
+	if !plan.Description.IsNull() {
+		source.Description = plan.Description.ValueString()
 	}
 	return &source
 }
@@ -87,6 +89,8 @@ func SharedSourceFromModel(plan *SharedSourceResourceModel) *SharedSource {
 func SharedSourceToModel(plan *SharedSourceResourceModel, source *SharedSource) {
 	plan.Id = NewStringValue(source.Id)
 	plan.Title = NewStringValue(source.Title)
-	plan.Description = NewStringValue(source.Description)
 	plan.Type = NewStringValue(source.Type)
+	if source.Description != "" {
+		plan.Description = NewStringValue(source.Description)
+	}
 }

@@ -49,9 +49,12 @@ resource "mezmo_shared_source" "http" {
 
 ### Required
 
-- `description` (String) Details describing the shared source.
 - `title` (String) A descriptive name for the shared source.
 - `type` (String) The type of source that should be shared. This is typically the name of the source componenet, e.g. `kinesis-firehose`. The source must be a "push source", thus pull sources cannot be shared and will result in an error.
+
+### Optional
+
+- `description` (String) Details describing the shared source.
 
 ### Read-Only
 
