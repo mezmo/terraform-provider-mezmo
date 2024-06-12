@@ -169,7 +169,8 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 			"```\n" + `{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}` + "\n```",
 	},
 	"ingestion_key": schema.StringAttribute{
-		Required: true,
+		Required:  true,
+		Sensitive: true,
 		Validators: []validator.String{
 			stringvalidator.LengthAtLeast(1),
 		},
