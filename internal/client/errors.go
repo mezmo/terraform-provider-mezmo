@@ -26,9 +26,43 @@ func newAPIError(status int, bodyBuffer []byte, _ context.Context) ApiResponseEr
 	if len(bodyBuffer) == 0 {
 		return result
 	}
-	err := json.Unmarshal(bodyBuffer, &result)
-	if err != nil {
-		result.Message = fmt.Sprintf("failed to decode JSON body. reason: %s", err.Error())
+	// Errors *should* follow the expected format, but to be safe, we'll unmarshal into an
+	// interface and assert the fields we expect.
+	var e map[string]any
+
+	if err := json.Unmarshal(bodyBuffer, &e); err != nil {
+		result.Code = "EUNKNOWN"
+		result.Message = "There was an error, but the response from the server was not understood."
+		result.Errors = append(result.Errors, validationError{
+			Path:    "raw error body",
+			Message: string(bodyBuffer),
+		})
+		return result
+	}
+
+	if code, ok := e["code"].(string); ok {
+		result.Code = code
+	}
+	if message, ok := e["message"].(string); ok {
+		result.Message = message
+	}
+	if errors, ok := e["errors"].([]any); ok {
+		for _, err := range errors {
+			if e, ok := err.(map[string]any); ok {
+				vError := validationError{}
+				if path, ok := e["instancePath"].(string); ok {
+					vError.Path = path
+				}
+				if message, ok := e["message"].(string); ok {
+					vError.Message = message
+				}
+				result.Errors = append(result.Errors, vError)
+			}
+		}
+	} else if errorString, ok := e["errors"].(string); ok {
+		result.Errors = append(result.Errors, validationError{
+			Message: errorString,
+		})
 	}
 	return result
 }
@@ -79,6 +113,8 @@ func SkipThisError(msg string) bool {
 	case "must match a schema in anyOf":
 		return true
 	case "must match a schema in allOf":
+		return true
+	case "must match a schema in oneOf":
 		return true
 	default:
 		return false
