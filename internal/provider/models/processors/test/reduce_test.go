@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestReduceProcessor(t *testing.T) {
+func TestAccReduceProcessor(t *testing.T) {
 	const cacheKey = "reduce_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

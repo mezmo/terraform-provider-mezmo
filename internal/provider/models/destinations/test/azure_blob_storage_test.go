@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestAzureBlobStorageDestinationResource(t *testing.T) {
+func TestAccAzureBlobStorageDestinationResource(t *testing.T) {
 	const cacheKey = "azure_blob_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

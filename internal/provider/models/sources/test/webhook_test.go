@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestWebhookSource(t *testing.T) {
+func TestAccWebhookSource(t *testing.T) {
 	cacheKey := "webhook_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

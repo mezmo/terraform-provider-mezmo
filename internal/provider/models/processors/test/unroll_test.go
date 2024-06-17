@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestUnrollProcessor(t *testing.T) {
+func TestAccUnrollProcessor(t *testing.T) {
 	const cacheKey = "unroll_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

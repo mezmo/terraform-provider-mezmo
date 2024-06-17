@@ -61,7 +61,7 @@ resource "mezmo_absence_alert" "no_data_alert" {
 - `component_id` (String) The uuid of the component that the alert is attached to
 - `component_kind` (String) The kind of component that the alert is attached to
 - `event_type` (String) The type of event is either a Log event or a Metric event.
-- `ingestion_key` (String) The key required to ingest the alert into Log Analysis
+- `ingestion_key` (String, Sensitive) The key required to ingest the alert into Log Analysis
 - `inputs` (List of String) The ids of the input components. This could be the id of a match arm for a route processor, or simply the id of the component.
 - `name` (String) The name of the alert.
 - `pipeline_id` (String) The uuid of the pipeline

@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestPrometheusDestinationResource(t *testing.T) {
+func TestAccPrometheusDestinationResource(t *testing.T) {
 	const cacheKey = "prometheus_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

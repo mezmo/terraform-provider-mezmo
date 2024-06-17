@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestHoneycombLogsDestinationResource(t *testing.T) {
+func TestAccHoneycombLogsDestinationResource(t *testing.T) {
 	const cacheKey = "honeycomb_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

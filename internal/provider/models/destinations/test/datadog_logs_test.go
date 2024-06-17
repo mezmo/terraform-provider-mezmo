@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestDatadogLogsDestinationResource(t *testing.T) {
+func TestAccDatadogLogsDestinationResource(t *testing.T) {
 	cacheKey := "datadog_logs_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

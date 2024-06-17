@@ -8,7 +8,7 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestKinesisFirehoseSourceResource(t *testing.T) {
+func TestAccKinesisFirehoseSourceResource(t *testing.T) {
 	cacheKey := "kinesis_firehose_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

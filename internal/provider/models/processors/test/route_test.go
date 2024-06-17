@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestRouteProcessor(t *testing.T) {
+func TestAccRouteProcessor(t *testing.T) {
 	const cacheKey = "route_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -422,7 +422,7 @@ func TestRouteProcessor(t *testing.T) {
 						description = "blackhole desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_route_processor.with_outputs.conditionals.0.output_name]
-					} 
+					}
 					resource "mezmo_logs_destination" "destination2" {
 						title = "logs title"
 						description = "logs desc"

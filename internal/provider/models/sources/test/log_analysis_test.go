@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestLogAnalysisSource(t *testing.T) {
+func TestAccLogAnalysisSource(t *testing.T) {
 	cacheKey := "log_analysis_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
