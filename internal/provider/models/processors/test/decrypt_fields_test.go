@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestDecryptFieldsProcessor(t *testing.T) {
+func TestAccDecryptFieldsProcessor(t *testing.T) {
 	const cacheKey = "decrypt_fields_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

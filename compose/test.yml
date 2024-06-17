@@ -26,13 +26,14 @@ services:
       context: ../
       target: test
     volumes:
-      - type: bind
-        source: ../
-        target: /report
+    - type: bind
+      source: ../
+      target: /report
     depends_on:
       pipeline-service:
         condition: service_healthy
     command: bash -c "go test -v ./... 2>&1 | go-junit-report -iocopy -set-exit-code -out /report/results.xml"
     environment:
+      TF_ACC: "1"
       TEST_ENDPOINT: http://pipeline-service:3000
       TEST_CONTROL_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0ZXN0LXN1aXRlIiwiYXVkIjoicGlwZWxpbmUtc2VydmljZSIsImlhdCI6MTY4NjY0NDQwMn0.06PBED8GQp3BBzCSPvFy71EpqXBfZ-3GImN6pS4Z4eY"

@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestFilterProcessor(t *testing.T) {
+func TestAccFilterProcessor(t *testing.T) {
 	const cacheKey = "filter_resources"
 	SetCachedConfig(cacheKey, `
 		resource "mezmo_pipeline" "test_parent" {
@@ -300,7 +300,7 @@ func TestFilterProcessor(t *testing.T) {
 						description = "blackhole desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_filter_processor.with_destination.id]
-					} 
+					}
 					`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_blackhole_destination.destination1", map[string]any{

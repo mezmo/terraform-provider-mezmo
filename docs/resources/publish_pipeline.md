@@ -4,26 +4,26 @@ page_title: "mezmo_publish_pipeline Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
   This resource will monitor a pipeline for changes, and publish it when necessary.
-  ## Configuration
+  Configuration
   To make sure a pipeline and its components exist before publishing, the configuration of this resource requires the use of child modules and depends_on. The pipeline's configuration should exist in a child module with an output of the pipeline's id field. This resource will then reference this field as pipeline_id, and be able to publish as needed when the pipeline changes.
   The output can be done however the user chooses, as long as the pipeline's id is accessible in the root module. In other words, output can be an object of the entire pipeline, or just the id.
-  ## Example Child Module
+  Example Child Module
   ```terraform
-  # This would exist in an arbitrary module directory. For example, "./modules/main.tf"
+  This would exist in an arbitrary module directory. For example, "./modules/main.tf"
   terraform {
-      required_providers {
+      requiredproviders {
           mezmo = {
               source = "registry.terraform.io/mezmo/mezmo"
           }
       }
   }
-  output "my_pipeline" {
-      value = mezmo_pipeline.my_pipeline
+  output "mypipeline" {
+      value = mezmopipeline.mypipeline
   }
-  resource "mezmo_pipeline" "my_pipeline" {
+  resource "mezmopipeline" "mypipeline" {
       title = "A pipeline to publish"
   }
-  # ... other sources, processors, destinations, etc.
+  ... other sources, processors, destinations, etc.
   ```
 ---
 
@@ -54,7 +54,7 @@ resource "mezmo_pipeline" "my_pipeline" {
 	title = "A pipeline to publish"
 }
 # ... other sources, processors, destinations, etc.
-
+			
 ```
 
 ## Example Usage

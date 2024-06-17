@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestThresholdAlert_success(t *testing.T) {
+func TestAccThresholdAlert_success(t *testing.T) {
 	const cacheKey = "threshold_alert"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestNewRelicDestinationResource(t *testing.T) {
+func TestAccNewRelicDestinationResource(t *testing.T) {
 	const cacheKey = "new_relic_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

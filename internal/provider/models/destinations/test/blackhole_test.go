@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestBlackholeDestinationResource(t *testing.T) {
+func TestAccBlackholeDestinationResource(t *testing.T) {
 	const cacheKey = "blackhole_destination_resource"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

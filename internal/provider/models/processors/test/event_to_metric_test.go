@@ -9,7 +9,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestEventToMetricProcessor(t *testing.T) {
+func TestAccEventToMetricProcessor(t *testing.T) {
 	const cacheKey = "event_to_metric_processor_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

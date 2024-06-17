@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestElasticSearchDestinationResource(t *testing.T) {
+func TestAccElasticSearchDestinationResource(t *testing.T) {
 	const cacheKey = "elasticsearch_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

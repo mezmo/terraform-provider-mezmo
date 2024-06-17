@@ -9,7 +9,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestMetricsTagCardinalityLimitProcessor(t *testing.T) {
+func TestAccMetricsTagCardinalityLimitProcessor(t *testing.T) {
 	const cacheKey = "metrics_tag_cardinality_limit_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

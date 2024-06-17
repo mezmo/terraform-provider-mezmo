@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestKafkaSourceResource(t *testing.T) {
+func TestAccKafkaSourceResource(t *testing.T) {
 	const cacheKey = "kafka_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

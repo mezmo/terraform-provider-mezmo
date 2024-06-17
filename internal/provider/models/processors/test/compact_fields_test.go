@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestCompactFieldsProcessor(t *testing.T) {
+func TestAccCompactFieldsProcessor(t *testing.T) {
 	const cacheKey = "compact_fields_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

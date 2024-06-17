@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestAggregateV2Processor(t *testing.T) {
+func TestAccAggregateV2Processor(t *testing.T) {
 	const cacheKey = "aggregate_v2_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

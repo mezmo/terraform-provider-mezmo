@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestS3SourceResource(t *testing.T) {
+func TestAccS3SourceResource(t *testing.T) {
 	const cacheKey = "s3_source_resource"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

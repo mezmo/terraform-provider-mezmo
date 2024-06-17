@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestSplunkHecSource(t *testing.T) {
+func TestAccSplunkHecSource(t *testing.T) {
 	cacheKey := "splunk_hec_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

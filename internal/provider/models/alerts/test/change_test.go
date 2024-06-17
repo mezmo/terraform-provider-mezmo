@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestChangeAlert_success(t *testing.T) {
+func TestAccChangeAlert_success(t *testing.T) {
 	const cacheKey = "change_alert"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

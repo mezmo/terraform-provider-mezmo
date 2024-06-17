@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestAbsenceAlert_success(t *testing.T) {
+func TestAccAbsenceAlert_success(t *testing.T) {
 	const cacheKey = "absence_alert"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

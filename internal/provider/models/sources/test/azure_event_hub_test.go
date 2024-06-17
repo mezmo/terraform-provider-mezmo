@@ -8,7 +8,7 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestAzureEventHubSourceResource(t *testing.T) {
+func TestAccAzureEventHubSourceResource(t *testing.T) {
 	cacheKey := "azure_event_hub_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
