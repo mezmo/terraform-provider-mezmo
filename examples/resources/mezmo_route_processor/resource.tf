@@ -21,85 +21,14 @@ resource "mezmo_pipeline" "pipeline1" {
 
 resource "mezmo_demo_source" "source1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
-  title       = "My source"
+  title       = "Apache demo logs"
   format      = "apache_common"
 }
 
+
 resource "mezmo_route_processor" "processor1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
-  title       = "My processor"
-  description = "This processor routes error logs"
-  inputs      = [mezmo_demo_source.source1.id]
-  conditionals = [
-    {
-      label = "error logs"
-      expressions = [
-        {
-          field        = ".status"
-          operator     = "greater_or_equal"
-          value_number = 300
-        },
-        {
-          field        = ".level"
-          operator     = "greater_or_equal"
-          value_string = "info"
-        }
-      ]
-      logical_operation = "OR"
-    }
-  ]
-}
-
-resource "mezmo_route_processor" "processor2" {
-  pipeline_id = mezmo_pipeline.pipeline1.id
-  title       = "My processor"
-  description = "This processor routes logs"
-  inputs      = [mezmo_demo_source.source1.id]
-  conditionals = [
-    {
-      expressions_group = [
-        {
-          expressions = [
-            {
-              field        = ".label"
-              operator     = "equal"
-              value_string = "account"
-            },
-            {
-              field        = ".app_name"
-              operator     = "ends_with"
-              value_string = "service"
-            },
-          ]
-        },
-        {
-          expressions_group = [
-            {
-              expressions = [
-                {
-                  field        = ".level"
-                  operator     = "greater_or_equal"
-                  value_number = 300
-                },
-                {
-                  field        = ".tag"
-                  operator     = "contains"
-                  value_string = "error"
-                }
-              ]
-              logical_operation = "OR"
-            }
-          ]
-        }
-      ]
-      label = "error logs"
-    }
-  ]
-}
-
-resource "mezmo_route_processor" "processor3" {
-  pipeline_id = mezmo_pipeline.pipeline1.id
-  title       = "My processor"
+  title       = "Log router"
   description = "This processor routes logs"
   inputs      = [mezmo_demo_source.source1.id]
   conditionals = [
@@ -156,24 +85,24 @@ resource "mezmo_route_processor" "processor3" {
 
 resource "mezmo_logs_destination" "destination1" {
   pipeline_id   = mezmo_pipeline.pipeline1.id
-  title         = "My destination"
+  title         = "Error log destination"
   description   = "Send logs to Mezmo Log Analysis"
-  inputs        = [mezmo_route_processor.processor3.conditionals.0.output_name]
+  inputs        = [mezmo_route_processor.processor1.conditionals.0.output_name]
   ingestion_key = var.my_ingestion_key
 }
 
 resource "mezmo_blackhole_destination" "destination2" {
   pipeline_id = mezmo_pipeline.pipeline1.id
-  title       = "My destination"
+  title       = "503 logs destination"
   description = "Trash the data without acking"
   ack_enabled = false
-  inputs      = [mezmo_route_processor.processor3.conditionals.1.output_name]
+  inputs      = [mezmo_route_processor.processor1.conditionals.1.output_name]
 }
 
 resource "mezmo_blackhole_destination" "destination3" {
   pipeline_id = mezmo_pipeline.pipeline1.id
-  title       = "My destination"
+  title       = "Unmatched dest"
   description = "Send unmatched data to blackhole"
   ack_enabled = false
-  inputs      = [mezmo_route_processor.processor3.unmatched]
+  inputs      = [mezmo_route_processor.processor1.unmatched]
 }
