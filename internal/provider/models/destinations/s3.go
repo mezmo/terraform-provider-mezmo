@@ -18,20 +18,21 @@ const S3_DESTINATION_TYPE_NAME = "s3"
 const S3_DESTINATION_NODE_NAME = S3_DESTINATION_TYPE_NAME
 
 type S3DestinationModel struct {
-	Id                  String `tfsdk:"id"`
-	PipelineId          String `tfsdk:"pipeline_id"`
-	Title               String `tfsdk:"title"`
-	Description         String `tfsdk:"description"`
-	Inputs              List   `tfsdk:"inputs"`
-	GenerationId        Int64  `tfsdk:"generation_id"`
-	AckEnabled          Bool   `tfsdk:"ack_enabled" user_config:"true"`
-	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs" user_config:"true"`
-	Auth                Object `tfsdk:"auth" user_config:"true"`
-	Region              String `tfsdk:"region" user_config:"true"`
-	Bucket              String `tfsdk:"bucket" user_config:"true"`
-	Prefix              String `tfsdk:"prefix" user_config:"true"`
-	Encoding            String `tfsdk:"encoding" user_config:"true"`
-	Compression         String `tfsdk:"compression" user_config:"true"`
+	Id                  String                      `tfsdk:"id"`
+	PipelineId          String                      `tfsdk:"pipeline_id"`
+	Title               String                      `tfsdk:"title"`
+	Description         String                      `tfsdk:"description"`
+	Inputs              List                        `tfsdk:"inputs"`
+	GenerationId        Int64                       `tfsdk:"generation_id"`
+	AckEnabled          Bool                        `tfsdk:"ack_enabled" user_config:"true"`
+	BatchTimeoutSeconds Int64                       `tfsdk:"batch_timeout_secs" user_config:"true"`
+	Auth                Object                      `tfsdk:"auth" user_config:"true"`
+	Region              String                      `tfsdk:"region" user_config:"true"`
+	Bucket              String                      `tfsdk:"bucket" user_config:"true"`
+	Prefix              String                      `tfsdk:"prefix" user_config:"true"`
+	Encoding            String                      `tfsdk:"encoding" user_config:"true"`
+	Compression         String                      `tfsdk:"compression" user_config:"true"`
+	FileConsolidation   *BlobFileConsolidationModel `tfsdk:"file_consolidation"`
 }
 
 var S3DestinationResourceSchema = schema.Schema{
@@ -85,6 +86,7 @@ var S3DestinationResourceSchema = schema.Schema{
 			Description: "The compression format of the S3 objects",
 			Validators:  []validator.String{stringvalidator.OneOf([]string{"gzip", "none"}...)},
 		},
+		"file_consolidation": BlobFileConsolidationAttr,
 	}, []string{"batch_timeout_secs"}),
 }
 
@@ -112,6 +114,10 @@ func S3DestinationFromModel(plan *S3DestinationModel, previousState *S3Destinati
 				"compression": plan.Compression.ValueString(),
 			},
 		},
+	}
+
+	if plan.FileConsolidation != nil {
+		component.UserConfig["file_consolidation"] = plan.FileConsolidation.ToMap()
 	}
 
 	if previousState != nil {
@@ -149,4 +155,13 @@ func S3DestinationToModel(plan *S3DestinationModel, component *Destination) {
 	plan.Prefix = StringValue(component.UserConfig["prefix"].(string))
 	plan.Encoding = StringValue(component.UserConfig["encoding"].(string))
 	plan.Compression = StringValue(component.UserConfig["compression"].(string))
+
+	if fc, ok := component.UserConfig["file_consolidation"].(map[string]any); ok {
+		plan.FileConsolidation = &BlobFileConsolidationModel{
+			Enabled:             BoolValue(fc["enabled"].(bool)),
+			ProcessEverySeconds: Int64Value(int64(fc["process_every_seconds"].(float64))),
+			RequestSizeBytes:    Int64Value(int64(fc["requested_size_bytes"].(float64))),
+			BasePath:            StringValue(fc["base_path"].(string)),
+		}
+	}
 }

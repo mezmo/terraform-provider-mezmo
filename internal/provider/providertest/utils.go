@@ -16,6 +16,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/mezmo/terraform-provider-mezmo/internal/client"
 	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
@@ -74,6 +75,15 @@ func GetProviderConfig() string {
 			}
 		}
 		`, GetTestEndpoint(), authAccountId, authUserEmail)
+}
+
+func NewTestClient() client.Client {
+	headers := map[string]string{
+		"x-auth-account-id": authAccountId,
+		"x-auth-user-email": authUserEmail,
+	}
+	return client.NewClient(GetTestEndpoint(), "", headers)
+
 }
 
 func TestPreCheck(t *testing.T) {

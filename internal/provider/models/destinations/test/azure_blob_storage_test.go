@@ -72,6 +72,86 @@ func TestAccAzureBlobStorageDestinationResource(t *testing.T) {
 				),
 			},
 
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_azure_blob_storage_destination" "my_destination" {
+						title             = "My destination"
+						description       = "my destination description"
+						inputs            = [mezmo_http_source.my_source.id]
+						pipeline_id       = mezmo_pipeline.test_parent.id
+						connection_string = "abc://defg.com"
+						container_name    = "my_container"
+					}
+					resource "mezmo_azure_blob_storage_destination" "implicit" {
+						title              = "My destination"
+						description        = "my destination description"
+						inputs             = [mezmo_http_source.my_source.id]
+						pipeline_id        = mezmo_pipeline.test_parent.id
+						connection_string  = "foo"
+						container_name     = "bar"
+						file_consolidation = {
+							enabled = true
+						}
+					}
+					resource "mezmo_azure_blob_storage_destination" "explicit" {
+						title              = "My destination"
+						description        = "my destination description"
+						inputs             = [mezmo_http_source.my_source.id]
+						pipeline_id        = mezmo_pipeline.test_parent.id
+						connection_string  = "foo"
+						container_name     = "bar"
+						file_consolidation = {
+							enabled = true
+							process_every_seconds = 420
+							requested_size_bytes = 420000000
+							base_path = "/foo/bar"
+						}
+					}
+					`,
+				Check: resource.ComposeTestCheckFunc([]resource.TestCheckFunc{
+					// Not enabled
+					resource.TestCheckNoResourceAttr("mezmo_azure_blob_storage_destination.my_destination", "file_consolidation"),
+					// Implicit config
+					resource.TestCheckResourceAttr("mezmo_azure_blob_storage_destination.implicit", "file_consolidation.enabled", "true"),
+					resource.TestCheckResourceAttr("mezmo_azure_blob_storage_destination.implicit", "file_consolidation.process_every_seconds", "600"),
+					resource.TestCheckResourceAttr("mezmo_azure_blob_storage_destination.implicit", "file_consolidation.requested_size_bytes", "500000000"),
+					resource.TestCheckResourceAttr("mezmo_azure_blob_storage_destination.implicit", "file_consolidation.base_path", ""),
+					testAccDestinationBackend("mezmo_azure_blob_storage_destination.implicit", map[string]any{
+						"ack_enabled":        true,
+						"batch_timeout_secs": float64(300),
+						"encoding":           "text",
+						"compression":        "none",
+						"container_name":     "bar",
+						"connection_string":  "foo",
+						"file_consolidation": map[string]any{
+							"enabled":               true,
+							"process_every_seconds": float64(600),
+							"requested_size_bytes":  float64(5e+08), // The backend returns this in scientific notation 🤷‍♂️
+							"base_path":             "",
+						},
+					}),
+					// Explicit config
+					resource.TestCheckResourceAttr("mezmo_azure_blob_storage_destination.explicit", "file_consolidation.enabled", "true"),
+					resource.TestCheckResourceAttr("mezmo_azure_blob_storage_destination.explicit", "file_consolidation.process_every_seconds", "420"),
+					resource.TestCheckResourceAttr("mezmo_azure_blob_storage_destination.explicit", "file_consolidation.requested_size_bytes", "420000000"),
+					resource.TestCheckResourceAttr("mezmo_azure_blob_storage_destination.explicit", "file_consolidation.base_path", "/foo/bar"),
+					testAccDestinationBackend("mezmo_azure_blob_storage_destination.explicit", map[string]any{
+						"ack_enabled":        true,
+						"batch_timeout_secs": float64(300),
+						"encoding":           "text",
+						"compression":        "none",
+						"container_name":     "bar",
+						"connection_string":  "foo",
+						"file_consolidation": map[string]any{
+							"enabled":               true,
+							"process_every_seconds": float64(420),
+							"requested_size_bytes":  float64(4.2e+08), // The backend returns this in scientific notation 🤷‍♂️
+							"base_path":             "/foo/bar",
+						},
+					}),
+				}...),
+			},
+
 			// Import
 			{
 				Config: GetCachedConfig(cacheKey) + `
