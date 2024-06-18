@@ -125,6 +125,8 @@ func AbsenceAlertFromModel(plan *AbsenceAlertModel, previousState *AbsenceAlertM
 // From an API response to a terraform model
 func AbsenceAlertToModel(plan *AbsenceAlertModel, component *Alert) {
 	plan.Id = NewStringValue(component.Id)
+	plan.ComponentKind = NewStringValue(component.ComponentKind)
+	plan.ComponentId = NewStringValue(component.ComponentId)
 	plan.Active = NewBoolValue(component.Active)
 	if component.Inputs != nil {
 		inputs := make([]attr.Value, 0)
