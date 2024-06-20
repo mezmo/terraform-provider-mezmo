@@ -86,17 +86,18 @@ func readBody(result any, resp *http.Response, ctx context.Context) error {
 		return err
 	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
-		return newAPIError(resp.StatusCode, bodyBuffer, nil)
+		return newAPIError(ctx, resp.StatusCode, bodyBuffer, nil)
 	}
 	if result == nil || len(bodyBuffer) == 0 {
 		return nil
 	}
-	// TF_LOG_PROVIDER=TRACE - Beware that this may print sensitive information
+	msg := fmt.Sprintf("-- Result of %s %s --", resp.Request.Method, resp.Request.URL)
 	err = json.Unmarshal(bodyBuffer, result)
 	if err == nil {
-		msg := Json(fmt.Sprintf("%s %s", resp.Request.Method, resp.Request.URL), result)
+		msg = Json(msg, result)
 		tflog.Trace(ctx, msg)
-	}
+	} // else it's an unmarshal error that we return
+
 	return err
 }
 
@@ -115,6 +116,8 @@ type client struct {
 // CreatePipeline implements Client.
 func (c *client) CreatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipeline, error) {
 	url := fmt.Sprintf("%s/v3/pipeline", c.endpoint)
+	msg := Json(fmt.Sprintf("-- Pipeline request to POST %s", url), pipeline)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(pipeline)
 	if err != nil {
 		return nil, err
@@ -135,6 +138,8 @@ func (c *client) CreatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipel
 // DeletePipeline implements Client.
 func (c *client) DeletePipeline(id string, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, id)
+	msg := fmt.Sprintf("-- Pipeline request to DELETE %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -146,6 +151,8 @@ func (c *client) DeletePipeline(id string, ctx context.Context) error {
 // Pipeline implements Client.
 func (c *client) Pipeline(id string, ctx context.Context) (*Pipeline, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, id)
+	msg := fmt.Sprintf("-- Pipeline request to GET %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -162,6 +169,8 @@ func (c *client) Pipeline(id string, ctx context.Context) (*Pipeline, error) {
 // UpdatePipeline implements Client.
 func (c *client) UpdatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipeline, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s", c.endpoint, pipeline.Id)
+	msg := Json(fmt.Sprintf("-- Pipeline request to PUT %s", url), pipeline)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(pipeline)
 	if err != nil {
 		return nil, err
@@ -182,6 +191,8 @@ func (c *client) UpdatePipeline(pipeline *Pipeline, ctx context.Context) (*Pipel
 // POST Source
 func (c *client) CreateSource(pipelineId string, component *Source, ctx context.Context) (*Source, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source", c.endpoint, pipelineId)
+	msg := Json(fmt.Sprintf("-- Source request to POST %s", url), component)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -203,6 +214,8 @@ func (c *client) CreateSource(pipelineId string, component *Source, ctx context.
 // DELETE Source
 func (c *client) DeleteSource(pipelineId string, id string, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, id)
+	msg := fmt.Sprintf("-- Source request to DELETE %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -214,6 +227,8 @@ func (c *client) DeleteSource(pipelineId string, id string, ctx context.Context)
 // GET Source
 func (c *client) Source(pipelineId string, id string, ctx context.Context) (*Source, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, id)
+	msg := fmt.Sprintf("-- Source request to GET %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -230,6 +245,8 @@ func (c *client) Source(pipelineId string, id string, ctx context.Context) (*Sou
 // PUT Source
 func (c *client) UpdateSource(pipelineId string, component *Source, ctx context.Context) (*Source, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/source/%s", c.endpoint, pipelineId, component.Id)
+	msg := Json(fmt.Sprintf("-- Source request to PUT %s", url), component)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -252,6 +269,8 @@ func (c *client) UpdateSource(pipelineId string, component *Source, ctx context.
 // GET Destination (sink)
 func (c *client) Destination(pipelineId string, id string, ctx context.Context) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
+	msg := fmt.Sprintf("-- Destination request to GET %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -270,6 +289,8 @@ func (c *client) Destination(pipelineId string, id string, ctx context.Context) 
 // POST Destination (sink)
 func (c *client) CreateDestination(pipelineId string, component *Destination, ctx context.Context) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink", c.endpoint, pipelineId)
+	msg := Json(fmt.Sprintf("-- Destination request to POST %s", url), component)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -292,6 +313,8 @@ func (c *client) CreateDestination(pipelineId string, component *Destination, ct
 // DELETE Destination (sink)
 func (c *client) DeleteDestination(pipelineId string, id string, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, id)
+	msg := fmt.Sprintf("-- Destination request to DELETE %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -303,6 +326,8 @@ func (c *client) DeleteDestination(pipelineId string, id string, ctx context.Con
 // PUT Destination (sink)
 func (c *client) UpdateDestination(pipelineId string, component *Destination, ctx context.Context) (*Destination, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/sink/%s", c.endpoint, pipelineId, component.Id)
+	msg := Json(fmt.Sprintf("-- Destination request to PUT %s", url), component)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -323,6 +348,8 @@ func (c *client) UpdateDestination(pipelineId string, component *Destination, ct
 // GET Processor (transform)
 func (c *client) Processor(pipelineId string, id string, ctx context.Context) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
+	msg := fmt.Sprintf("-- Processor request to GET %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -339,6 +366,8 @@ func (c *client) Processor(pipelineId string, id string, ctx context.Context) (*
 // POST Processor (transform)
 func (c *client) CreateProcessor(pipelineId string, component *Processor, ctx context.Context) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform", c.endpoint, pipelineId)
+	msg := Json(fmt.Sprintf("-- Processor request to POST %s", url), component)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -359,6 +388,8 @@ func (c *client) CreateProcessor(pipelineId string, component *Processor, ctx co
 // DELETE Processor (transform)
 func (c *client) DeleteProcessor(pipelineId string, id string, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, id)
+	msg := fmt.Sprintf("-- Processor request to DELETE %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -370,6 +401,8 @@ func (c *client) DeleteProcessor(pipelineId string, id string, ctx context.Conte
 // PUT Processor (transform)
 func (c *client) UpdateProcessor(pipelineId string, component *Processor, ctx context.Context) (*Processor, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/transform/%s", c.endpoint, pipelineId, component.Id)
+	msg := Json(fmt.Sprintf("-- Processor request to PUT %s", url), component)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(component)
 	if err != nil {
 		return nil, err
@@ -390,6 +423,8 @@ func (c *client) UpdateProcessor(pipelineId string, component *Processor, ctx co
 // GET Alert (not used by the UI)
 func (c *client) Alert(pipelineId string, id string, ctx context.Context) (*Alert, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/alert/%s", c.endpoint, pipelineId, id)
+	msg := fmt.Sprintf("-- Alert request to GET %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -406,6 +441,8 @@ func (c *client) Alert(pipelineId string, id string, ctx context.Context) (*Aler
 // POST Alert
 func (c *client) CreateAlert(pipelineId string, alert *Alert, ctx context.Context) (*Alert, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/%s/%s/alert", c.endpoint, pipelineId, alert.ComponentKind, alert.ComponentId)
+	msg := Json(fmt.Sprintf("-- Alert request to POST %s", url), alert)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(alert)
 	if err != nil {
 		return nil, err
@@ -426,6 +463,8 @@ func (c *client) CreateAlert(pipelineId string, alert *Alert, ctx context.Contex
 // PUT Alert
 func (c *client) UpdateAlert(pipelineId string, alert *Alert, ctx context.Context) (*Alert, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/%s/%s/alert/%s", c.endpoint, pipelineId, alert.ComponentKind, alert.ComponentId, alert.Id)
+	msg := Json(fmt.Sprintf("-- Alert request to PUT %s", url), alert)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(alert)
 	if err != nil {
 		return nil, err
@@ -446,6 +485,8 @@ func (c *client) UpdateAlert(pipelineId string, alert *Alert, ctx context.Contex
 // DELETE Alert
 func (c *client) DeleteAlert(pipelineId string, alert *Alert, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/%s/%s/alert/%s", c.endpoint, pipelineId, alert.ComponentKind, alert.ComponentId, alert.Id)
+	msg := fmt.Sprintf("-- Alert request to DELETE %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -457,6 +498,8 @@ func (c *client) DeleteAlert(pipelineId string, alert *Alert, ctx context.Contex
 // POST Access Key
 func (c *client) CreateAccessKey(accessKey *AccessKey, ctx context.Context) (*AccessKey, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key", c.endpoint, accessKey.SharedSourceId)
+	msg := Json(fmt.Sprintf("-- Access Key request to POST %s", url), accessKey)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(accessKey)
 	if err != nil {
 		return nil, err
@@ -477,6 +520,8 @@ func (c *client) CreateAccessKey(accessKey *AccessKey, ctx context.Context) (*Ac
 // DELETE access key
 func (c *client) DeleteAccessKey(accessKey *AccessKey, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s/access-key/%s", c.endpoint, accessKey.SharedSourceId, accessKey.Id)
+	msg := fmt.Sprintf("-- Access Key request to DELETE %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -488,6 +533,8 @@ func (c *client) DeleteAccessKey(accessKey *AccessKey, ctx context.Context) erro
 // POST Shared Source
 func (c *client) CreateSharedSource(source *SharedSource, ctx context.Context) (*SharedSource, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route", c.endpoint)
+	msg := Json(fmt.Sprintf("-- Shared Source request to POST %s", url), source)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(source)
 	if err != nil {
 		return nil, err
@@ -508,6 +555,8 @@ func (c *client) CreateSharedSource(source *SharedSource, ctx context.Context) (
 // GET shared source
 func (c *client) SharedSource(id string, ctx context.Context) (*SharedSource, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s", c.endpoint, id)
+	msg := fmt.Sprintf("-- Shared Source request to GET %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodGet, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -524,6 +573,8 @@ func (c *client) SharedSource(id string, ctx context.Context) (*SharedSource, er
 // PUT shared source
 func (c *client) UpdateSharedSource(source *SharedSource, ctx context.Context) (*SharedSource, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s", c.endpoint, source.Id)
+	msg := Json(fmt.Sprintf("-- Shared Source request to PUT %s", url), source)
+	tflog.Trace(ctx, msg)
 	reqBody, err := json.Marshal(source)
 	if err != nil {
 		return nil, err
@@ -544,6 +595,8 @@ func (c *client) UpdateSharedSource(source *SharedSource, ctx context.Context) (
 // DELETE shared source
 func (c *client) DeleteSharedSource(source *SharedSource, ctx context.Context) error {
 	url := fmt.Sprintf("%s/v3/pipeline/gateway-route/%s", c.endpoint, source.Id)
+	msg := fmt.Sprintf("-- Shared Source request to DELETE %s", url)
+	tflog.Trace(ctx, msg)
 	req := c.newRequest(http.MethodDelete, url, nil)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -555,6 +608,8 @@ func (c *client) DeleteSharedSource(source *SharedSource, ctx context.Context) e
 // POST publish pipeline
 func (c *client) PublishPipeline(pipelineId string, ctx context.Context) (*PublishPipeline, error) {
 	url := fmt.Sprintf("%s/v3/pipeline/%s/publish?allow_unconnected_edges=true", c.endpoint, pipelineId)
+	msg := fmt.Sprintf("-- Pipeline Publish request to POST %s", url)
+	tflog.Trace(ctx, msg)
 	// Because it's a POST, an empty body is required
 	reqBody, err := json.Marshal(struct{}{})
 	if err != nil {

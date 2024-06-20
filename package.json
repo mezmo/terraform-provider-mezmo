@@ -7,7 +7,8 @@
     "url": "git+https://github.com/mezmo/terraform-provider-mezmo.git"
   },
   "scripts": {
-    "commitlint": "commitlint --from=origin/main"
+    "commitlint": "commitlint --from=origin/main",
+    "local": "env $(cat ./env/local.env) "
   },
   "commitlint": {
     "extends": "@answerbook/commitlint-config-logdna"

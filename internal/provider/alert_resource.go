@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"reflect"
 	"strings"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/alerts"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type AlertModel interface {
@@ -98,11 +96,6 @@ func (r *AlertResource[T]) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Printf("----- Plan ----- %+v\n", plan)
-		fmt.Println(Json("----- Alert TO Create api ---", component))
-	}
-
 	stored, err := r.client.CreateAlert(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -110,10 +103,6 @@ func (r *AlertResource[T]) Create(ctx context.Context, req resource.CreateReques
 			"Could not create alert, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Println(Json("----- Alert FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -138,10 +127,6 @@ func (r *AlertResource[T]) Delete(ctx context.Context, req resource.DeleteReques
 	alert, dd := r.fromModelFunc(&state, &state)
 	if setDiagnosticsHasError(dd, &resp.Diagnostics) {
 		return
-	}
-
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Printf("----- Delete Alert ----- %+v\n", alert)
 	}
 
 	err := r.client.DeleteAlert(r.getPipelineIdFunc(&state).ValueString(), alert, ctx)
@@ -206,11 +191,6 @@ func (r *AlertResource[T]) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Printf("----- Plan ----- %+v\n", plan)
-		fmt.Println(Json("----- Alert TO Update api ---", component))
-	}
-
 	stored, err := r.client.UpdateAlert(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -218,10 +198,6 @@ func (r *AlertResource[T]) Update(ctx context.Context, req resource.UpdateReques
 			"Could not updated alert, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Println(Json("----- Alert FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)

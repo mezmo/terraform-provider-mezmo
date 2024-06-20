@@ -83,21 +83,18 @@ additional debugging information when writing tests. Note that `fmt.Println` doe
 work when running the provider directly, so these variables have no effect then. See
 [Trace Logging During Execution](#trace-logging-during-execution) for logging while using the provider.
 
-* `DEBUG_SOURCE=1` - Displays the API request/responses for sources
-* `DEBUG_PROCESSOR=1` - Displays the API request/responses for processors
-* `DEBUG_DESTINATION=1` - Displays the API request/responses for destinations
-* `DEBUG_ALERT=1` - Displays the API request/responses for alerts
 * `DEBUG_ATTRIBUTES=1` - Displays the loaded state attributes when using the `StateHasExpectedValues` assertion
 
-### Trace Logging During Execution
+### Trace Logging During Execution and Testing
 
-When running the provider, the APIs and their results can be printed to the screen.
-For this, set `TF_LOG_PROVIDER=TRACE`, but be aware that it could print sensitive information.
-This should only be used when debugging provider execution locally!
+When running the provider directly or through integration tests, the APIs and their results can be printed to the screen.
+For this, set `TF_LOG_PROVIDER_MEZMO=TRACE`, but be aware that it could print sensitive information.
+This should only be used when debugging provider execution locally (including integration tests)!
 
 #### Examples
 * `-run` accepts a regex for the test name, and the path
 * The path given shoulid match where the test file resides
+* `TF_LOG_PROVIDER_MEZMO=TRACE` can be provided to see all api requests/responses/errors
 
 **Run all tests**
 
@@ -107,12 +104,12 @@ make local-test
 **Run a singular test**
 
 ```sh
-env $(cat env/local.env) DEBUG_ATTRIBUTES=1 DEBUG_ALERT=1 go test -v -run 'TestAbsenceAlert_success' ./internal/provider/models/alerts/test
+npm run local -- _TF_LOG_PROVIDER_MEZMO=TRACE go test -v -run 'TestAccAbsenceAlert_success' ./internal/provider/models/alerts/test
 ```
 
 **Run a group of tests**
 
 ```sh
-env $(cat env/local.env) test -v -run 'TestChangeAlert.*_errors' ./internal/provider/models/alerts/test
+npm run local -- test -v -run 'TestAccChangeAlert.*_errors' ./internal/provider/models/alerts/test
 ```
 

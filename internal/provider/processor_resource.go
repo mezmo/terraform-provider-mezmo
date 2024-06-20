@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"reflect"
 	"strings"
 
@@ -15,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/processors"
 )
 
@@ -117,10 +115,6 @@ func (r *ProcessorResource[T]) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		fmt.Println(Json("----- Processor TO Create api ---", component))
-	}
-
 	stored, err := r.client.CreateProcessor(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -128,10 +122,6 @@ func (r *ProcessorResource[T]) Create(ctx context.Context, req resource.CreateRe
 			"Could not create processor, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		fmt.Println(Json("----- Processor FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -213,10 +203,6 @@ func (r *ProcessorResource[T]) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		fmt.Println(Json("----- Processor TO Update api ---", component))
-	}
-
 	stored, err := r.client.UpdateProcessor(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -224,10 +210,6 @@ func (r *ProcessorResource[T]) Update(ctx context.Context, req resource.UpdateRe
 			"Could not update processor, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		fmt.Println(Json("----- Processor FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
