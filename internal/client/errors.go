@@ -6,6 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type validationError struct {
@@ -19,7 +22,7 @@ type ApiResponseError struct {
 	Errors  []validationError `json:"errors,omitempty"`
 }
 
-func newAPIError(status int, bodyBuffer []byte, _ context.Context) ApiResponseError {
+func newAPIError(ctx context.Context, status int, bodyBuffer []byte, _ context.Context) ApiResponseError {
 	result := ApiResponseError{
 		Status: uint16(status),
 	}
@@ -39,6 +42,9 @@ func newAPIError(status int, bodyBuffer []byte, _ context.Context) ApiResponseEr
 		})
 		return result
 	}
+
+	msg := modelutils.Json("API Error response", e)
+	tflog.Trace(ctx, msg)
 
 	if code, ok := e["code"].(string); ok {
 		result.Code = code

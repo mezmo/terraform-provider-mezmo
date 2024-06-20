@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"reflect"
 	"strings"
 
@@ -16,7 +15,6 @@ import (
 	"github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/destinations"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type DestinationModel interface {
@@ -113,10 +111,6 @@ func (r *DestinationResource[T]) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		fmt.Println(Json("----- Destination TO Create api ---", component))
-	}
-
 	stored, err := r.client.CreateDestination(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -124,10 +118,6 @@ func (r *DestinationResource[T]) Create(ctx context.Context, req resource.Create
 			"Could not create destination, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		fmt.Println(Json("----- Destination FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -209,10 +199,6 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		fmt.Println(Json("----- Destination TO Update api ---", component))
-	}
-
 	// Set id from the current state (not in plan)
 	stored, err := r.client.UpdateDestination(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
 	if err != nil {
@@ -221,10 +207,6 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 			"Could not update destination, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		fmt.Println(Json("----- Destination FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)

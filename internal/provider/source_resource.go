@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"reflect"
 	"strings"
 
@@ -15,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/sources"
 )
 
@@ -115,10 +113,6 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	if os.Getenv("DEBUG_SOURCE") == "1" {
-		fmt.Println(Json("----- Destination TO Create api ---", component))
-	}
-
 	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -126,10 +120,6 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 			"Could not create source, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_SOURCE") == "1" {
-		fmt.Println(Json("----- Destination FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -211,10 +201,6 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	if os.Getenv("DEBUG_SOURCE") == "1" {
-		fmt.Println(Json("----- Destination TO Update api ---", component))
-	}
-
 	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -222,10 +208,6 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 			"Could not update source, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_SOURCE") == "1" {
-		fmt.Println(Json("----- Destination FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
