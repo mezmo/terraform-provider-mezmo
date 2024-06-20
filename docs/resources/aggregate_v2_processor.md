@@ -89,7 +89,7 @@ resource "mezmo_aggregate_v2_processor" "processor2" {
 - `operation` (String) The operation in which to perform the aggregation
 - `script` (String)
 - `title` (String) A user-defined title for the processor
-- `window_min` (Number)
+- `window_min` (Number) The minimum amount of time to wait before creating a new sliding window for future events.
 
 ### Read-Only
 
