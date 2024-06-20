@@ -245,7 +245,7 @@ func TestAccAggregateV2Processor(t *testing.T) {
 				ExpectError: regexp.MustCompile("(?s).*/user_config/window/interval"),
 			},
 
-			// Error: window min
+			//
 			{
 				Config: GetCachedConfig(cacheKey) + `
 						resource "mezmo_aggregate_v2_processor" "my_processor" {
@@ -256,7 +256,19 @@ func TestAccAggregateV2Processor(t *testing.T) {
 							interval 	= 10
 							window_min 	= 5
 						}`,
-				ExpectError: regexp.MustCompile("The field 'window_min' is only allowed when using a sliding window type."),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("mezmo_aggregate_v2_processor.my_processor", "window_type", "tumbling"),
+					resource.TestCheckResourceAttr("mezmo_aggregate_v2_processor.my_processor", "window_min", "5"),
+					testAccBackend("mezmo_aggregate_v2_processor.my_processor", map[string]any{
+						"window": map[string]any{
+							"interval":   float64(10),
+							"type":       string("tumbling"),
+							"window_min": float64(5),
+						},
+						"evaluate":        map[string]any{"operation": string("SUM")},
+						"event_timestamp": string(".timestamp"),
+					}),
+				),
 			},
 
 			// confirm manually deleted resources are recreated

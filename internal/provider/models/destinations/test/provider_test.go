@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -18,9 +17,9 @@ var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServe
 	"mezmo": providerserver.NewProtocol6WithError(provider.New("destinations_test")()),
 }
 
-// testAccDestinationBackend checks that userConfig matches whats is in the
+// testAccBackend checks that userConfig matches whats is in the
 // backend for resourceName
-func testAccDestinationBackend(resourceName string, userConfig map[string]any) resource.TestCheckFunc {
+func testAccBackend(resourceName string, userConfig map[string]any) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[resourceName]
 		if !ok {
@@ -38,14 +37,6 @@ func testAccDestinationBackend(resourceName string, userConfig map[string]any) r
 		}
 
 		// Check the backend UserConfig matches the passed userConfig
-		return validateUserConfig(destination.UserConfig, userConfig)
+		return providertest.ValidateUserConfig(destination.UserConfig, userConfig)
 	}
-}
-
-// Validate that UserConfig A and B are equal
-func validateUserConfig(got, want map[string]any) error {
-	if diff := cmp.Diff(got, want); diff != "" {
-		return fmt.Errorf("UserConfig mismatch (-got +want):\n%s", diff)
-	}
-	return nil
 }

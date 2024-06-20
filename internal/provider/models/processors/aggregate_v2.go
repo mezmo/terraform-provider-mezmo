@@ -30,10 +30,10 @@ type AggregateV2ProcessorModel struct {
 	Inputs         List                `tfsdk:"inputs"`
 	GenerationId   Int64               `tfsdk:"generation_id"`
 	Interval       Int64               `tfsdk:"interval" user_config:"true"`
-	Minimum        Int64               `tfsdk:"window_min" user_config:"true"`
 	Conditional    Object              `tfsdk:"conditional" user_config:"true"`
 	GroupBy        basetypes.ListValue `tfsdk:"group_by" user_config:"true"`
 	Script         String              `tfsdk:"script" user_config:"true"`
+	WindowMin      Int64               `tfsdk:"window_min" user_config:"true"`
 	WindowType     String              `tfsdk:"window_type" user_config:"true"`
 	Operation      String              `tfsdk:"operation" user_config:"true"`
 	EventTimestamp String              `tfsdk:"event_timestamp" user_config:"true"`
@@ -64,7 +64,7 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 		"window_min": schema.Int64Attribute{
 			Optional:    true,
 			Computed:    true,
-			Description: "",
+			Description: "The minimum amount of time to wait before creating a new sliding window for future events.",
 		},
 		"conditional": schema.SingleNestedAttribute{
 			Optional:    true,
@@ -89,20 +89,11 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 }
 
 func windowConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[string]any, dd *diag.Diagnostics) {
-	isMinimumSet := !plan.Minimum.IsNull() && !plan.Minimum.IsUnknown()
-
 	windowConfig := make(map[string]any)
 	windowConfig["type"] = plan.WindowType.ValueString()
 	windowConfig["interval"] = plan.Interval.ValueInt64()
-	if windowConfig["type"] == "tumbling" && isMinimumSet {
-		dd.AddError(
-			"Error in plan",
-			"The field 'window_min' is only allowed when using a sliding window type.",
-		)
-	} else {
-		if isMinimumSet {
-			windowConfig["window_min"] = plan.Minimum.ValueInt64()
-		}
+	if windowConfig["type"] == "tumbling" {
+		windowConfig["window_min"] = plan.WindowMin.ValueInt64()
 	}
 	userConfig["window"] = windowConfig
 }
@@ -183,7 +174,7 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 	plan.WindowType = basetypes.NewStringValue(windowConfig["type"].(string))
 	plan.Interval = Int64Value(int64(windowConfig["interval"].(float64)))
 	if windowConfig["window_min"] != nil {
-		plan.Minimum = Int64Value(int64(windowConfig["window_min"].(float64)))
+		plan.WindowMin = Int64Value(int64(windowConfig["window_min"].(float64)))
 	}
 
 	evaluateConfig := component.UserConfig["evaluate"].(map[string]any)

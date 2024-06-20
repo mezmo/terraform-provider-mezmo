@@ -14,6 +14,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"github.com/mezmo/terraform-provider-mezmo/internal/client"
@@ -326,4 +327,12 @@ func CheckMultipleErrors(err_strings []string) resource.ErrorCheckFunc {
 		}
 		return nil
 	}
+}
+
+// Validate that UserConfig A and B are equal
+func ValidateUserConfig(got, want map[string]any) error {
+	if diff := cmp.Diff(got, want); diff != "" {
+		return fmt.Errorf("UserConfig mismatch (-got +want):\n%s", diff)
+	}
+	return nil
 }
