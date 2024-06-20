@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
@@ -98,9 +99,10 @@ func (r *AlertResource[T]) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Printf("----- Plan ----- %+v\n", plan)
-		fmt.Println(Json("----- Alert TO Create api ---", component))
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Alert TO Create api ---", component)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	stored, err := r.client.CreateAlert(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
@@ -110,10 +112,6 @@ func (r *AlertResource[T]) Create(ctx context.Context, req resource.CreateReques
 			"Could not create alert, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Println(Json("----- Alert FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -140,8 +138,10 @@ func (r *AlertResource[T]) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Printf("----- Delete Alert ----- %+v\n", alert)
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Delete Alert ---", alert)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	err := r.client.DeleteAlert(r.getPipelineIdFunc(&state).ValueString(), alert, ctx)
@@ -206,9 +206,10 @@ func (r *AlertResource[T]) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Printf("----- Plan ----- %+v\n", plan)
-		fmt.Println(Json("----- Alert TO Update api ---", component))
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Alert TO Update api ---", component)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	stored, err := r.client.UpdateAlert(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
@@ -218,10 +219,6 @@ func (r *AlertResource[T]) Update(ctx context.Context, req resource.UpdateReques
 			"Could not updated alert, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_ALERT") == "1" {
-		fmt.Println(Json("----- Alert FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
@@ -86,16 +87,16 @@ func readBody(result any, resp *http.Response, ctx context.Context) error {
 		return err
 	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusNoContent {
-		return newAPIError(resp.StatusCode, bodyBuffer, nil)
+		return newAPIError(ctx, resp.StatusCode, bodyBuffer, nil)
 	}
 	if result == nil || len(bodyBuffer) == 0 {
 		return nil
 	}
-	// TF_LOG_PROVIDER=TRACE - Beware that this may print sensitive information
 	err = json.Unmarshal(bodyBuffer, result)
-	if err == nil {
-		msg := Json(fmt.Sprintf("%s %s", resp.Request.Method, resp.Request.URL), result)
+	if err == nil && os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json(fmt.Sprintf("Result of %s %s", resp.Request.Method, resp.Request.URL), result)
 		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 	return err
 }

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
@@ -113,8 +114,10 @@ func (r *DestinationResource[T]) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		fmt.Println(Json("----- Destination TO Create api ---", component))
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Destination TO Create api ---", component)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	stored, err := r.client.CreateDestination(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
@@ -124,10 +127,6 @@ func (r *DestinationResource[T]) Create(ctx context.Context, req resource.Create
 			"Could not create destination, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		fmt.Println(Json("----- Destination FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -209,8 +208,10 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		fmt.Println(Json("----- Destination TO Update api ---", component))
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Destination TO Update api ---", component)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	// Set id from the current state (not in plan)
@@ -221,10 +222,6 @@ func (r *DestinationResource[T]) Update(ctx context.Context, req resource.Update
 			"Could not update destination, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_DESTINATION") == "1" {
-		fmt.Println(Json("----- Destination FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
