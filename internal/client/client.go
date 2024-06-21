@@ -7,9 +7,10 @@ import (
 	"io"
 	"net/http"
 
+	"context"
+
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
-	"golang.org/x/net/context"
 )
 
 type Client interface {

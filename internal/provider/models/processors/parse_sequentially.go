@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"slices"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -13,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
-	"golang.org/x/exp/slices"
 )
 
 const PARSE_SEQUENTIALLY_PROCESSOR_TYPE_NAME = "parse_sequentially"
