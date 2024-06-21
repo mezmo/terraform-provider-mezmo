@@ -56,7 +56,7 @@ resource "mezmo_absence_alert" "no_data_alert" {
 
 - `body` (String) The message body to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
 ```
-{{.my_field}} had a count of {{metadata.aggregate.event_count}}
+{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}
 ```
 - `component_id` (String) The uuid of the component that the alert is attached to
 - `component_kind` (String) The kind of component that the alert is attached to
@@ -67,7 +67,7 @@ resource "mezmo_absence_alert" "no_data_alert" {
 - `pipeline_id` (String) The uuid of the pipeline
 - `subject` (String) The subject line to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
 ```
-{{.my_field}} had a count of {{metadata.aggregate.event_count}}
+{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}
 ```
 
 ### Optional
