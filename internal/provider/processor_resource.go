@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
@@ -117,8 +118,10 @@ func (r *ProcessorResource[T]) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		fmt.Println(Json("----- Processor TO Create api ---", component))
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Processor TO Create api ---", component)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	stored, err := r.client.CreateProcessor(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
@@ -128,10 +131,6 @@ func (r *ProcessorResource[T]) Create(ctx context.Context, req resource.CreateRe
 			"Could not create processor, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		fmt.Println(Json("----- Processor FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -213,8 +212,10 @@ func (r *ProcessorResource[T]) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		fmt.Println(Json("----- Processor TO Update api ---", component))
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Processor TO Update api ---", component)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	stored, err := r.client.UpdateProcessor(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
@@ -224,10 +225,6 @@ func (r *ProcessorResource[T]) Update(ctx context.Context, req resource.UpdateRe
 			"Could not update processor, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_PROCESSOR") == "1" {
-		fmt.Println(Json("----- Processor FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)

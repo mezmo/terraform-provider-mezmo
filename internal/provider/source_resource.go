@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
@@ -115,8 +116,10 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
-	if os.Getenv("DEBUG_SOURCE") == "1" {
-		fmt.Println(Json("----- Destination TO Create api ---", component))
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Destination TO Create api ---", component)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	stored, err := r.client.CreateSource(r.getPipelineIdFunc(&plan).ValueString(), component, ctx)
@@ -126,10 +129,6 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 			"Could not create source, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_SOURCE") == "1" {
-		fmt.Println(Json("----- Destination FROM Create api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
@@ -211,8 +210,10 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
-	if os.Getenv("DEBUG_SOURCE") == "1" {
-		fmt.Println(Json("----- Destination TO Update api ---", component))
+	if os.Getenv("TF_LOG_PROVIDER") == "TRACE" {
+		msg := Json("----- Destination TO Update api ---", component)
+		tflog.Trace(ctx, msg)
+		fmt.Println(msg)
 	}
 
 	stored, err := r.client.UpdateSource(r.getPipelineIdFunc(&state).ValueString(), component, ctx)
@@ -222,10 +223,6 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 			"Could not update source, unexpected error: "+err.Error(),
 		)
 		return
-	}
-
-	if os.Getenv("DEBUG_SOURCE") == "1" {
-		fmt.Println(Json("----- Destination FROM Update api ---", stored))
 	}
 
 	NullifyPlanFields(&plan, r.schema)
