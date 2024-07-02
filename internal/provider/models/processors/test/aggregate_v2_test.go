@@ -53,7 +53,7 @@ func TestAggregateV2Processor(t *testing.T) {
 						"window_type":     "tumbling",
 						"interval":        "3600",
 						"operation":       "sum",
-						"event_timestamp": ".timestamp",
+						"event_timestamp": "timestamp",
 					}),
 					StateDoesNotHaveFields("mezmo_aggregate_v2_processor.my_processor", []string{"script"}),
 				),
