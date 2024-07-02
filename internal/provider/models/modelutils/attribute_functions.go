@@ -5,12 +5,13 @@ import (
 
 	"fmt"
 
+	"slices"
+
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"golang.org/x/exp/slices"
 )
 
 // This function can help with taking an object from an API response and translating

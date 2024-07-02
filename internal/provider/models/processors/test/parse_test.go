@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestParseProcessor(t *testing.T) {
+func TestAccParseProcessor(t *testing.T) {
 	const cacheKey = "parse_resources"
 	SetCachedConfig(cacheKey, `
 		resource "mezmo_pipeline" "test_parent" {

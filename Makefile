@@ -12,11 +12,22 @@ generate-doc:
 	go generate
 
 .PHONY: test
+test: test-docs test-unit test-acceptance
+
+.PHONY: test-unit
+test-unit:
+	go test ./...
+
+.PHONY: test-acceptance
 test:
 	docker-compose -f compose/base.yml pull && docker-compose \
 	-p terraform-provider-mezmo-$(BUILD_TAG) \
 	-f compose/base.yml -f compose/test.yml \
 	up --remove-orphans --exit-code-from terraform-provider-mezmo --build
+
+.PHONY: test-docs
+test-docs: generate-doc
+	@git diff --exit-code
 
 .PHONY: start
 start:

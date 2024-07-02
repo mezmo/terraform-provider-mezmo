@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestDedupeProcessor(t *testing.T) {
+func TestAccDedupeProcessor(t *testing.T) {
 	const cacheKey = "dedupe_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

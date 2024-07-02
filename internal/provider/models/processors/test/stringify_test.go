@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestStringifyProcessorResource(t *testing.T) {
+func TestAccStringifyProcessorResource(t *testing.T) {
 	const cacheKey = "stringify_processor_resource"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

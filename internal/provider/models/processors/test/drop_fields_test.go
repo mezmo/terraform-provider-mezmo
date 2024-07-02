@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestDropFieldsProcessor(t *testing.T) {
+func TestAccDropFieldsProcessor(t *testing.T) {
 	const cacheKey = "drop_fields_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

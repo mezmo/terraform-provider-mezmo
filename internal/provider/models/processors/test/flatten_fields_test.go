@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestFlattenFieldsProcessor(t *testing.T) {
+func TestAccFlattenFieldsProcessor(t *testing.T) {
 	const cacheKey = "flatten_fields_resources"
 	SetCachedConfig(cacheKey, `
 		resource "mezmo_pipeline" "test_parent" {

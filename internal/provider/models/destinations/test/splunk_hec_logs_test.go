@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestSplunkHecLogsDestinationResource(t *testing.T) {
+func TestAccSplunkHecLogsDestinationResource(t *testing.T) {
 	const cacheKey = "splunk_hec_logs_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

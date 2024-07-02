@@ -76,20 +76,20 @@ resource "mezmo_threshold_alert" "order_count" {
 
 - `body` (String) The message body to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
 ```
-{{.my_field}} had a count of {{metadata.aggregate.event_count}}
+{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}
 ```
 - `component_id` (String) The uuid of the component that the alert is attached to
 - `component_kind` (String) The kind of component that the alert is attached to
 - `conditional` (Attributes) A group of expressions (optionally nested) joined by a logical operator (see [below for nested schema](#nestedatt--conditional))
 - `event_type` (String) The type of event is either a Log event or a Metric event.
-- `ingestion_key` (String) The key required to ingest the alert into Log Analysis
+- `ingestion_key` (String, Sensitive) The key required to ingest the alert into Log Analysis
 - `inputs` (List of String) The ids of the input components. This could be the id of a match arm for a route processor, or simply the id of the component.
 - `name` (String) The name of the alert.
 - `operation` (String) Specifies the type of aggregation operation to use with the window type and duration. This value must be `custom` for a Log event type.
 - `pipeline_id` (String) The uuid of the pipeline
 - `subject` (String) The subject line to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
 ```
-{{.my_field}} had a count of {{metadata.aggregate.event_count}}
+{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}
 ```
 
 ### Optional
@@ -164,7 +164,7 @@ Optional:
 - `logical_operation` (String) The logical operation (AND/OR) to be applied to the list of conditionals
 
 <a id="nestedatt--conditional--expressions_group--expressions_group--expressions"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation`
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions`
 
 Required:
 
@@ -178,16 +178,16 @@ Optional:
 
 
 <a id="nestedatt--conditional--expressions_group--expressions_group--expressions_group"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation`
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions_group`
 
 Optional:
 
-- `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions))
-- `expressions_group` (Attributes List) A group of expressions joined by a logical operator (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group))
+- `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions))
+- `expressions_group` (Attributes List) A group of expressions joined by a logical operator (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group))
 - `logical_operation` (String) The logical operation (AND/OR) to be applied to the list of conditionals
 
-<a id="nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation.expressions`
+<a id="nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions"></a>
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions_group.expressions`
 
 Required:
 
@@ -200,17 +200,17 @@ Optional:
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
 
-<a id="nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation.expressions_group`
+<a id="nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group"></a>
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions_group.expressions_group`
 
 Optional:
 
-- `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--expressions))
-- `expressions_group` (Attributes List) A group of expressions joined by a logical operator (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--expressions_group))
+- `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions))
+- `expressions_group` (Attributes List) A group of expressions joined by a logical operator (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group))
 - `logical_operation` (String) The logical operation (AND/OR) to be applied to the list of conditionals
 
-<a id="nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--expressions"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation.expressions_group.logical_operation`
+<a id="nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions"></a>
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions_group.expressions_group.expressions`
 
 Required:
 
@@ -223,17 +223,17 @@ Optional:
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
 
-<a id="nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--expressions_group"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation.expressions_group.logical_operation`
+<a id="nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group"></a>
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions_group.expressions_group.expressions_group`
 
 Optional:
 
-- `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--logical_operation--expressions))
-- `expressions_group` (Attributes List) A group of expressions joined by a logical operator (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--logical_operation--expressions_group))
+- `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group--expressions))
+- `expressions_group` (Attributes List) A group of expressions joined by a logical operator (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group))
 - `logical_operation` (String) The logical operation (AND/OR) to be applied to the list of conditionals
 
-<a id="nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--logical_operation--expressions"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation.expressions_group.logical_operation.logical_operation`
+<a id="nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group--expressions"></a>
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions_group.expressions_group.expressions_group.expressions`
 
 Required:
 
@@ -246,16 +246,16 @@ Optional:
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
 
-<a id="nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--logical_operation--expressions_group"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation.expressions_group.logical_operation.logical_operation`
+<a id="nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group"></a>
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions_group.expressions_group.expressions_group.expressions_group`
 
 Optional:
 
-- `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--logical_operation--logical_operation--expressions))
+- `expressions` (Attributes List) Defines a list of expressions for field comparisons (see [below for nested schema](#nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group--expressions))
 - `logical_operation` (String) The logical operation (AND/OR) to be applied to the list of conditionals
 
-<a id="nestedatt--conditional--expressions_group--expressions_group--logical_operation--expressions_group--logical_operation--logical_operation--expressions"></a>
-### Nested Schema for `conditional.expressions_group.expressions_group.logical_operation.expressions_group.logical_operation.logical_operation.logical_operation`
+<a id="nestedatt--conditional--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group--expressions_group--expressions"></a>
+### Nested Schema for `conditional.expressions_group.expressions_group.expressions_group.expressions_group.expressions_group.expressions_group.expressions`
 
 Required:
 

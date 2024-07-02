@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestS3DestinationResource(t *testing.T) {
+func TestAccS3DestinationResource(t *testing.T) {
 	const cacheKey = "s3_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -106,6 +106,69 @@ func TestS3DestinationResource(t *testing.T) {
 						"bucket":                 "mybucket",
 					}),
 				),
+			},
+
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_s3_destination" "my_destination" {
+						title       = "My destination"
+						description = "my destination description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						region      = "us-west1"
+						auth = {
+							access_key_id = "my_key"
+							secret_access_key = "my_secret"
+						}
+						bucket = "mybucket"
+					}
+					resource "mezmo_s3_destination" "implicit" {
+						title             = "My destination"
+						description       = "my destination description"
+						inputs            = [mezmo_http_source.my_source.id]
+						pipeline_id       = mezmo_pipeline.test_parent.id
+						region            = "us-west1"
+						auth              = {
+							access_key_id     = "my_key"
+							secret_access_key = "my_secret"
+						}
+						bucket             = "mybucket"
+						file_consolidation = {
+							enabled = true
+						}
+					}
+					resource "mezmo_s3_destination" "explicit" {
+						title             = "My destination"
+						description       = "my destination description"
+						inputs            = [mezmo_http_source.my_source.id]
+						pipeline_id       = mezmo_pipeline.test_parent.id
+						region            = "us-west1"
+						auth              = {
+							access_key_id     = "my_key"
+							secret_access_key = "my_secret"
+						}
+						bucket             = "mybucket"
+						file_consolidation = {
+							enabled = true
+							process_every_seconds = 420
+							requested_size_bytes = 420000000
+							base_path = "/foo/bar"
+						}
+					}
+					`,
+				Check: resource.ComposeTestCheckFunc([]resource.TestCheckFunc{
+					// Not enabled
+					resource.TestCheckNoResourceAttr("mezmo_s3_destination.my_destination", "file_consolidation"),
+					// Implicit config
+					resource.TestCheckResourceAttr("mezmo_s3_destination.implicit", "file_consolidation.enabled", "true"),
+					resource.TestCheckResourceAttr("mezmo_s3_destination.implicit", "file_consolidation.process_every_seconds", "600"),
+					resource.TestCheckResourceAttr("mezmo_s3_destination.implicit", "file_consolidation.requested_size_bytes", "500000000"),
+					resource.TestCheckResourceAttr("mezmo_s3_destination.implicit", "file_consolidation.base_path", ""),
+					// Explicit config
+					resource.TestCheckResourceAttr("mezmo_s3_destination.explicit", "file_consolidation.enabled", "true"),
+					resource.TestCheckResourceAttr("mezmo_s3_destination.explicit", "file_consolidation.process_every_seconds", "420"),
+					resource.TestCheckResourceAttr("mezmo_s3_destination.explicit", "file_consolidation.requested_size_bytes", "420000000"),
+					resource.TestCheckResourceAttr("mezmo_s3_destination.explicit", "file_consolidation.base_path", "/foo/bar"),
+				}...),
 			},
 
 			// Import

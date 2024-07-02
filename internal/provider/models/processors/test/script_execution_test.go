@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestScriptExecutionProcessor(t *testing.T) {
+func TestAccScriptExecutionProcessor(t *testing.T) {
 	const cacheKey = "script_execution_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

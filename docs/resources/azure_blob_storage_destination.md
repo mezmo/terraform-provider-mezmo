@@ -64,6 +64,7 @@ resource "mezmo_azure_blob_storage_destination" "destination1" {
 - `compression` (String) The compression strategy used on the encoded data prior to sending
 - `description` (String) A user-defined value describing the destination
 - `encoding` (String) The encoding to apply to the data
+- `file_consolidation` (Attributes) This sink writes many small files out to azure blob storage. Enabling this process will allow the automatic consolidation of these small files into larger files of your choosing. This process will enable upon deployment and run on the chosen interval from `Processing Interval` creating files named `merged_[timestamp].log` where `timestamp` is the time since epoch when the actual file was created. The process will recursively access all files under the `Base Path`  to handle merging sub-directory logging structures. (see [below for nested schema](#nestedatt--file_consolidation))
 - `inputs` (List of String) The ids of the input components
 - `prefix` (String) A prefix to be applied to all object keys
 - `title` (String) A user-defined title for the destination
@@ -72,3 +73,13 @@ resource "mezmo_azure_blob_storage_destination" "destination1" {
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the destination
+
+<a id="nestedatt--file_consolidation"></a>
+### Nested Schema for `file_consolidation`
+
+Optional:
+
+- `base_path` (String) The path from the container to begin recursively looking for files to merge. A blank value indicates root. Merged files will only contain data from the respective folder.
+- `enabled` (Boolean) Toggles whether the process is enabled.
+- `process_every_seconds` (Number) How often to run the consolidation process in seconds
+- `requested_size_bytes` (Number) The requested size of the consolidated files in bytes.

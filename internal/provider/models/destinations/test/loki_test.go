@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestLokiDestinationResource(t *testing.T) {
+func TestAccLokiDestinationResource(t *testing.T) {
 	cacheKey := "loki_destination_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

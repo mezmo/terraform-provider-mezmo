@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"slices"
+
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -11,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
-	"golang.org/x/exp/slices"
 )
 
 const PARSE_PROCESSOR_NODE_NAME = "parse"

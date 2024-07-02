@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestGcpCloudStorageSinkResource(t *testing.T) {
+func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 	const cacheKey = "gcp_cloud_storage_destination_resource"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

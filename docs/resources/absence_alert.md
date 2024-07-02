@@ -56,18 +56,18 @@ resource "mezmo_absence_alert" "no_data_alert" {
 
 - `body` (String) The message body to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
 ```
-{{.my_field}} had a count of {{metadata.aggregate.event_count}}
+{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}
 ```
 - `component_id` (String) The uuid of the component that the alert is attached to
 - `component_kind` (String) The kind of component that the alert is attached to
 - `event_type` (String) The type of event is either a Log event or a Metric event.
-- `ingestion_key` (String) The key required to ingest the alert into Log Analysis
+- `ingestion_key` (String, Sensitive) The key required to ingest the alert into Log Analysis
 - `inputs` (List of String) The ids of the input components. This could be the id of a match arm for a route processor, or simply the id of the component.
 - `name` (String) The name of the alert.
 - `pipeline_id` (String) The uuid of the pipeline
 - `subject` (String) The subject line to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
 ```
-{{.my_field}} had a count of {{metadata.aggregate.event_count}}
+{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}
 ```
 
 ### Optional

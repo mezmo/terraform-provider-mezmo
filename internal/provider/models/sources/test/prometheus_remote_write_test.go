@@ -8,7 +8,7 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
 )
 
-func TestPrometheusRemoteWriteSource(t *testing.T) {
+func TestAccPrometheusRemoteWriteSource(t *testing.T) {
 	const cacheKey = "prometheus_remote_write_source_resources"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
