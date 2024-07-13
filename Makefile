@@ -19,7 +19,7 @@ test-unit:
 	go test ./...
 
 .PHONY: test-acceptance
-test:
+test-acceptance:
 	docker-compose -f compose/base.yml pull && docker-compose \
 	-p terraform-provider-mezmo-$(BUILD_TAG) \
 	-f compose/base.yml -f compose/test.yml \
@@ -27,7 +27,7 @@ test:
 
 .PHONY: test-docs
 test-docs: generate-doc
-	@git diff --exit-code
+	git diff --exit-code -- docs/
 
 .PHONY: start
 start:
@@ -81,10 +81,8 @@ examples/%: build-test-example-binary
 		exit $${PIPESTATUS[0]}
 
 .PHONY: local-test
-ENV := $(PWD)/env/local.env
-include $(ENV)
-export
 local-test:
+	@set -a; . $(PWD)/env/local.env; set +a; \
 	go test -v -count=1 ./...
 
 .PHONY: lint
