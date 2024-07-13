@@ -1,4 +1,4 @@
-FROM golang:1.20-bullseye as test
+FROM golang:1.21-bullseye as test
 
 WORKDIR /build
 
