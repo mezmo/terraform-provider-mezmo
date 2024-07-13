@@ -266,7 +266,7 @@ func TestAccAggregateV2Processor(t *testing.T) {
 							"window_min": float64(5),
 						},
 						"evaluate":        map[string]any{"operation": string("SUM")},
-						"event_timestamp": string(".timestamp"),
+						"event_timestamp": string("timestamp"),
 					}),
 				),
 			},
