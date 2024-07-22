@@ -121,7 +121,7 @@ func TestAccUnrollProcessor(t *testing.T) {
 					inputs = []
 					field = "not-a-valid-field"
 				}`,
-				ExpectError: regexp.MustCompile("match pattern"),
+				ExpectError: regexp.MustCompile("Must be a valid data access syntax."),
 			},
 
 			// confirm manually deleted resources are recreated
