@@ -118,10 +118,10 @@ func TestAccUnrollProcessor(t *testing.T) {
 				Config: GetCachedConfig(cacheKey) + `
 				resource "mezmo_unroll_processor" "my_processor" {
 					pipeline_id = mezmo_pipeline.test_parent.id
-					inputs = []
+					inputs = ["something"]
 					field = "not-a-valid-field"
 				}`,
-				ExpectError: regexp.MustCompile("match pattern"),
+				ExpectError: regexp.MustCompile("(?).*Must be a valid data access syntax"),
 			},
 
 			// confirm manually deleted resources are recreated
