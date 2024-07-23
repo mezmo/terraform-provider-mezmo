@@ -30,11 +30,7 @@ type ThresholdAlertModel struct {
 	WindowDurationMin Int64Value  `tfsdk:"window_duration_minutes" user_config:"true"`
 	Script            StringValue `tfsdk:"script" user_config:"true"`
 	EventTimestamp    StringValue `tfsdk:"event_timestamp" user_config:"true"`
-	Severity          StringValue `tfsdk:"severity" user_config:"true"`
-	Style             StringValue `tfsdk:"style" user_config:"true"`
-	Subject           StringValue `tfsdk:"subject" user_config:"true"`
-	Body              StringValue `tfsdk:"body" user_config:"true"`
-	IngestionKey      StringValue `tfsdk:"ingestion_key" user_config:"true"`
+	AlertPayload      ObjectValue `tfsdk:"alert_payload" user_config:"true"`
 }
 
 var ThresholdAlertResourceSchema = schema.Schema{
@@ -69,6 +65,8 @@ var ThresholdAlertResourceSchema = schema.Schema{
 // From terraform schema/model to a struct for sending to the API
 func ThresholdAlertFromModel(plan *ThresholdAlertModel, previousState *ThresholdAlertModel) (*Alert, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
+
+	alertPayload := GetAlertPayloadFromModel(plan.AlertPayload, &dd)
 
 	checkFields := CheckedFields{
 		Operation:      plan.Operation,
@@ -106,13 +104,7 @@ func ThresholdAlertFromModel(plan *ThresholdAlertModel, previousState *Threshold
 				"operation":   Aggregate_Operations[plan.Operation.ValueString()],
 				"conditional": UnwindConditionalFromModel(plan.Conditional),
 			},
-			"alert_payload": map[string]any{
-				"subject": plan.Subject.ValueString(),
-				"body":    plan.Body.ValueString(),
-				"destination": map[string]any{
-					"ingestion_key": plan.IngestionKey.ValueString(),
-				},
-			},
+			"alert_payload": alertPayload,
 		},
 	}
 
@@ -130,7 +122,6 @@ func ThresholdAlertFromModel(plan *ThresholdAlertModel, previousState *Threshold
 
 	general := component.AlertConfig["general"].(map[string]any)
 	evaluation := component.AlertConfig["evaluation"].(map[string]any)
-	alertPayload := component.AlertConfig["alert_payload"].(map[string]any)
 
 	if !plan.Description.IsNull() {
 		general["description"] = plan.Description.ValueString()
@@ -149,12 +140,6 @@ func ThresholdAlertFromModel(plan *ThresholdAlertModel, previousState *Threshold
 	}
 	if !plan.Script.IsNull() {
 		evaluation["script"] = plan.Script.ValueString()
-	}
-	if !plan.Severity.IsUnknown() {
-		alertPayload["severity"] = plan.Severity.ValueString()
-	}
-	if !plan.Style.IsUnknown() {
-		alertPayload["style"] = plan.Style.ValueString()
 	}
 
 	return &component, dd
@@ -176,8 +161,6 @@ func ThresholdAlertToModel(plan *ThresholdAlertModel, component *Alert) {
 
 	general := component.AlertConfig["general"].(map[string]any)
 	evaluation := component.AlertConfig["evaluation"].(map[string]any)
-	alertPayload := component.AlertConfig["alert_payload"].(map[string]any)
-	destination := alertPayload["destination"].(map[string]any)
 
 	// General properties
 	plan.Name = NewStringValue(general["name"].(string))
@@ -203,9 +186,5 @@ func ThresholdAlertToModel(plan *ThresholdAlertModel, component *Alert) {
 	}
 
 	// Alert Payload properties
-	plan.Severity = NewStringValue(alertPayload["severity"].(string))
-	plan.Style = NewStringValue(alertPayload["style"].(string))
-	plan.Subject = NewStringValue(alertPayload["subject"].(string))
-	plan.Body = NewStringValue(alertPayload["body"].(string))
-	plan.IngestionKey = NewStringValue(destination["ingestion_key"].(string))
+	plan.AlertPayload = GetAlertPayloadToModel(component.AlertConfig["alert_payload"].(map[string]any))
 }

@@ -45,9 +45,15 @@ func TestAccChangeAlert_success(t *testing.T) {
 								}
 							],
 						}
-						subject = "Change Alert"
-						body = "You received a change alert"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+								name = "log_analysis"
+								subject = "Change Alert"
+								body = "You received a change alert"
+								ingestion_key = "abc123"
+								severity = "INFO"
+							}
+						}
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
@@ -67,15 +73,17 @@ func TestAccChangeAlert_success(t *testing.T) {
 						"conditional.expressions.0.value_number": "500",
 						"conditional.logical_operation":          "AND",
 						"event_type":                             "metric",
-						"ingestion_key":                          "abc123",
-						"body":                                   "You received a change alert",
 						"name":                                   "my change alert",
 						"operation":                              "sum",
-						"severity":                               "INFO",
-						"style":                                  "static",
-						"subject":                                "Change Alert",
 						"window_duration_minutes":                "5",
 						"window_type":                            "tumbling",
+						"alert_payload.service.name":             "log_analysis",
+						"alert_payload.service.ingestion_key":    "abc123",
+						"alert_payload.service.body":             "You received a change alert",
+						"alert_payload.service.severity":         "INFO",
+						"alert_payload.service.subject":          "Change Alert",
+						"alert_payload.throttling.window_secs":   "60",
+						"alert_payload.throttling.threshold":     "1",
 					}),
 				),
 			},
@@ -96,6 +104,7 @@ func TestAccChangeAlert_success(t *testing.T) {
 						window_type = "sliding"
 						window_duration_minutes = 10
 						group_by = [".other"]
+						active = false
 						conditional = {
 							expressions = [
 								{
@@ -105,11 +114,19 @@ func TestAccChangeAlert_success(t *testing.T) {
 								}
 							],
 						}
-						severity = "WARNING"
-						subject = "updated subject"
-						body = "updated body"
-						ingestion_key = "abc123"
-						active = false
+						alert_payload = {
+							service = {
+								name = "log_analysis"
+								severity = "WARNING"
+								subject = "updated subject"
+								body = "updated body"
+								ingestion_key = "abc123"
+							}
+							throttling = {
+                window_secs = 300
+								threshold = 5
+              }
+						}
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_change_alert.default_metric", map[string]any{
@@ -117,17 +134,21 @@ func TestAccChangeAlert_success(t *testing.T) {
 						"description":                            "updated description",
 						"group_by.#":                             "1",
 						"group_by.0":                             ".other",
-						"body":                                   "updated body",
 						"name":                                   "updated name",
 						"operation":                              "custom",
 						"conditional.expressions.0.field":        ".other_value",
 						"conditional.expressions.0.operator":     "value_change_less_or_equal",
 						"conditional.expressions.0.value_number": "100",
 						"script":                                 "function myFunc(a, e, m) { return a }",
-						"severity":                               "WARNING",
-						"subject":                                "updated subject",
 						"window_duration_minutes":                "10",
 						"window_type":                            "sliding",
+						"alert_payload.service.name":             "log_analysis",
+						"alert_payload.service.ingestion_key":    "abc123",
+						"alert_payload.service.body":             "updated body",
+						"alert_payload.service.severity":         "WARNING",
+						"alert_payload.service.subject":          "updated subject",
+						"alert_payload.throttling.window_secs":   "300",
+						"alert_payload.throttling.threshold":     "5",
 					}),
 				),
 			},
@@ -155,9 +176,13 @@ func TestAccChangeAlert_success(t *testing.T) {
 								}
 							],
 						}
-						subject = "Change Alert for Log event"
-						body = "You received a change alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+								name = "slack"
+								uri = "http://google.com/our_slack_api"
+								message_text = "Alert: Log event count has exceeded threshold"
+							}
+						}
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
@@ -182,16 +207,14 @@ func TestAccChangeAlert_success(t *testing.T) {
 						"group_by.0":                             ".name",
 						"group_by.1":                             ".namespace",
 						"group_by.2":                             ".tags",
-						"ingestion_key":                          "abc123",
 						"name":                                   "my change alert",
 						"operation":                              "custom",
 						"script":                                 "function myFunc(a, e, m) { return a }",
-						"severity":                               "INFO",
-						"style":                                  "static",
-						"subject":                                "Change Alert for Log event",
-						"body":                                   "You received a change alert for a Log event",
 						"window_duration_minutes":                "5",
 						"window_type":                            "tumbling",
+						"alert_payload.service.name":             "slack",
+						"alert_payload.service.message_text":     "Alert: Log event count has exceeded threshold",
+						"alert_payload.service.uri":              "http://google.com/our_slack_api",
 					}),
 				),
 			},
@@ -199,7 +222,7 @@ func TestAccChangeAlert_success(t *testing.T) {
 	})
 }
 
-func TestChangeAlert_schema_validation_errors(t *testing.T) {
+func TestAccChangeAlert_schema_validation_errors(t *testing.T) {
 	const cacheKey = "change_alert_schema_validation_errors"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -232,9 +255,13 @@ func TestChangeAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Change Alert for Log event"
-						body = "You received a change alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+								name = "slack"
+								uri = "http://google.com/our_slack_api"
+								message_text = "Alert: Log event count has exceeded threshold"
+							}
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*operator value must be one of.*percent_change_less"),
 			},

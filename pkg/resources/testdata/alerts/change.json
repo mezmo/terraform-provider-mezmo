@@ -8,13 +8,15 @@
   ],
   "alert_config": {
     "alert_payload": {
-      "destination": {
-        "ingestion_key": "abc123"
+      "service": {
+        "name": "slack",
+        "uri": "https://hooks.slack.com/services/your/slack/webhook",
+        "message_text": "Got an alert: {{.some_field}}"
       },
-      "body": "You received a change alert",
-      "severity": "INFO",
-      "style": "static",
-      "subject": "Change Alert"
+      "throttling": {
+        "window_secs": 300,
+        "threshold": 1
+      }
     },
     "evaluation": {
       "alert_type": "change",
