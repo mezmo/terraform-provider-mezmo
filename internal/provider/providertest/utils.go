@@ -322,7 +322,10 @@ func CheckMultipleErrors(err_strings []string) resource.ErrorCheckFunc {
 		for _, err_string := range err_strings {
 			found, _ := regexp.Match(err_string, error_bytes)
 			if !found {
-				return errors.New("The expected error was not found: " + err_string)
+				return errors.New(
+					"The expected error was not found: " + err_string +
+						". Errors found: " + string(error_bytes),
+				)
 			}
 		}
 		return nil

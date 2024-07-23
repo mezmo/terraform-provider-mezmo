@@ -25,11 +25,7 @@ type AbsenceAlertModel struct {
 	WindowType        StringValue `tfsdk:"window_type" user_config:"true"`
 	WindowDurationMin Int64Value  `tfsdk:"window_duration_minutes" user_config:"true"`
 	EventTimestamp    StringValue `tfsdk:"event_timestamp" user_config:"true"`
-	Severity          StringValue `tfsdk:"severity" user_config:"true"`
-	Style             StringValue `tfsdk:"style" user_config:"true"`
-	Subject           StringValue `tfsdk:"subject" user_config:"true"`
-	Body              StringValue `tfsdk:"body" user_config:"true"`
-	IngestionKey      StringValue `tfsdk:"ingestion_key" user_config:"true"`
+	AlertPayload      ObjectValue `tfsdk:"alert_payload" user_config:"true"`
 }
 
 var AbsenceAlertResourceSchema = schema.Schema{
@@ -40,6 +36,8 @@ var AbsenceAlertResourceSchema = schema.Schema{
 // From terraform schema/model to a struct for sending to the API
 func AbsenceAlertFromModel(plan *AbsenceAlertModel, previousState *AbsenceAlertModel) (*Alert, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
+
+	alertPayload := GetAlertPayloadFromModel(plan.AlertPayload, &dd)
 
 	CustomErrorChecks(&CheckedFields{
 		EventType:      plan.EventType,
@@ -71,13 +69,7 @@ func AbsenceAlertFromModel(plan *AbsenceAlertModel, previousState *AbsenceAlertM
 				"alert_type": ALERT_TYPE_ABSENCE, // Required for the API, but hidden from the user here
 				"event_type": plan.EventType.ValueString(),
 			},
-			"alert_payload": map[string]any{
-				"subject": plan.Subject.ValueString(),
-				"body":    plan.Body.ValueString(),
-				"destination": map[string]any{
-					"ingestion_key": plan.IngestionKey.ValueString(),
-				},
-			},
+			"alert_payload": alertPayload,
 		},
 	}
 
@@ -95,7 +87,6 @@ func AbsenceAlertFromModel(plan *AbsenceAlertModel, previousState *AbsenceAlertM
 
 	general := component.AlertConfig["general"].(map[string]any)
 	evaluation := component.AlertConfig["evaluation"].(map[string]any)
-	alertPayload := component.AlertConfig["alert_payload"].(map[string]any)
 
 	if !plan.Description.IsNull() {
 		general["description"] = plan.Description.ValueString()
@@ -111,12 +102,6 @@ func AbsenceAlertFromModel(plan *AbsenceAlertModel, previousState *AbsenceAlertM
 	}
 	if !plan.EventTimestamp.IsNull() {
 		evaluation["event_timestamp"] = plan.EventTimestamp.ValueString()
-	}
-	if !plan.Severity.IsUnknown() {
-		alertPayload["severity"] = plan.Severity.ValueString()
-	}
-	if !plan.Style.IsUnknown() {
-		alertPayload["style"] = plan.Style.ValueString()
 	}
 
 	return &component, dd
@@ -138,8 +123,6 @@ func AbsenceAlertToModel(plan *AbsenceAlertModel, component *Alert) {
 
 	general := component.AlertConfig["general"].(map[string]any)
 	evaluation := component.AlertConfig["evaluation"].(map[string]any)
-	alertPayload := component.AlertConfig["alert_payload"].(map[string]any)
-	destination := alertPayload["destination"].(map[string]any)
 
 	// General properties
 	plan.Name = NewStringValue(general["name"].(string))
@@ -160,9 +143,5 @@ func AbsenceAlertToModel(plan *AbsenceAlertModel, component *Alert) {
 	}
 
 	// Alert Payload properties
-	plan.Severity = NewStringValue(alertPayload["severity"].(string))
-	plan.Style = NewStringValue(alertPayload["style"].(string))
-	plan.Subject = NewStringValue(alertPayload["subject"].(string))
-	plan.Body = NewStringValue(alertPayload["body"].(string))
-	plan.IngestionKey = NewStringValue(destination["ingestion_key"].(string))
+	plan.AlertPayload = GetAlertPayloadToModel(component.AlertConfig["alert_payload"].(map[string]any))
 }

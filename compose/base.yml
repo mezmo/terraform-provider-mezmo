@@ -45,6 +45,7 @@ services:
 #      target: release
 #      args:
 #        - GITHUB_TOKEN
+#        - VECTOR_VERSION
   pipeline-service:
     image: us.gcr.io/logdna-k8s/pipeline-service:3-latest
     depends_on:

@@ -54,21 +54,13 @@ resource "mezmo_absence_alert" "no_data_alert" {
 
 ### Required
 
-- `body` (String) The message body to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
-```
-{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}
-```
+- `alert_payload` (Attributes) Configure where the alert will be sent, including choosing a service and throttling options. All options for the chosen `service` will be required. All text fields support templating. (see [below for nested schema](#nestedatt--alert_payload))
 - `component_id` (String) The uuid of the component that the alert is attached to
 - `component_kind` (String) The kind of component that the alert is attached to
 - `event_type` (String) The type of event is either a Log event or a Metric event.
-- `ingestion_key` (String, Sensitive) The key required to ingest the alert into Log Analysis
 - `inputs` (List of String) The ids of the input components. This could be the id of a match arm for a route processor, or simply the id of the component.
 - `name` (String) The name of the alert.
 - `pipeline_id` (String) The uuid of the pipeline
-- `subject` (String) The subject line to use when the alert is sent. For a `template` style, surround the field path in double curly braces.
-```
-{{"{{.my_field}} had a count of {{metadata.aggregate.event_count}}"}}
-```
 
 ### Optional
 
@@ -76,11 +68,49 @@ resource "mezmo_absence_alert" "no_data_alert" {
 - `description` (String) An optional description describing what the alert is for.
 - `event_timestamp` (String) The path to a field on the event that contains an epoch timestamp value. If an event does not have a timestamp field, events will be associated to the wall clock value when the event is processed. Required for Log event types and disallowed for Metric event types.
 - `group_by` (List of String) When aggregating, group events based on matching values from each of these field paths. Supports nesting via dot-notation. This value is optional for Metric event types, and SHOULD be used for Log event types.
-- `severity` (String) The severity level of the alert.
-- `style` (String) Configuration for how the alert message will be constructed. For `static`, exact strings will be used. For `template`, the alert subjec and body will allow for placeholders to substitute values from the event.
 - `window_duration_minutes` (Number) The duration of the aggregation window in minutes.
 - `window_type` (String) Sliding windows can overlap, whereas tumbling windows are disjoint. For example, a tumbling window has a fixed time span and any events that fall within the "window duration" will be used in the aggregate. In a sliding window, the aggregation occurs every "window duration" seconds after an event is encountered.
 
 ### Read-Only
 
 - `id` (String) The uuid of the alert
+
+<a id="nestedatt--alert_payload"></a>
+### Nested Schema for `alert_payload`
+
+Required:
+
+- `service` (Attributes) Configuration for the service receiving the alert. (see [below for nested schema](#nestedatt--alert_payload--service))
+
+Optional:
+
+- `throttling` (Attributes) Configure throttling options for the service receiving the alert. (see [below for nested schema](#nestedatt--alert_payload--throttling))
+
+<a id="nestedatt--alert_payload--service"></a>
+### Nested Schema for `alert_payload.service`
+
+Required:
+
+- `name` (String) The name of the service.
+
+Optional:
+
+- `body` (String) Additional information to be added to the message (Log Analysis).
+- `event_action` (String) The event action to use (PagerDuty).
+- `ingestion_key` (String) The ingestion key for the service (Log Analysis).
+- `message_text` (String) The text value of the notification message (Slack, Webhook).
+- `routing_key` (String) The service's routing key (PagerDuty).
+- `severity` (String) The severity level of the alert (PagerDuty, Log Analysis).
+- `source` (String) The source of the alert (PagerDuty).
+- `subject` (String) The main subject line of the message (Log Analysis).
+- `summary` (String) Summarize the alert details (PagerDuty).
+- `uri` (String) The URI of the service (Slack, PagerDuty, Webhook).
+
+
+<a id="nestedatt--alert_payload--throttling"></a>
+### Nested Schema for `alert_payload.throttling`
+
+Optional:
+
+- `threshold` (Number) The maximum number of notifications allowed over the given time window set by `window_secs` (default: 1).
+- `window_secs` (Number) The time frame during which the number of notifications (set by the `threshold`) is permitted (default: 60).

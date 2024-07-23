@@ -45,9 +45,15 @@ func TestAccThresholdAlert_success(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert"
-						body = "You received a threshold alert"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+								name = "log_analysis"
+								subject = "Threshold Alert"
+								body = "You received a threshold alert"
+								ingestion_key = "abc123"
+								severity = "INFO"
+							}
+						}
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
@@ -67,15 +73,17 @@ func TestAccThresholdAlert_success(t *testing.T) {
 						"conditional.expressions.0.value_number": "5000",
 						"conditional.logical_operation":          "AND",
 						"event_type":                             "metric",
-						"ingestion_key":                          "abc123",
-						"body":                                   "You received a threshold alert",
 						"name":                                   "my threshold alert",
 						"operation":                              "sum",
-						"severity":                               "INFO",
-						"style":                                  "static",
-						"subject":                                "Threshold Alert",
 						"window_duration_minutes":                "5",
 						"window_type":                            "tumbling",
+						"alert_payload.service.name":             "log_analysis",
+						"alert_payload.service.ingestion_key":    "abc123",
+						"alert_payload.service.body":             "You received a threshold alert",
+						"alert_payload.service.severity":         "INFO",
+						"alert_payload.service.subject":          "Threshold Alert",
+						"alert_payload.throttling.window_secs":   "60",
+						"alert_payload.throttling.threshold":     "1",
 					}),
 				),
 			},
@@ -104,24 +112,37 @@ func TestAccThresholdAlert_success(t *testing.T) {
 								}
 							],
 						}
-						severity = "WARNING"
-						subject = "updated subject"
-						body = "updated body"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+								name = "log_analysis"
+								severity = "WARNING"
+								subject = "updated subject"
+								body = "updated body"
+								ingestion_key = "abc123"
+							}
+							throttling = {
+                window_secs = 300
+								threshold = 5
+              }
+						}
 						active = false
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_threshold_alert.default_metric", map[string]any{
-						"active":                  "false",
-						"description":             "updated description",
-						"body":                    "updated body",
-						"name":                    "updated name",
-						"operation":               "custom",
-						"script":                  "function myFunc(a, e, m) { return a }",
-						"severity":                "WARNING",
-						"subject":                 "updated subject",
-						"window_duration_minutes": "10",
-						"window_type":             "sliding",
+						"active":                               "false",
+						"description":                          "updated description",
+						"name":                                 "updated name",
+						"operation":                            "custom",
+						"script":                               "function myFunc(a, e, m) { return a }",
+						"window_duration_minutes":              "10",
+						"window_type":                          "sliding",
+						"alert_payload.service.name":           "log_analysis",
+						"alert_payload.service.ingestion_key":  "abc123",
+						"alert_payload.service.body":           "updated body",
+						"alert_payload.service.severity":       "WARNING",
+						"alert_payload.service.subject":        "updated subject",
+						"alert_payload.throttling.window_secs": "300",
+						"alert_payload.throttling.threshold":   "5",
 					}),
 				),
 			},
@@ -149,9 +170,13 @@ func TestAccThresholdAlert_success(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+								name = "slack"
+								uri = "http://google.com/our_slack_api"
+								message_text = "Alert: Log event count has exceeded threshold"
+							}
+						}
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
@@ -176,16 +201,14 @@ func TestAccThresholdAlert_success(t *testing.T) {
 						"group_by.0":                             ".name",
 						"group_by.1":                             ".namespace",
 						"group_by.2":                             ".tags",
-						"ingestion_key":                          "abc123",
 						"name":                                   "my threshold alert",
 						"operation":                              "custom",
 						"script":                                 "function myFunc(a, e, m) { return a }",
-						"severity":                               "INFO",
-						"style":                                  "static",
-						"subject":                                "Threshold Alert for Log event",
-						"body":                                   "You received a threshold alert for a Log event",
 						"window_duration_minutes":                "5",
 						"window_type":                            "tumbling",
+						"alert_payload.service.name":             "slack",
+						"alert_payload.service.message_text":     "Alert: Log event count has exceeded threshold",
+						"alert_payload.service.uri":              "http://google.com/our_slack_api",
 					}),
 				),
 			},
@@ -208,10 +231,8 @@ func TestThresholdAlert_root_required_errors(t *testing.T) {
 			`The argument "name" is required`,
 			`The argument "event_type" is required`,
 			`The argument "operation" is required`,
-			`The argument "subject" is required`,
-			`The argument "body" is required`,
-			`The argument "ingestion_key" is required`,
 			`The argument "conditional" is required`,
+			`The argument "alert_payload" is required`,
 		}),
 		Steps: []resource.TestStep{
 			{
@@ -261,9 +282,13 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*operator value must be one of.*"),
 			},
@@ -287,9 +312,13 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*Attribute pipeline_id string length must be at least 1"),
 			},
@@ -313,9 +342,13 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*Attribute component_id string length must be at least 1"),
 			},
@@ -339,9 +372,13 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute component_kind value must be one of: \["source" "transform"\]`),
 			},
@@ -365,9 +402,13 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute inputs list must contain at least 1 elements`),
 			},
@@ -391,9 +432,13 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute inputs\[0\] string length must be at least 1`),
 			},
@@ -449,9 +494,13 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*Attribute name string length must be at least 1"),
 			},
@@ -475,9 +524,13 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute event_type value must be one of: \["log" "metric"\]`),
 			},
@@ -502,38 +555,15 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 							],
 						}
 						window_type = "badwindow"
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).*Attribute window_type value must be one of: \["tumbling" "sliding"\]`),
-			},
-			// invalid severity
-			{
-				Config: GetCachedConfig(cacheKey) + `
-					resource "mezmo_threshold_alert" "bad_severity" {
-						pipeline_id = mezmo_pipeline.test_parent.id
-						component_kind = "source"
-						component_id = mezmo_http_source.my_source.id
-						inputs = [mezmo_http_source.my_source.id]
-						name = "my threshold alert"
-						event_type = "metric"
-						operation = "sum"
-						conditional = {
-							expressions = [
-								{
-									field = ".event_count"
-									operator = "greater"
-									value_number = 10
-								}
-							],
-						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
-						severity = "invalid"
-					}`,
-				ExpectError: regexp.MustCompile("(?s).*Attribute severity value must be one of.*"),
 			},
 			// invalid operation
 			{
@@ -555,38 +585,15 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile(`(?s).Attribute operation value must be one of:`),
-			},
-			// invalid style
-			{
-				Config: GetCachedConfig(cacheKey) + `
-					resource "mezmo_threshold_alert" "bad_style" {
-						pipeline_id = mezmo_pipeline.test_parent.id
-						component_kind = "source"
-						component_id = mezmo_http_source.my_source.id
-						inputs = [mezmo_http_source.my_source.id]
-						name = "my threshold alert"
-						event_type = "metric"
-						operation = "sum"
-						conditional = {
-							expressions = [
-								{
-									field = ".event_count"
-									operator = "greater"
-									value_number = 10
-								}
-							],
-						}
-						style = "NOPE"
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
-					}`,
-				ExpectError: regexp.MustCompile(`(?s).Attribute style value must be one of:`),
 			},
 		},
 	})
@@ -624,9 +631,13 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*A 'custom' operation requires a valid JS `script` function"),
 			},
@@ -651,9 +662,13 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*`script` cannot be set when `operation` is not 'custom'"),
 			},
@@ -677,9 +692,13 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*A 'log' event type requires a 'custom' `operation` and a valid JS `script`"),
 			},
@@ -704,11 +723,209 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 								}
 							],
 						}
-						subject = "Threshold Alert for Log event"
-						body = "You received a threshold alert for a Log event"
-						ingestion_key = "abc123"
+						alert_payload = {
+							service = {
+                name = "slack"
+                uri = "http://google.com/our_slack_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+              }
+						}
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*A 'metric' event type cannot have an `event_timestamp` field"),
+			},
+		},
+	})
+}
+
+func TestThresholdAlert_slack_payload_errors(t *testing.T) {
+	const cacheKey = "slack_payload_errors"
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { TestPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		ErrorCheck: CheckMultipleErrors([]string{
+			"`uri` is required for Slack, PagerDuty, or Webhook",
+			"`message_text` is required for Slack or Webhook notifications",
+		}),
+		Steps: []resource.TestStep{
+			// custom operation requires script
+			{
+				Config: SetCachedConfig(cacheKey, `
+					resource "mezmo_pipeline" "test_parent" {
+						title = "pipeline"
+					}
+					resource "mezmo_http_source" "my_source" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+					}`) + `
+					resource "mezmo_threshold_alert" "bad_alert" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "metric"
+						operation = "sum"
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 5000
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+                name = "slack"
+              }
+						}
+					}`,
+			},
+		},
+	})
+}
+
+func TestAccThresholdAlert_webhook_payload_errors(t *testing.T) {
+	const cacheKey = "webhook_payload_errors"
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		PreCheck:                 func() { TestPreCheck(t) },
+		ErrorCheck: CheckMultipleErrors([]string{
+			"`uri` is required for Slack, PagerDuty, or Webhook",
+			"`message_text` is required for Slack or Webhook notifications",
+		}),
+		Steps: []resource.TestStep{
+			// custom operation requires script
+			{
+				Config: SetCachedConfig(cacheKey, `
+					resource "mezmo_pipeline" "test_parent" {
+						title = "pipeline"
+					}
+					resource "mezmo_http_source" "my_source" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+					}`) + `
+					resource "mezmo_threshold_alert" "bad_alert" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "metric"
+						operation = "sum"
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 5000
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+                name = "webhook"
+              }
+						}
+					}`,
+			},
+		},
+	})
+}
+
+func TestAccThresholdAlert_pager_duty_payload_errors(t *testing.T) {
+	const cacheKey = "pager_duty_payload_errors"
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		PreCheck:                 func() { TestPreCheck(t) },
+		ErrorCheck: CheckMultipleErrors([]string{
+			"`uri` is required for Slack, PagerDuty, or Webhook",
+			"`summary` is required for PagerDuty notifications",
+			"`severity` is required for PagerDuty notifications",
+			"`source` is required for PagerDuty notifications",
+			"`routing_key` is required for PagerDuty notifications",
+			"`event_action` is required for PagerDuty notifications",
+		}),
+		Steps: []resource.TestStep{
+			// custom operation requires script
+			{
+				Config: SetCachedConfig(cacheKey, `
+					resource "mezmo_pipeline" "test_parent" {
+						title = "pipeline"
+					}
+					resource "mezmo_http_source" "my_source" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+					}`) + `
+					resource "mezmo_threshold_alert" "bad_alert" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "metric"
+						operation = "sum"
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 5000
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+                name = "pager_duty"
+              }
+						}
+					}`,
+			},
+		},
+	})
+}
+
+func TestAccThresholdAlert_log_analysis_payload_errors(t *testing.T) {
+	const cacheKey = "log_analysis_payload_errors"
+	resource.Test(t, resource.TestCase{
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		PreCheck:                 func() { TestPreCheck(t) },
+		ErrorCheck: CheckMultipleErrors([]string{
+			"`severity` is required for Log Analysis notifications",
+			"`subject` is required for Log Analysis notifications",
+			"`body` is required for Log Analysis notifications",
+			"`ingestion_key` is required for Log Analysis notifications",
+		}),
+		Steps: []resource.TestStep{
+			// custom operation requires script
+			{
+				Config: SetCachedConfig(cacheKey, `
+					resource "mezmo_pipeline" "test_parent" {
+						title = "pipeline"
+					}
+					resource "mezmo_http_source" "my_source" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+					}`) + `
+					resource "mezmo_threshold_alert" "bad_alert" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "metric"
+						operation = "sum"
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 5000
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+                name = "log_analysis"
+              }
+						}
+					}`,
 			},
 		},
 	})
