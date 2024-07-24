@@ -120,9 +120,9 @@ Optional:
 
 - `body` (String) Additional information to be added to the message (Log Analysis).
 - `event_action` (String) The event action to use (PagerDuty).
-- `ingestion_key` (String) The ingestion key for the service (Log Analysis).
+- `ingestion_key` (String, Sensitive) The ingestion key for the service (Log Analysis).
 - `message_text` (String) The text value of the notification message (Slack, Webhook).
-- `routing_key` (String) The service's routing key (PagerDuty).
+- `routing_key` (String, Sensitive) The service's routing key (PagerDuty).
 - `severity` (String) The severity level of the alert (PagerDuty, Log Analysis).
 - `source` (String) The source of the alert (PagerDuty).
 - `subject` (String) The main subject line of the message (Log Analysis).

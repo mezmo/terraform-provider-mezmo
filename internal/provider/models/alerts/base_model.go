@@ -166,6 +166,7 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 					},
 					"routing_key": schema.StringAttribute{
 						Optional:    true,
+						Sensitive:   true,
 						Description: "The service's routing key (PagerDuty).",
 					},
 					"event_action": schema.StringAttribute{
@@ -189,6 +190,7 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 					},
 					"ingestion_key": schema.StringAttribute{
 						Optional:    true,
+						Sensitive:   true,
 						Description: "The ingestion key for the service (Log Analysis).",
 					},
 				},
