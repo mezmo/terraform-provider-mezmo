@@ -23,17 +23,13 @@ resource "mezmo_demo_source" "source1" {
 }
 
 resource "mezmo_gcp_cloud_storage_destination" "gcp" {
-  title         = "GCP"
-  description   = "This stores our data in GCP cloud storage"
-  inputs        = [mezmo_demo_source.source1.id]
-  pipeline_id   = mezmo_pipeline.pipeline1.id
-  encoding      = "json"
-  compression   = "gzip"
-  bucket        = "test_bucket"
-  bucket_prefix = "bucket_prefix"
-  auth = {
-    type  = "api_key"
-    value = "key"
-  }
-
+  title            = "GCP"
+  description      = "This stores our data in GCP cloud storage"
+  inputs           = [mezmo_demo_source.source1.id]
+  pipeline_id      = mezmo_pipeline.pipeline1.id
+  encoding         = "json"
+  compression      = "gzip"
+  bucket           = "test_bucket"
+  bucket_prefix    = "bucket_prefix"
+  credentials_json = "{}"
 }
