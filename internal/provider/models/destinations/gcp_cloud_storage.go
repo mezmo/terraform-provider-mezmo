@@ -1,16 +1,12 @@
 package destinations
 
 import (
-	"context"
-
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
@@ -29,7 +25,7 @@ type GcpCloudStorageDestinationModel struct {
 	Bucket              String `tfsdk:"bucket" user_config:"true"`
 	Compression         String `tfsdk:"compression" user_config:"true"`
 	BucketPrefix        String `tfsdk:"bucket_prefix" user_config:"true"`
-	Auth                Object `tfsdk:"auth" user_config:"true"`
+	CredentialsJSON     String `tfsdk:"credentials_json" user_config:"true"`
 	AckEnabled          Bool   `tfsdk:"ack_enabled" user_config:"true"`
 	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs" user_config:"true"`
 }
@@ -70,25 +66,11 @@ var GcpCloudStorageResourceSchema = schema.Schema{
 				stringvalidator.LengthAtLeast(1),
 			},
 		},
-		"auth": schema.SingleNestedAttribute{
+		"credentials_json": schema.StringAttribute{
 			Required:    true,
-			Description: "Configure GCP Cloud Storage authentication",
-			Attributes: map[string]schema.Attribute{
-				"type": schema.StringAttribute{
-					Required:    true,
-					Description: "The type of authentication to use.",
-					Validators: []validator.String{
-						stringvalidator.OneOf("api_key", "credentials_json"),
-					},
-				},
-				"value": schema.StringAttribute{
-					Required:    true,
-					Sensitive:   true,
-					Description: "Authentication secret value.",
-					Validators: []validator.String{
-						stringvalidator.LengthAtLeast(1),
-					},
-				},
+			Description: "JSON Credentials",
+			Validators: []validator.String{
+				stringvalidator.LengthAtLeast(1),
 			},
 		},
 	}, []string{"batch_timeout_secs"}),
@@ -109,16 +91,9 @@ func GcpCloudStorageDestinationFromModel(plan *GcpCloudStorageDestinationModel, 
 				"encoding":           plan.Encoding.ValueString(),
 				"bucket":             plan.Bucket.ValueString(),
 				"compression":        plan.Compression.ValueString(),
+				"credentials_json":   plan.CredentialsJSON.ValueString(),
 			},
 		},
-	}
-
-	auth := plan.Auth.Attributes()
-	component.UserConfig["auth"] = GetAttributeValue[String](auth, "type").ValueString()
-	if component.UserConfig["auth"] == "api_key" {
-		component.UserConfig["api_key"] = GetAttributeValue[String](auth, "value").ValueString()
-	} else {
-		component.UserConfig["credentials_json"] = GetAttributeValue[String](auth, "value").ValueString()
 	}
 
 	if plan.BucketPrefix.ValueString() != "" {
@@ -148,20 +123,9 @@ func GcpCloudStorageDestinationToModel(plan *GcpCloudStorageDestinationModel, co
 	plan.Encoding = StringValue(component.UserConfig["encoding"].(string))
 	plan.Bucket = StringValue(component.UserConfig["bucket"].(string))
 	plan.BatchTimeoutSeconds = Int64Value(int64(component.UserConfig["batch_timeout_secs"].(float64)))
+	plan.CredentialsJSON = StringValue(component.UserConfig["credentials_json"].(string))
 
 	if component.UserConfig["bucket_prefix"] != nil {
 		plan.BucketPrefix = StringValue(component.UserConfig["bucket_prefix"].(string))
 	}
-
-	authAttrTypes := plan.Auth.AttributeTypes(context.Background())
-	if len(authAttrTypes) == 0 {
-		authAttrTypes = GcpCloudStorageResourceSchema.Attributes["auth"].GetType().(basetypes.ObjectType).AttrTypes
-	}
-	authType, _ := component.UserConfig["auth"].(string)
-	plan.Auth = basetypes.NewObjectValueMust(
-		authAttrTypes,
-		map[string]attr.Value{
-			"type":  StringValue(authType),
-			"value": StringValue(component.UserConfig[authType].(string)),
-		})
 }

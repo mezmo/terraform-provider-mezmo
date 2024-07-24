@@ -20,10 +20,7 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 					resource "mezmo_gcp_cloud_storage_destination" "my_dest" {
 						inputs = ["abc"]
 						pipeline_id = "pipeline-id"
-						auth = {
-							type = "api_key"
-							value = "key"
-						}
+						credentials_json = "{}"
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"bucket\" is required"),
 			},
@@ -34,31 +31,7 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 						pipeline_id = "pipeline-id"
 						bucket = "test_bucket"
 					}`,
-				ExpectError: regexp.MustCompile("The argument \"auth\" is required"),
-			},
-			{
-				Config: GetProviderConfig() + `
-					resource "mezmo_gcp_cloud_storage_destination" "my_dest" {
-						inputs = ["abc"]
-						pipeline_id = "pipeline-id"
-						bucket = "test_bucket"
-						auth = {
-							value = "key"
-						}
-					}`,
-				ExpectError: regexp.MustCompile("attribute \"type\" is required"),
-			},
-			{
-				Config: GetProviderConfig() + `
-					resource "mezmo_gcp_cloud_storage_destination" "my_dest" {
-						inputs = ["abc"]
-						pipeline_id = "pipeline-id"
-						bucket = "test_bucket"
-						auth = {
-							type = "api_key"
-						}
-					}`,
-				ExpectError: regexp.MustCompile("attribute \"value\" is required"),
+				ExpectError: regexp.MustCompile("The argument \"credentials_json\" is required"),
 			},
 			// validators
 			{
@@ -68,10 +41,7 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 						pipeline_id = "pipeline-id"
 						bucket = "test_bucket"
 						encoding = "invalid"
-						auth = {
-							type = "api_key"
-							value = "key"
-						}
+						credentials_json = "{}"
 					}`,
 				ExpectError: regexp.MustCompile("Attribute encoding value must be one of"),
 			},
@@ -81,10 +51,7 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 						inputs = ["abc"]
 						pipeline_id = "pipeline-id"
 						bucket = ""
-						auth = {
-							type = "api_key"
-							value = "key"
-						}
+						credentials_json = "{}"
 					}`,
 				ExpectError: regexp.MustCompile("Attribute bucket string length must be at least 1"),
 			},
@@ -95,10 +62,7 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 						pipeline_id = "pipeline-id"
 						bucket = "test_bucket"
 						compression = "bzip"
-						auth = {
-							type = "api_key"
-							value = "key"
-						}
+						credentials_json = "{}"
 					}`,
 				ExpectError: regexp.MustCompile("Attribute compression value must be one of"),
 			},
@@ -109,40 +73,9 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 						pipeline_id = "pipeline-id"
 						bucket = "test_bucket"
 						bucket_prefix = ""
-						auth = {
-							type = "api_key"
-							value = "key"
-						}
+						credentials_json = "{}"
 					}`,
 				ExpectError: regexp.MustCompile("Attribute bucket_prefix string length must be at least 1"),
-			},
-			{
-				Config: GetProviderConfig() + `
-					resource "mezmo_gcp_cloud_storage_destination" "my_dest" {
-						inputs = ["abc"]
-						pipeline_id = "pipeline-id"
-						bucket = "test_bucket"
-						auth = {
-							type = "invalid"
-							value = "key"
-						}
-					}
-				`,
-				ExpectError: regexp.MustCompile("Attribute auth.type value must be one of"),
-			},
-			{
-				Config: GetProviderConfig() + `
-					resource "mezmo_gcp_cloud_storage_destination" "my_dest" {
-						inputs = ["abc"]
-						pipeline_id = "pipeline-id"
-						bucket = "test_bucket"
-						auth = {
-							type = "api_key"
-							value = ""
-						}
-					}
-				`,
-				ExpectError: regexp.MustCompile("Attribute auth.value string length must be at least 1"),
 			},
 			// Create
 			{
@@ -162,27 +95,23 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 						compression = "gzip"
 						bucket = "test_bucket"
 						bucket_prefix = "bucket_prefix"
-						auth = {
-							type = "api_key"
-							value = "key"
-						}
+						credentials_json = "{}"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_gcp_cloud_storage_destination.my_dest", "id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_gcp_cloud_storage_destination.my_dest", map[string]any{
-						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
-						"title":         "test dest",
-						"description":   "test dest description",
-						"generation_id": "0",
-						"ack_enabled":   "true",
-						"inputs.#":      "1",
-						"encoding":      "json",
-						"compression":   "gzip",
-						"bucket":        "test_bucket",
-						"bucket_prefix": "bucket_prefix",
-						"auth.type":     "api_key",
-						"auth.value":    "key",
+						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
+						"title":            "test dest",
+						"description":      "test dest description",
+						"generation_id":    "0",
+						"ack_enabled":      "true",
+						"inputs.#":         "1",
+						"encoding":         "json",
+						"compression":      "gzip",
+						"bucket":           "test_bucket",
+						"bucket_prefix":    "bucket_prefix",
+						"credentials_json": "{}",
 					}),
 				),
 			},
@@ -198,10 +127,7 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 						compression = "gzip"
 						bucket = "test_bucket"
 						bucket_prefix = "bucket_prefix"
-						auth = {
-							type = "api_key"
-							value = "key"
-						}
+						credentials_json = "{}"
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_gcp_cloud_storage_destination.import_target",
@@ -223,26 +149,22 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 						compression = "none"
 						bucket = "new_bucket"
 						ack_enabled = false
-						auth = {
-							type = "credentials_json"
-							value = "{}"
-						}
+						credentials_json = "{}"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_gcp_cloud_storage_destination.my_dest", "id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_gcp_cloud_storage_destination.my_dest", map[string]any{
-						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
-						"title":         "new test dest",
-						"description":   "this is a new test description",
-						"generation_id": "1",
-						"ack_enabled":   "false",
-						"inputs.#":      "1",
-						"encoding":      "text",
-						"compression":   "none",
-						"bucket":        "new_bucket",
-						"auth.type":     "credentials_json",
-						"auth.value":    "{}",
+						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
+						"title":            "new test dest",
+						"description":      "this is a new test description",
+						"generation_id":    "1",
+						"ack_enabled":      "false",
+						"inputs.#":         "1",
+						"encoding":         "text",
+						"compression":      "none",
+						"bucket":           "new_bucket",
+						"credentials_json": "{}",
 					}),
 				),
 			},
@@ -262,10 +184,7 @@ func TestAccGcpCloudStorageSinkResource(t *testing.T) {
 					compression = "gzip"
 					bucket 			= "test_bucket"
 					bucket_prefix = "bucket_prefix"
-					auth = {
-						type = "api_key"
-						value = "key"
-					}
+					credentials_json = "{}"
 					inputs 			= [mezmo_http_source.my_source2.id]
 				}`,
 				Check: resource.ComposeAggregateTestCheckFunc(

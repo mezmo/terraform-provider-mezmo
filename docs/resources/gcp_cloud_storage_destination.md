@@ -38,19 +38,15 @@ resource "mezmo_demo_source" "source1" {
 }
 
 resource "mezmo_gcp_cloud_storage_destination" "gcp" {
-  title         = "GCP"
-  description   = "This stores our data in GCP cloud storage"
-  inputs        = [mezmo_demo_source.source1.id]
-  pipeline_id   = mezmo_pipeline.pipeline1.id
-  encoding      = "json"
-  compression   = "gzip"
-  bucket        = "test_bucket"
-  bucket_prefix = "bucket_prefix"
-  auth = {
-    type  = "api_key"
-    value = "key"
-  }
-
+  title            = "GCP"
+  description      = "This stores our data in GCP cloud storage"
+  inputs           = [mezmo_demo_source.source1.id]
+  pipeline_id      = mezmo_pipeline.pipeline1.id
+  encoding         = "json"
+  compression      = "gzip"
+  bucket           = "test_bucket"
+  bucket_prefix    = "bucket_prefix"
+  credentials_json = "{}"
 }
 ```
 
@@ -59,8 +55,8 @@ resource "mezmo_gcp_cloud_storage_destination" "gcp" {
 
 ### Required
 
-- `auth` (Attributes) Configure GCP Cloud Storage authentication (see [below for nested schema](#nestedatt--auth))
 - `bucket` (String) The name of the bucket in GCP where the data will be stored.
+- `credentials_json` (String) JSON Credentials
 - `pipeline_id` (String) The uuid of the pipeline
 
 ### Optional
@@ -78,11 +74,3 @@ resource "mezmo_gcp_cloud_storage_destination" "gcp" {
 
 - `generation_id` (Number) An internal field used for component versioning
 - `id` (String) The uuid of the destination
-
-<a id="nestedatt--auth"></a>
-### Nested Schema for `auth`
-
-Required:
-
-- `type` (String) The type of authentication to use.
-- `value` (String, Sensitive) Authentication secret value.
