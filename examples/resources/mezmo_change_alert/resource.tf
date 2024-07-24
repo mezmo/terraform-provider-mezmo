@@ -48,8 +48,16 @@ resource "mezmo_change_alert" "order_spike" {
   }
   window_type             = "sliding"
   window_duration_minutes = 15
-  subject                 = "Spike in ordering!"
-  severity                = "WARNING"
-  body                    = "There has been a > 20% increase in orders over the last 15 minutes. Check application scaling."
-  ingestion_key           = "abc123"
+
+  alert_payload = {
+    service = {
+      name         = "webhook"
+      uri          = "https://example.com/my_webhook"
+      message_text = "There has been a > 20% increase in orders ({{.total_orders}}) over the last 15 minutes. Check application scaling."
+    }
+    throttling = {
+      window_secs = 3600
+      threshold   = 2
+    }
+  }
 }
