@@ -134,6 +134,7 @@ func TestAccAggregateV2Processor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs      = [mezmo_http_source.my_source.id]
 						window_type = "sliding"
+						window_min  = 10
 						operation	= "average"
 						interval    = 10
 					}`,
@@ -146,6 +147,7 @@ func TestAccAggregateV2Processor(t *testing.T) {
 						"inputs.#":      "1",
 						"inputs.0":      "#mezmo_http_source.my_source.id",
 						"window_type":   "sliding",
+						"window_min":    "10",
 						"operation":     "average",
 						"interval":      "10",
 					}),
@@ -162,6 +164,7 @@ func TestAccAggregateV2Processor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs 		= [mezmo_http_source.my_source.id]
 						window_type = "sliding"
+						window_min  = 10
 						operation	= "average"
 						interval    = 10
 						conditional = {
@@ -183,6 +186,7 @@ func TestAccAggregateV2Processor(t *testing.T) {
 						"inputs.#":                               "1",
 						"inputs.0":                               "#mezmo_http_source.my_source.id",
 						"window_type":                            "sliding",
+						"window_min":                             "10",
 						"operation":                              "average",
 						"interval":                               "10",
 						"conditional.expressions.#":              "1",
@@ -202,6 +206,7 @@ func TestAccAggregateV2Processor(t *testing.T) {
 						pipeline_id 	 = mezmo_pipeline.test_parent.id
 						inputs			 = [mezmo_http_source.my_source.id]
 						window_type      = "sliding"
+						window_min       = 10
 						interval         = 10
 						script 			 = "function process(event, metadata) { event.foo = \"bar\"; return event }"
 					}`,
@@ -221,6 +226,7 @@ func TestAccAggregateV2Processor(t *testing.T) {
 						pipeline_id 	 = mezmo_pipeline.test_parent.id
 						inputs			 = [mezmo_http_source.my_source.id]
 						window_type 	 = "sliding"
+						window_min       = 10
 						interval         = 10
 						operation		 = "average"
 					}`,
@@ -239,31 +245,32 @@ func TestAccAggregateV2Processor(t *testing.T) {
 						pipeline_id 	= mezmo_pipeline.test_parent.id
 						inputs 			= [mezmo_http_source.my_source.id]
 						window_type 	= "sliding"
+						window_min      = 10
 						operation 		= "average"
 						interval        = 305325235325
 					}`,
 				ExpectError: regexp.MustCompile("(?s).*/user_config/window/interval"),
 			},
 
-			//
+			// Check backend values
 			{
 				Config: GetCachedConfig(cacheKey) + `
 						resource "mezmo_aggregate_v2_processor" "my_processor" {
 							pipeline_id = mezmo_pipeline.test_parent.id
 							inputs 		= [mezmo_http_source.my_source.id]
 							operation 	= "sum"
-							window_type = "tumbling"
+							window_type = "sliding"
+							window_min 	= 10
 							interval 	= 10
-							window_min 	= 5
 						}`,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("mezmo_aggregate_v2_processor.my_processor", "window_type", "tumbling"),
-					resource.TestCheckResourceAttr("mezmo_aggregate_v2_processor.my_processor", "window_min", "5"),
+					resource.TestCheckResourceAttr("mezmo_aggregate_v2_processor.my_processor", "window_type", "sliding"),
+					resource.TestCheckResourceAttr("mezmo_aggregate_v2_processor.my_processor", "window_min", "10"),
 					testAccBackend("mezmo_aggregate_v2_processor.my_processor", map[string]any{
 						"window": map[string]any{
+							"type":       string("sliding"),
 							"interval":   float64(10),
-							"type":       string("tumbling"),
-							"window_min": float64(5),
+							"window_min": float64(10),
 						},
 						"evaluate":        map[string]any{"operation": string("SUM")},
 						"event_timestamp": string("timestamp"),

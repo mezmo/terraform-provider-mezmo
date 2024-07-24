@@ -92,7 +92,7 @@ func windowConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[strin
 	windowConfig := make(map[string]any)
 	windowConfig["type"] = plan.WindowType.ValueString()
 	windowConfig["interval"] = plan.Interval.ValueInt64()
-	if windowConfig["type"] == "tumbling" {
+	if windowConfig["type"] == "sliding" {
 		windowConfig["window_min"] = plan.WindowMin.ValueInt64()
 	}
 	userConfig["window"] = windowConfig
