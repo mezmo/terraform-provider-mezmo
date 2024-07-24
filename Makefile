@@ -43,8 +43,8 @@ build-snapshot-binary:
 	$(eval GOOS ?= $(shell go env GOOS))
 	$(eval GOARCH ?= $(shell go env GOARCH))
 	@docker run \
-	-e GOOS \
-	-e GOARCH \
+	-e GOOS=${GOOS} \
+	-e GOARCH=${GOARCH} \
 	-v $(PWD):/opt/app \
 	-w /opt/app \
 	goreleaser/goreleaser:v2.0.0 \
