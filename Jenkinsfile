@@ -92,9 +92,19 @@ pipeline {
 
     stage('Test') {
       parallel {
-        stage('Integration Tests') {
+        stage('Documentation') {
           steps {
-            sh 'make test'
+            sh 'make test-docs'
+          }
+        }
+        stage('Unit') {
+          steps {
+            sh 'make test-unit'
+          }
+        }
+        stage('Integration') {
+          steps {
+            sh 'make test-acceptance'
           }
           post {
             always {

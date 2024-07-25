@@ -11,6 +11,8 @@ build:
 generate-doc:
 	go generate
 
+# If you add a new target that `test` calls, you'll need to add it to CI
+# explicitly.
 .PHONY: test
 test: test-docs test-unit test-acceptance
 
