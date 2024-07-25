@@ -24,6 +24,9 @@ type DestinationModel interface {
 		DatadogMetricsDestinationModel |
 		ElasticSearchDestinationModel |
 		GcpCloudStorageDestinationModel |
+		GcpCloudMonitoringDestinationModel |
+		GcpCloudOperationsDestinationModel |
+		GcpCloudPubSubDestinationModel |
 		HoneycombLogsDestinationModel |
 		HttpDestinationModel |
 		KafkaDestinationModel |
