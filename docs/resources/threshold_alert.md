@@ -62,10 +62,21 @@ resource "mezmo_threshold_alert" "order_count" {
   }
   window_type             = "tumbling"
   window_duration_minutes = 60
-  subject                 = "Lots of orders coming in the last hour!"
-  severity                = "WARNING"
-  body                    = "Check to make sure there are no errors in pricing, and no unexpected special offers were released."
-  ingestion_key           = "abc123"
+  alert_payload = {
+    service = {
+      name         = "pager_duty"
+      uri          = "https://example.com/pager_duty_api"
+      source       = "{{.my_source}}"
+      routing_key  = "abc123"
+      severity     = "CRITICAL"
+      event_action = "trigger"
+      summary      = "Check to make sure there are no errors in pricing, and no unexpected special offers were released."
+    }
+    throttling = {
+      window_secs = 3600
+      threshold   = 1
+    }
+  }
 }
 ```
 
