@@ -32,7 +32,7 @@ resource "mezmo_absence_alert" "no_data_alert" {
       name          = "log_analysis"
       subject       = "No data received!"
       severity      = "WARNING"
-      body          = "There has been no metrics data recieved in the last 15 minutes!"
+      body          = "There has been no metrics data received in the last 15 minutes!"
       ingestion_key = "abc123"
     }
   }
