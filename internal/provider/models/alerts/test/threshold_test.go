@@ -59,6 +59,8 @@ func TestAccThresholdAlert_success(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_threshold_alert.default_metric", "id", regexp.MustCompile(`[\w-]{36}`),
 					),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.default_metric", "alert_payload.service.auth"),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.default_metric", "alert_payload.service.headers"),
 					StateHasExpectedValues("mezmo_threshold_alert.default_metric", map[string]any{
 						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
 						"inputs.#":                               "1",
@@ -128,6 +130,8 @@ func TestAccThresholdAlert_success(t *testing.T) {
 						active = false
 					}`,
 				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.default_metric", "alert_payload.service.auth"),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.default_metric", "alert_payload.service.headers"),
 					StateHasExpectedValues("mezmo_threshold_alert.default_metric", map[string]any{
 						"active":                               "false",
 						"description":                          "updated description",
@@ -182,6 +186,8 @@ func TestAccThresholdAlert_success(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_threshold_alert.default_log", "id", regexp.MustCompile(`[\w-]{36}`),
 					),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.default_log", "alert_payload.service.auth"),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.default_log", "alert_payload.service.headers"),
 					StateHasExpectedValues("mezmo_threshold_alert.default_log", map[string]any{
 						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
 						"inputs.#":                               "1",
@@ -210,6 +216,92 @@ func TestAccThresholdAlert_success(t *testing.T) {
 						"alert_payload.service.message_text":     "Alert: Log event count has exceeded threshold",
 						"alert_payload.service.uri":              "http://google.com/our_slack_api",
 					}),
+				),
+			},
+			// CREATE alert with webhook auth payload
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_threshold_alert" "webhook_auth_alert" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "log"
+						operation = "custom"
+						script = "function myFunc(a, e, m) { return a }"
+						event_timestamp = ".timestamp"
+						group_by = [".name", ".namespace", ".tags"]
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 5000
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+								name = "webhook"
+								uri = "http://example.com/our_webhook_api"
+								message_text = "Alert: Log event count has exceeded threshold"
+								auth = {
+									strategy = "basic"
+									user = "my_user"
+									password = "my_password"
+								}
+								headers = {
+                  "x-custom-header" = "header_value"
+                }
+							}
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_threshold_alert.webhook_auth_alert", map[string]any{
+						"alert_payload.service.auth.password":           "my_password",
+						"alert_payload.service.auth.strategy":           "basic",
+						"alert_payload.service.auth.user":               "my_user",
+						"alert_payload.service.headers.%":               "1",
+						"alert_payload.service.headers.x-custom-header": "header_value",
+					}),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.webhook_auth_alert", "alert_payload.service.auth.token"),
+				),
+			},
+			// Update webhook alert and remove auth and headers
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_threshold_alert" "webhook_auth_alert" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "log"
+						operation = "custom"
+						script = "function myFunc(a, e, m) { return a }"
+						event_timestamp = ".timestamp"
+						group_by = [".name", ".namespace", ".tags"]
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 5000
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+								name = "webhook"
+								uri = "http://example.com/our_webhook_api"
+								message_text = "Alert: Log event count has exceeded threshold"
+							}
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.webhook_auth_alert", "alert_payload.service.auth"),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.webhook_auth_alert", "alert_payload.service.headers"),
 				),
 			},
 		},
@@ -593,7 +685,73 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
               }
 						}
 					}`,
-				ExpectError: regexp.MustCompile(`(?s).Attribute operation value must be one of:`),
+				ExpectError: regexp.MustCompile(`(?s).*Attribute operation value must be one of:`),
+			},
+			// invalid auth for basic
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_threshold_alert" "bad_operation" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "metric"
+						operation = "sum"
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 10
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+                name = "webhook"
+                uri = "http://example.com/our_webhook_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+								auth = {
+									strategy = "basic"
+								}
+              }
+						}
+					}`,
+				ExpectError: regexp.MustCompile(`(?s).*Basic auth requires user and password fields to be defined`),
+			},
+			// invalid auth for bearer
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_threshold_alert" "bad_operation" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "metric"
+						operation = "sum"
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 10
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+                name = "webhook"
+                uri = "http://example.com/our_webhook_api"
+                message_text = "Alert: Log event count has exceeded threshold"
+								auth = {
+									strategy = "bearer"
+								}
+              }
+						}
+					}`,
+				ExpectError: regexp.MustCompile(`(?s).*Bearer auth requires token field to be defined`),
 			},
 		},
 	})

@@ -5,6 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/mapvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -15,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
 type SchemaAttributes map[string]schema.Attribute
@@ -193,11 +195,46 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 						Sensitive:   true,
 						Description: "The ingestion key for the service (Log Analysis).",
 					},
+					"auth": schema.SingleNestedAttribute{
+						Optional:    true,
+						Description: "Configures HTTP authentication (Webhook).",
+						Attributes: map[string]schema.Attribute{
+							"strategy": schema.StringAttribute{
+								Required:   true,
+								Validators: []validator.String{stringvalidator.OneOf("basic", "bearer")},
+							},
+							"user": schema.StringAttribute{
+								Optional:   true,
+								Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+							},
+							"password": schema.StringAttribute{
+								Sensitive:  true,
+								Optional:   true,
+								Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+							},
+							"token": schema.StringAttribute{
+								Sensitive:  true,
+								Optional:   true,
+								Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+							},
+						},
+					},
+					"headers": schema.MapAttribute{
+						Optional:    true,
+						Description: "Optional key/val request headers (Webhook).",
+						ElementType: StringType{},
+						Validators: []validator.Map{
+							mapvalidator.All(
+								mapvalidator.KeysAre(stringvalidator.LengthAtLeast(1)),
+								mapvalidator.ValueStringsAre(stringvalidator.LengthAtLeast(1)),
+							),
+						},
+					},
 				},
 			},
 			"throttling": schema.SingleNestedAttribute{
 				Optional:    true,
-				Computed:    true,
+				Computed:    true, // There are defaults set by the server, hence Computed
 				Description: "Configure throttling options for the service receiving the alert.",
 				Attributes: map[string]schema.Attribute{
 					"window_secs": schema.Int64Attribute{
@@ -247,8 +284,19 @@ func GetAlertPayloadToModel(component map[string]any) ObjectValue {
 		"subject":       StringType{},
 		"body":          StringType{},
 		"ingestion_key": StringType{},
+		"auth": ObjectType{
+			AttrTypes: map[string]attr.Type{
+				"strategy": StringType{},
+				"user":     StringType{},
+				"password": StringType{},
+				"token":    StringType{},
+			},
+		},
+		"headers": MapType{
+			ElemType: StringType{},
+		},
 	}
-	serviceAttrs := map[string]attr.Value{
+	serviceValues := map[string]attr.Value{
 		"name":          NewStringNull(),
 		"uri":           NewStringNull(),
 		"message_text":  NewStringNull(),
@@ -260,27 +308,52 @@ func GetAlertPayloadToModel(component map[string]any) ObjectValue {
 		"subject":       NewStringNull(),
 		"body":          NewStringNull(),
 		"ingestion_key": NewStringNull(),
+		"auth":          NewObjectNull(serviceTypes["auth"].(ObjectType).AttributeTypes()),
+		"headers":       NewMapNull(StringType{}),
 	}
 	throttlingTypes := map[string]attr.Type{
 		"window_secs": Int64Type{},
 		"threshold":   Int64Type{},
 	}
-	throttlingAttrs := map[string]attr.Value{}
+	throttlingValues := map[string]attr.Value{}
 	for key, value := range component["service"].(map[string]any) {
-		// All service values are strings
-		serviceAttrs[key] = NewStringValue(value.(string))
+		switch key {
+		case "auth":
+			auth, _ := value.(map[string]any)
+			if len(auth) > 0 {
+				if auth["strategy"] != "none" {
+					authTypes := serviceTypes["auth"].(ObjectType).AttributeTypes()
+					authValues := MapAnyFillMissingValues(authTypes, auth, MapKeys(authTypes))
+					serviceValues[key] = NewObjectValueMust(authTypes, authValues)
+				}
+			}
+		case "headers":
+			headerArray, _ := value.([]any)
+			if len(headerArray) > 0 {
+				headerMap := make(map[string]any, len(headerArray))
+				for _, obj := range headerArray {
+					obj := obj.(map[string]any)
+					key := obj["header_name"].(string)
+					value := obj["header_value"].(string)
+					headerMap[key] = value
+				}
+				serviceValues["headers"] = NewMapValueMust(serviceTypes["headers"].(MapType).ElementType(), MapAnyToMapValues(headerMap))
+			}
+		default:
+			serviceValues[key] = NewStringValue(value.(string))
+		}
 	}
 	for key, value := range component["throttling"].(map[string]any) {
 		// All throttling values are float64/Int64
-		throttlingAttrs[key] = NewInt64Value(int64(value.(float64)))
+		throttlingValues[key] = NewInt64Value(int64(value.(float64)))
 	}
 
 	alertPayloadAttrs := NewObjectValueMust(map[string]attr.Type{
 		"service":    ObjectType{AttrTypes: serviceTypes},
 		"throttling": ObjectType{AttrTypes: throttlingTypes},
 	}, map[string]attr.Value{
-		"service":    NewObjectValueMust(serviceTypes, serviceAttrs),
-		"throttling": NewObjectValueMust(throttlingTypes, throttlingAttrs),
+		"service":    NewObjectValueMust(serviceTypes, serviceValues),
+		"throttling": NewObjectValueMust(throttlingTypes, throttlingValues),
 	})
 
 	return alertPayloadAttrs
@@ -296,13 +369,13 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 	}
 	attrs := value.Attributes()
 
-	serviceAttrs := attrs["service"].(ObjectValue).Attributes()
-	serviceName := serviceAttrs["name"].(StringValue).ValueString()
+	serviceValues := attrs["service"].(ObjectValue).Attributes()
+	serviceName := serviceValues["name"].(StringValue).ValueString()
 	service := map[string]any{
 		"name": serviceName,
 	}
 
-	if serviceName != "log_analysis" && serviceAttrs["uri"].(StringValue).IsNull() {
+	if serviceName != "log_analysis" && serviceValues["uri"].(StringValue).IsNull() {
 		dd.AddError(
 			"Error in plan",
 			"`uri` is required for Slack, PagerDuty, or Webhook",
@@ -311,22 +384,49 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 
 	switch serviceName {
 	case "slack", "webhook":
-		messageText := serviceAttrs["message_text"].(StringValue)
+		messageText := serviceValues["message_text"].(StringValue)
 		if messageText.IsNull() {
 			dd.AddError(
 				"Error in plan",
 				"`message_text` is required for Slack or Webhook notifications",
 			)
 		}
+		if authObj, ok := serviceValues["auth"]; ok && !authObj.IsNull() {
+			auth := MapValuesToMapAny(authObj, dd)
+			service["auth"] = auth
+			if auth["strategy"] == "basic" {
+				if auth["user"] == nil || auth["password"] == nil {
+					dd.AddError(
+						"Error in plan",
+						"Basic auth requires user and password fields to be defined")
+				}
+			} else {
+				if auth["token"] == nil {
+					dd.AddError(
+						"Error in plan",
+						"Bearer auth requires token field to be defined")
+				}
+			}
+		}
+		if headersObj, ok := serviceValues["headers"]; ok && !headersObj.IsNull() {
+			headerMap := MapValuesToMapAny(headersObj, dd)
+			if len(headerMap) > 0 {
+				headerArray := make([]map[string]string, 0, len(headerMap))
+				for k, v := range headerMap {
+					headerArray = append(headerArray, map[string]string{"header_name": k, "header_value": v.(string)})
+				}
+				service["headers"] = headerArray
+			}
+		}
 		service["message_text"] = messageText.ValueString()
-		service["uri"] = serviceAttrs["uri"].(StringValue).ValueString()
+		service["uri"] = serviceValues["uri"].(StringValue).ValueString()
 
 	case "pager_duty":
-		summary := serviceAttrs["summary"].(StringValue)
-		severity := serviceAttrs["severity"].(StringValue)
-		source := serviceAttrs["source"].(StringValue)
-		routingKey := serviceAttrs["routing_key"].(StringValue)
-		eventAction := serviceAttrs["event_action"].(StringValue)
+		summary := serviceValues["summary"].(StringValue)
+		severity := serviceValues["severity"].(StringValue)
+		source := serviceValues["source"].(StringValue)
+		routingKey := serviceValues["routing_key"].(StringValue)
+		eventAction := serviceValues["event_action"].(StringValue)
 
 		if summary.IsNull() {
 			dd.AddError(
@@ -363,13 +463,13 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 		service["source"] = source.ValueString()
 		service["routing_key"] = routingKey.ValueString()
 		service["event_action"] = eventAction.ValueString()
-		service["uri"] = serviceAttrs["uri"].(StringValue).ValueString()
+		service["uri"] = serviceValues["uri"].(StringValue).ValueString()
 
 	case "log_analysis":
-		severity := serviceAttrs["severity"].(StringValue)
-		subject := serviceAttrs["subject"].(StringValue)
-		body := serviceAttrs["body"].(StringValue)
-		ingestionKey := serviceAttrs["ingestion_key"].(StringValue)
+		severity := serviceValues["severity"].(StringValue)
+		subject := serviceValues["subject"].(StringValue)
+		body := serviceValues["body"].(StringValue)
+		ingestionKey := serviceValues["ingestion_key"].(StringValue)
 
 		if severity.IsNull() {
 			dd.AddError(
@@ -408,12 +508,12 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 	}
 
 	if throttlingObj, ok := attrs["throttling"]; ok && !throttlingObj.IsNull() {
-		throttlingAttrs := throttlingObj.(ObjectValue).Attributes()
+		throttlingValues := throttlingObj.(ObjectValue).Attributes()
 		throttling := map[string]any{}
-		if windowSecsAttr, ok := throttlingAttrs["window_secs"]; ok && !windowSecsAttr.IsNull() {
+		if windowSecsAttr, ok := throttlingValues["window_secs"]; ok && !windowSecsAttr.IsNull() {
 			throttling["window_secs"] = windowSecsAttr.(Int64Value).ValueInt64()
 		}
-		if thresholdAttr, ok := throttlingAttrs["threshold"]; ok && !thresholdAttr.IsNull() {
+		if thresholdAttr, ok := throttlingValues["threshold"]; ok && !thresholdAttr.IsNull() {
 			throttling["threshold"] = thresholdAttr.(Int64Value).ValueInt64()
 		}
 		alertPayload["throttling"] = throttling
