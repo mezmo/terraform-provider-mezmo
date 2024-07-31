@@ -234,3 +234,15 @@ func NewFilterProcessorResource() resource.Resource {
 		schema:            FilterProcessorResourceSchema,
 	}
 }
+
+func NewSetTimestampProcessorResource() resource.Resource {
+	return &ProcessorResource[SetTimestampProcessorModel]{
+		typeName:          SET_TIMESTAMP_PROCESSOR_TYPE_NAME,
+		nodeName:          SET_TIMESTAMP_PROCESSOR_NODE_NAME,
+		fromModelFunc:     SetTimestampProcessorFromModel,
+		toModelFunc:       SetTimestampProcessorToModel,
+		getIdFunc:         func(m *SetTimestampProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *SetTimestampProcessorModel) basetypes.StringValue { return m.PipelineId },
+		schema:            SetTimestampProcessorResourceSchema,
+	}
+}

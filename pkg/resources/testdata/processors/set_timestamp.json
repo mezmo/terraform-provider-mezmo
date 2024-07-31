@@ -1,0 +1,35 @@
+{
+  "id": "9d4b677a-6e2c-11ee-a476-6671faf7df66",
+  "title": "set timestamp title",
+  "description": "set timestamp description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 0,
+  "type": "set-timestamp",
+  "deploy_type": "saas",
+  "user_config": {
+    "parsers": [
+      {
+        "field": ".blah",
+        "options": {
+          "format": "Custom",
+          "custom_format": "%Y-%m-%dT%H:%M:%S"
+        }
+      },
+      {
+        "field": ".two",
+        "options": {
+          "format": "Custom",
+          "custom_format": "%m/%d/%Y::%H:%M"
+        }
+      }
+    ]
+  },
+  "inputs": ["7b212506-23cb-11ed-b300-4ef12c27e273"],
+  "outputs": [
+      {
+          "id": "9d4b677a-6e2c-11ee-a476-6671faf7df66",
+          "label": "Default"
+      }
+  ]
+}
