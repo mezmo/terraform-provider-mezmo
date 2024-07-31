@@ -126,8 +126,10 @@ Required:
 
 Optional:
 
+- `auth` (Attributes) Configures HTTP authentication (Webhook). (see [below for nested schema](#nestedatt--alert_payload--service--auth))
 - `body` (String) Additional information to be added to the message (Log Analysis).
 - `event_action` (String) The event action to use (PagerDuty).
+- `headers` (Map of String) Optional key/val request headers (Webhook).
 - `ingestion_key` (String, Sensitive) The ingestion key for the service (Log Analysis).
 - `message_text` (String) The text value of the notification message (Slack, Webhook).
 - `routing_key` (String, Sensitive) The service's routing key (PagerDuty).
@@ -136,6 +138,20 @@ Optional:
 - `subject` (String) The main subject line of the message (Log Analysis).
 - `summary` (String) Summarize the alert details (PagerDuty).
 - `uri` (String) The URI of the service (Slack, PagerDuty, Webhook).
+
+<a id="nestedatt--alert_payload--service--auth"></a>
+### Nested Schema for `alert_payload.service.auth`
+
+Required:
+
+- `strategy` (String)
+
+Optional:
+
+- `password` (String, Sensitive)
+- `token` (String, Sensitive)
+- `user` (String)
+
 
 
 <a id="nestedatt--alert_payload--throttling"></a>
