@@ -94,15 +94,20 @@ pipeline {
       parallel {
         stage('Documentation') {
           steps {
-            sh 'make test-docs'
+            withChecks('Tests / Test / Documentation') {
+              sh 'make test-docs'
+            }
           }
         }
         stage('Unit') {
           steps {
-            sh 'make test-unit'
+            withChecks('Tests / Test / Unit') {
+              sh 'make test-unit'
+            }
           }
         }
         stage('Integration') {
+          // Steps with junit already get a named check
           steps {
             sh 'make test-acceptance'
           }
@@ -114,7 +119,9 @@ pipeline {
         }
         stage('Example Validation') {
           steps {
-            sh 'make -j8 -k -O examples'
+            withChecks('Tests / Test / Example Validation') {
+              sh 'make -j8 -k -O examples'
+            }
           }
         }
       }
