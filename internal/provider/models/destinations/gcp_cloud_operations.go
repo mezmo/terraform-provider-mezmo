@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
@@ -139,8 +138,8 @@ func GcpCloudOperationsDestinationToModel(plan *GcpCloudOperationsDestinationMod
 				value := obj["label_value"].(string)
 				labelMap[key] = value
 			}
-			labelType := GcpCloudMonitoringResourceSchema.Attributes["resource_labels"].GetType().(basetypes.MapType).ElemType
-			plan.ResourceLabels = basetypes.NewMapValueMust(labelType, MapAnyToMapValues(labelMap))
+			labelType := GcpCloudMonitoringResourceSchema.Attributes["resource_labels"].GetType().(MapType).ElemType
+			plan.ResourceLabels = NewMapValueMust(labelType, MapAnyToMapValues(labelMap))
 		}
 	}
 }
