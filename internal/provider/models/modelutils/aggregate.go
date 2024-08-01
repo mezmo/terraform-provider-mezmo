@@ -1,6 +1,7 @@
 package modelutils
 
 var Aggregate_Operations = map[string]string{
+	"add":                        "DEFAULT",
 	"sum":                        "SUM",
 	"minimum":                    "MIN",
 	"maximum":                    "MAX",
