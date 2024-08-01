@@ -100,7 +100,7 @@ pipeline {
         stage('Unit') {
           steps {
             sh 'command -v go-junit-report || go install github.com/jstemmer/go-junit-report/v2@latest'
-            sh 'make test-unit 2>&1 | go-junit-report -iocopy -set-exit-code -out unit-results.xml'
+            sh 'make test-unit 2>&1 | $(go env GOPATH)/bin/go-junit-report -iocopy -set-exit-code -out unit-results.xml'
           }
           post {
             always {
