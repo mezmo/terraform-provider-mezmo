@@ -1,19 +1,19 @@
 {
   "id": "b8071802-63af-11ee-aee9-26dab184329f",
-  "title": "gcp cloud storage sink title",
-  "description": "gcp cloud storage sink description",
+  "title": "gcp cloud monitoring sink title",
+  "description": "gcp cloud monitoring sink description",
   "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
   "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
   "generation_id": 3,
-  "type": "gcp-cloud-storage",
+  "type": "gcp-cloud-monitoring",
   "deploy_type": "saas",
   "user_config": {
     "ack_enabled": true,
-    "compression": "gzip",
-    "encoding": "json",
-    "bucket_prefix": "gcp_",
-    "bucket": "logs",
-    "batch_timeout_secs": 3000,
+    "project_id": "proj123",
+    "resource_type": "global",
+    "resource_labels": [
+      {"label_name": "label1", "label_value": "value1"}
+    ],
     "credentials_json": "{\"foo\": \"bar\"}"
   },
   "inputs": [

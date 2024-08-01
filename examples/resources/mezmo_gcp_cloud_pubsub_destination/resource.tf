@@ -22,15 +22,14 @@ resource "mezmo_demo_source" "source1" {
   format      = "nginx"
 }
 
-resource "mezmo_gcp_cloud_storage_destination" "gcp" {
-  title            = "GCP"
-  description      = "This stores our data in GCP cloud storage"
+resource "mezmo_gcp_cloud_pubsub_destination" "gcp" {
+  title            = "GCP Cloud PubSub"
+  description      = "This stores our log events in GCP cloud PubSub"
   inputs           = [mezmo_demo_source.source1.id]
   pipeline_id      = mezmo_pipeline.pipeline1.id
-  encoding         = "json"
-  compression      = "gzip"
-  bucket           = "test_bucket"
-  bucket_prefix    = "bucket_prefix"
+  encoding         = "text"
+  project_id       = "proj456"
+  topic            = "topic456"
   credentials_json = <<-EOT
             {
               "type": "service_account",

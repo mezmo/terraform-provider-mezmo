@@ -186,3 +186,39 @@ func NewGcpCloudStorageDestinationResource() resource.Resource {
 		schema:            GcpCloudStorageResourceSchema,
 	}
 }
+
+func NewGcpCloudMonitoringDestinationResource() resource.Resource {
+	return &DestinationResource[GcpCloudMonitoringDestinationModel]{
+		typeName:          GCP_CLOUD_MONITORING_DESTINATION_TYPE_NAME,
+		nodeName:          GCP_CLOUD_MONITORING_DESTINATION_NODE_NAME,
+		fromModelFunc:     GcpCloudMonitoringDestinationFromModel,
+		toModelFunc:       GcpCloudMonitoringDestinationToModel,
+		getIdFunc:         func(m *GcpCloudMonitoringDestinationModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *GcpCloudMonitoringDestinationModel) basetypes.StringValue { return m.PipelineId },
+		schema:            GcpCloudMonitoringResourceSchema,
+	}
+}
+
+func NewGcpCloudOperationsDestinationResource() resource.Resource {
+	return &DestinationResource[GcpCloudOperationsDestinationModel]{
+		typeName:          GCP_CLOUD_OPERATIONS_DESTINATION_TYPE_NAME,
+		nodeName:          GCP_CLOUD_OPERATIONS_DESTINATION_NODE_NAME,
+		fromModelFunc:     GcpCloudOperationsDestinationFromModel,
+		toModelFunc:       GcpCloudOperationsDestinationToModel,
+		getIdFunc:         func(m *GcpCloudOperationsDestinationModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *GcpCloudOperationsDestinationModel) basetypes.StringValue { return m.PipelineId },
+		schema:            GcpCloudOperationsResourceSchema,
+	}
+}
+
+func NewGcpCloudPubSubDestinationResource() resource.Resource {
+	return &DestinationResource[GcpCloudPubSubDestinationModel]{
+		typeName:          GCP_CLOUD_PUBSUB_DESTINATION_TYPE_NAME,
+		nodeName:          GCP_CLOUD_PUBSUB_DESTINATION_NODE_NAME,
+		fromModelFunc:     GcpCloudPubSubDestinationFromModel,
+		toModelFunc:       GcpCloudPubSubDestinationToModel,
+		getIdFunc:         func(m *GcpCloudPubSubDestinationModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *GcpCloudPubSubDestinationModel) basetypes.StringValue { return m.PipelineId },
+		schema:            GcpCloudPubSubResourceSchema,
+	}
+}
