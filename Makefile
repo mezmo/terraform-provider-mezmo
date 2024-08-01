@@ -18,7 +18,7 @@ test: test-docs test-unit test-acceptance
 
 .PHONY: test-unit
 test-unit:
-	go test ./...
+	@go test -v ./...
 
 .PHONY: test-acceptance
 test-acceptance:

@@ -99,7 +99,13 @@ pipeline {
         }
         stage('Unit') {
           steps {
-            sh 'make test-unit'
+            sh 'command -v go-junit-report || go install github.com/jstemmer/go-junit-report/v2@latest'
+            sh 'make test-unit 2>&1 | go-junit-report -iocopy -set-exit-code -out unit-results.xml'
+          }
+          post {
+            always {
+              junit testResults: 'unit-results.xml'
+            }
           }
         }
         stage('Integration') {
