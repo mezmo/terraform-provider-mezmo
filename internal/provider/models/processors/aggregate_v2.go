@@ -14,14 +14,6 @@ import (
 const AGGREGATE_PROCESSOR_NODE_NAME = "aggregate-v2"
 const AGGREGATE_PROCESSOR_TYPE_NAME = "aggregate_v2"
 
-// FIXME: Move to Aggregate_Operations? Why missing min, max
-var OPERATIONS = map[string]string{
-	"sum":                        "SUM",
-	"average":                    "AVG",
-	"set_intersection":           "SET_INTERSECTION",
-	"distribution_concatenation": "DIST_CONCAT",
-}
-
 type AggregateV2ProcessorModel struct {
 	Id             String              `tfsdk:"id"`
 	PipelineId     String              `tfsdk:"pipeline_id"`
@@ -55,7 +47,7 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 			Optional:    true,
 			Computed:    true,
 			Description: "The operation in which to perform the aggregation",
-			Validators:  []validator.String{stringvalidator.OneOf(MapKeys(OPERATIONS)...)},
+			Validators:  []validator.String{stringvalidator.OneOf(MapKeys(Aggregate_Operations)...)},
 		},
 		"script": schema.StringAttribute{
 			Optional: true,
@@ -117,7 +109,7 @@ func evaluateConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[str
 		evaluateConfig["script"] = plan.Script.ValueString()
 	} else {
 		delete(evaluateConfig, "script")
-		evaluateConfig["operation"] = OPERATIONS[plan.Operation.ValueString()]
+		evaluateConfig["operation"] = Aggregate_Operations[plan.Operation.ValueString()]
 	}
 	userConfig["evaluate"] = evaluateConfig
 }
@@ -184,7 +176,7 @@ func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Pro
 			plan.Operation = basetypes.NewStringNull()
 			plan.Script = basetypes.NewStringValue(evaluateConfig["script"].(string))
 		} else {
-			plan.Operation = basetypes.NewStringValue(FindKey(OPERATIONS, apiOperation))
+			plan.Operation = basetypes.NewStringValue(FindKey(Aggregate_Operations, apiOperation))
 			plan.Script = basetypes.NewStringNull()
 		}
 	}
