@@ -312,7 +312,7 @@ func TestAccThresholdAlert_success(t *testing.T) {
 // tests where we bubble up errors with diag. This tends to cause teardown errors and
 // may be a bug.
 
-func TestThresholdAlert_root_required_errors(t *testing.T) {
+func TestAccThresholdAlert_root_required_errors(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
@@ -342,7 +342,7 @@ func TestThresholdAlert_root_required_errors(t *testing.T) {
 	})
 }
 
-func TestThresholdAlert_schema_validation_errors(t *testing.T) {
+func TestAccThresholdAlert_schema_validation_errors(t *testing.T) {
 	const cacheKey = "threshold_alert_schema_validation_errors"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -757,7 +757,7 @@ func TestThresholdAlert_schema_validation_errors(t *testing.T) {
 	})
 }
 
-func TestThresholdAlert_custom_errors(t *testing.T) {
+func TestAccThresholdAlert_custom_errors(t *testing.T) {
 	const cacheKey = "threshold_custom_errors"
 	resource.Test(t, resource.TestCase{
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -895,14 +895,25 @@ func TestThresholdAlert_custom_errors(t *testing.T) {
 	})
 }
 
-func TestThresholdAlert_slack_payload_errors(t *testing.T) {
+func TestAccThresholdAlert_slack_payload_errors(t *testing.T) {
 	const cacheKey = "slack_payload_errors"
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { TestPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		ErrorCheck: CheckMultipleErrors([]string{
-			"`uri` is required for Slack, PagerDuty, or Webhook",
-			"`message_text` is required for Slack or Webhook notifications",
+			"`uri` is required for the `slack` service",
+			"`message_text` is required for the `slack` service",
+			"Attribute `summary` is not allowed for service `slack`",
+			"Attribute `source` is not allowed for service `slack`",
+			"Attribute `routing_key` is not allowed for service `slack`",
+			"Attribute `event_action` is not allowed for service `slack`",
+			"Attribute `severity` is not allowed for service `slack`",
+			"Attribute `subject` is not allowed for service `slack`",
+			"Attribute `body` is not allowed for service `slack`",
+			"Attribute `ingestion_key` is not allowed for service `slack`",
+			"Attribute `auth` is not allowed for service `slack`",
+			"Attribute `headers` is not allowed for service `slack`",
+			"Attribute `method` is not allowed for service `slack`",
 		}),
 		Steps: []resource.TestStep{
 			// custom operation requires script
@@ -934,6 +945,19 @@ func TestThresholdAlert_slack_payload_errors(t *testing.T) {
 						alert_payload = {
 							service = {
                 name = "slack"
+								summary = "nope"
+								source = "nope"
+								routing_key = "nope"
+								event_action = "nope"
+								severity = "INFO"
+								subject = "nope"
+								body = "nope"
+								ingestion_key = "nope"
+								auth = {
+									strategy = "bearer"
+								}
+								headers = {}
+								method = "post"
               }
 						}
 					}`,
@@ -948,8 +972,16 @@ func TestAccThresholdAlert_webhook_payload_errors(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
 		ErrorCheck: CheckMultipleErrors([]string{
-			"`uri` is required for Slack, PagerDuty, or Webhook",
-			"`message_text` is required for Slack or Webhook notifications",
+			"`uri` is required for the `webhook` service",
+			"`message_text` is required for the `webhook` service",
+			"Attribute `summary` is not allowed for service `webhook`",
+			"Attribute `source` is not allowed for service `webhook`",
+			"Attribute `routing_key` is not allowed for service `webhook`",
+			"Attribute `event_action` is not allowed for service `webhook`",
+			"Attribute `severity` is not allowed for service `webhook`",
+			"Attribute `subject` is not allowed for service `webhook`",
+			"Attribute `body` is not allowed for service `webhook`",
+			"Attribute `ingestion_key` is not allowed for service `webhook`",
 		}),
 		Steps: []resource.TestStep{
 			// custom operation requires script
@@ -981,6 +1013,14 @@ func TestAccThresholdAlert_webhook_payload_errors(t *testing.T) {
 						alert_payload = {
 							service = {
                 name = "webhook"
+								summary = "nope"
+								source = "nope"
+								routing_key = "nope"
+								event_action = "nope"
+								severity = "INFO"
+								subject = "nope"
+								body = "nope"
+								ingestion_key = "nope"
               }
 						}
 					}`,
@@ -995,12 +1035,19 @@ func TestAccThresholdAlert_pager_duty_payload_errors(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
 		ErrorCheck: CheckMultipleErrors([]string{
-			"`uri` is required for Slack, PagerDuty, or Webhook",
-			"`summary` is required for PagerDuty notifications",
-			"`severity` is required for PagerDuty notifications",
-			"`source` is required for PagerDuty notifications",
-			"`routing_key` is required for PagerDuty notifications",
-			"`event_action` is required for PagerDuty notifications",
+			"`uri` is required for the `pager_duty` service",
+			"`summary` is required for the `pager_duty` service",
+			"`severity` is required for the `pager_duty` service",
+			"`source` is required for the `pager_duty` service",
+			"`routing_key` is required for the `pager_duty` service",
+			"`event_action` is required for the `pager_duty` service",
+			"Attribute `message_text` is not allowed for service `pager_duty`",
+			"Attribute `subject` is not allowed for service `pager_duty`",
+			"Attribute `body` is not allowed for service `pager_duty`",
+			"Attribute `ingestion_key` is not allowed for service `pager_duty`",
+			"Attribute `auth` is not allowed for service `pager_duty`",
+			"Attribute `headers` is not allowed for service `pager_duty`",
+			"Attribute `method` is not allowed for service `pager_duty`",
 		}),
 		Steps: []resource.TestStep{
 			// custom operation requires script
@@ -1032,6 +1079,15 @@ func TestAccThresholdAlert_pager_duty_payload_errors(t *testing.T) {
 						alert_payload = {
 							service = {
                 name = "pager_duty"
+								message_text = "nope"
+								subject = "nope"
+								body = "nope"
+								ingestion_key = "nope"
+								auth = {
+									strategy = "bearer"
+								}
+								headers = {}
+								method = "post"
               }
 						}
 					}`,
@@ -1046,10 +1102,19 @@ func TestAccThresholdAlert_log_analysis_payload_errors(t *testing.T) {
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		PreCheck:                 func() { TestPreCheck(t) },
 		ErrorCheck: CheckMultipleErrors([]string{
-			"`severity` is required for Log Analysis notifications",
-			"`subject` is required for Log Analysis notifications",
-			"`body` is required for Log Analysis notifications",
-			"`ingestion_key` is required for Log Analysis notifications",
+			"`severity` is required for the `log_analysis` service",
+			"`subject` is required for the `log_analysis` service",
+			"`body` is required for the `log_analysis` service",
+			"`ingestion_key` is required for the `log_analysis` service",
+			"Attribute `uri` is not allowed for service `log_analysis`",
+			"Attribute `message_text` is not allowed for service `log_analysis`",
+			"Attribute `summary` is not allowed for service `log_analysis`",
+			"Attribute `source` is not allowed for service `log_analysis`",
+			"Attribute `routing_key` is not allowed for service `log_analysis`",
+			"Attribute `event_action` is not allowed for service `log_analysis`",
+			"Attribute `auth` is not allowed for service `log_analysis`",
+			"Attribute `headers` is not allowed for service `log_analysis`",
+			"Attribute `method` is not allowed for service `log_analysis`",
 		}),
 		Steps: []resource.TestStep{
 			// custom operation requires script
@@ -1081,6 +1146,17 @@ func TestAccThresholdAlert_log_analysis_payload_errors(t *testing.T) {
 						alert_payload = {
 							service = {
                 name = "log_analysis"
+								uri = "http://example.com/webhook"
+								message_text = "nope"
+								summary = "nope"
+								source = "nope"
+								routing_key = "nope"
+								event_action = "nope"
+								auth = {
+									strategy = "bearer"
+								}
+								headers = {}
+								method = "post"
               }
 						}
 					}`,

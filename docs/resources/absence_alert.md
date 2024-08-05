@@ -72,6 +72,7 @@ resource "mezmo_absence_alert" "no_data_alert_webhook" {
       headers = {
         "x-my-header" = "header_value"
       }
+      method = "put"
     }
   }
 }
@@ -129,6 +130,7 @@ Optional:
 - `headers` (Map of String) Optional key/val request headers (Webhook).
 - `ingestion_key` (String, Sensitive) The ingestion key for the service (Log Analysis).
 - `message_text` (String) The text value of the notification message (Slack, Webhook).
+- `method` (String) The HTTP method to use for the destination (Webhook, default is `post`).
 - `routing_key` (String, Sensitive) The service's routing key (PagerDuty).
 - `severity` (String) The severity level of the alert (PagerDuty, Log Analysis).
 - `source` (String) The source of the alert (PagerDuty).

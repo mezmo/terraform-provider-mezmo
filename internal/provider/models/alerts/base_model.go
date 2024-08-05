@@ -230,6 +230,11 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 							),
 						},
 					},
+					"method": schema.StringAttribute{
+						Optional:    true,
+						Description: "The HTTP method to use for the destination (Webhook, default is `post`).",
+						Validators:  []validator.String{stringvalidator.OneOf("post", "put", "patch", "delete", "get", "head", "options", "trace")},
+					},
 				},
 			},
 			"throttling": schema.SingleNestedAttribute{
@@ -295,6 +300,7 @@ func GetAlertPayloadToModel(component map[string]any) ObjectValue {
 		"headers": MapType{
 			ElemType: StringType{},
 		},
+		"method": StringType{},
 	}
 	serviceValues := map[string]attr.Value{
 		"name":          NewStringNull(),
@@ -310,6 +316,7 @@ func GetAlertPayloadToModel(component map[string]any) ObjectValue {
 		"ingestion_key": NewStringNull(),
 		"auth":          NewObjectNull(serviceTypes["auth"].(ObjectType).AttributeTypes()),
 		"headers":       NewMapNull(StringType{}),
+		"method":        NewStringNull(),
 	}
 	throttlingTypes := map[string]attr.Type{
 		"window_secs": Int64Type{},
@@ -320,12 +327,10 @@ func GetAlertPayloadToModel(component map[string]any) ObjectValue {
 		switch key {
 		case "auth":
 			auth, _ := value.(map[string]any)
-			if len(auth) > 0 {
-				if auth["strategy"] != "none" {
-					authTypes := serviceTypes["auth"].(ObjectType).AttributeTypes()
-					authValues := MapAnyFillMissingValues(authTypes, auth, MapKeys(authTypes))
-					serviceValues[key] = NewObjectValueMust(authTypes, authValues)
-				}
+			if auth["strategy"] != "none" {
+				authTypes := serviceTypes["auth"].(ObjectType).AttributeTypes()
+				authValues := MapAnyFillMissingValues(authTypes, auth, MapKeys(authTypes))
+				serviceValues[key] = NewObjectValueMust(authTypes, authValues)
 			}
 		case "headers":
 			headerArray, _ := value.([]any)
@@ -375,20 +380,64 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 		"name": serviceName,
 	}
 
-	if serviceName != "log_analysis" && serviceValues["uri"].(StringValue).IsNull() {
+	// Check that there are no extra properties that the service doesn't expect
+	for attribute := range serviceValues {
+		if attribute == "name" {
+			continue
+		}
+		switch attribute {
+		case "uri":
+			if serviceName == "slack" || serviceName == "pager_duty" || serviceName == "webhook" {
+				continue
+			}
+		case "message_text":
+			if serviceName == "slack" || serviceName == "webhook" {
+				continue
+			}
+		case "summary", "source", "routing_key", "event_action":
+			if serviceName == "pager_duty" {
+				continue
+			}
+		case "severity":
+			if serviceName == "pager_duty" || serviceName == "log_analysis" {
+				continue
+			}
+		case "subject", "body", "ingestion_key":
+			if serviceName == "log_analysis" {
+				continue
+			}
+		case "auth", "headers", "method":
+			if serviceName == "webhook" {
+				continue
+			}
+		}
+
+		if serviceValues[attribute].IsNull() {
+			// The TF framework will populate optional fields with null values. Values must
+			// be non-null to be considered an error
+			continue
+		}
 		dd.AddError(
 			"Error in plan",
-			"`uri` is required for Slack, PagerDuty, or Webhook",
+			fmt.Sprintf("Attribute `%s` is not allowed for service `%s`", attribute, serviceName),
 		)
 	}
 
+	// Check for *missing* properties for the selected service, and construct the payload.
+	// At this point, there are no extra properties which is validated above.
 	switch serviceName {
 	case "slack", "webhook":
+		if serviceValues["uri"].(StringValue).IsNull() {
+			dd.AddError(
+				"Error in plan",
+				fmt.Sprintf("`uri` is required for the `%s` service", serviceName),
+			)
+		}
 		messageText := serviceValues["message_text"].(StringValue)
 		if messageText.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`message_text` is required for Slack or Webhook notifications",
+				fmt.Sprintf("`message_text` is required for the `%s` service", serviceName),
 			)
 		}
 		if authObj, ok := serviceValues["auth"]; ok && !authObj.IsNull() {
@@ -398,13 +447,13 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 				if auth["user"] == nil || auth["password"] == nil {
 					dd.AddError(
 						"Error in plan",
-						"Basic auth requires user and password fields to be defined")
+						"Basic auth requires user and password fields to be defined for the `webhook` service")
 				}
 			} else {
 				if auth["token"] == nil {
 					dd.AddError(
 						"Error in plan",
-						"Bearer auth requires token field to be defined")
+						"Bearer auth requires token field to be defined for the `webhook` service")
 				}
 			}
 		}
@@ -420,8 +469,18 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 		}
 		service["message_text"] = messageText.ValueString()
 		service["uri"] = serviceValues["uri"].(StringValue).ValueString()
+		method := serviceValues["method"].(StringValue)
+		if !method.IsNull() {
+			service["method"] = method.ValueString()
+		}
 
 	case "pager_duty":
+		if serviceValues["uri"].(StringValue).IsNull() {
+			dd.AddError(
+				"Error in plan",
+				fmt.Sprintf("`uri` is required for the `%s` service", serviceName),
+			)
+		}
 		summary := serviceValues["summary"].(StringValue)
 		severity := serviceValues["severity"].(StringValue)
 		source := serviceValues["source"].(StringValue)
@@ -431,31 +490,31 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 		if summary.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`summary` is required for PagerDuty notifications",
+				"`summary` is required for the `pager_duty` service",
 			)
 		}
 		if severity.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`severity` is required for PagerDuty notifications",
+				"`severity` is required for the `pager_duty` service",
 			)
 		}
 		if severity.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`source` is required for PagerDuty notifications",
+				"`source` is required for the `pager_duty` service",
 			)
 		}
 		if routingKey.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`routing_key` is required for PagerDuty notifications",
+				"`routing_key` is required for the `pager_duty` service",
 			)
 		}
 		if eventAction.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`event_action` is required for PagerDuty notifications",
+				"`event_action` is required for the `pager_duty` service",
 			)
 		}
 		service["summary"] = summary.ValueString()
@@ -474,25 +533,25 @@ func GetAlertPayloadFromModel(v attr.Value, dd *diag.Diagnostics) map[string]any
 		if severity.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`severity` is required for Log Analysis notifications",
+				"`severity` is required for the `log_analysis` service",
 			)
 		}
 		if subject.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`subject` is required for Log Analysis notifications",
+				"`subject` is required for the `log_analysis` service",
 			)
 		}
 		if body.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`body` is required for Log Analysis notifications",
+				"`body` is required for the `log_analysis` service",
 			)
 		}
 		if ingestionKey.IsNull() {
 			dd.AddError(
 				"Error in plan",
-				"`ingestion_key` is required for Log Analysis notifications",
+				"`ingestion_key` is required for the `log_analysis` service",
 			)
 		}
 		service["severity"] = severity.ValueString()
