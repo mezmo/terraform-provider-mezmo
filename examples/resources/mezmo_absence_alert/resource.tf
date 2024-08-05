@@ -57,6 +57,7 @@ resource "mezmo_absence_alert" "no_data_alert_webhook" {
       headers = {
         "x-my-header" = "header_value"
       }
+      method = "put"
     }
   }
 }
