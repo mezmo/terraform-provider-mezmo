@@ -34,6 +34,7 @@ type ProcessorModel interface {
 		ReduceProcessorModel |
 		RouteProcessorModel |
 		SampleProcessorModel |
+		SetTimestampProcessorModel |
 		ScriptExecutionProcessorModel |
 		StringifyProcessorModel |
 		UnrollProcessorModel
