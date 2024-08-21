@@ -85,7 +85,7 @@ resource "mezmo_threshold_alert" "order_count" {
 
 ### Required
 
-- `alert_payload` (Attributes) Configure where the alert will be sent, including choosing a service and throttling options. All options for the chosen `service` will be required. All text fields support templating. (see [below for nested schema](#nestedatt--alert_payload))
+- `alert_payload` (Attributes) Configure where the alert will be sent, including choosing a service and throttling options. All options for the chosen `service` will be required. All text fields support templating, e.g. `{{.my_field}}` as long as those values can be coerced to a string. For more information, see [our documentation](https://docs.mezmo.com/telemetry-pipelines/syntax-for-editing-pipeline-component-configuration-values#templates). (see [below for nested schema](#nestedatt--alert_payload))
 - `component_id` (String) The uuid of the component that the alert is attached to
 - `component_kind` (String) The kind of component that the alert is attached to
 - `conditional` (Attributes) A group of expressions (optionally nested) joined by a logical operator (see [below for nested schema](#nestedatt--conditional))
@@ -134,7 +134,7 @@ Optional:
 - `event_action` (String) The event action to use (PagerDuty).
 - `headers` (Map of String) Optional key/val request headers (Webhook).
 - `ingestion_key` (String, Sensitive) The ingestion key for the service (Log Analysis).
-- `message_text` (String) The text value of the notification message (Slack, Webhook).
+- `message_text` (String) The text value of the notification message (Slack, Webhook). When using a Webhook, this value may be a text string or stringified JSON. If the Webhook's message can be parsed as JSON, it will be sent as such.
 - `method` (String) The HTTP method to use for the destination (Webhook, default is `post`).
 - `routing_key` (String, Sensitive) The service's routing key (PagerDuty).
 - `severity` (String) The severity level of the alert (PagerDuty, Log Analysis).
@@ -148,13 +148,13 @@ Optional:
 
 Required:
 
-- `strategy` (String)
+- `strategy` (String) Choose basic or token-based authentication.
 
 Optional:
 
-- `password` (String, Sensitive)
-- `token` (String, Sensitive)
-- `user` (String)
+- `password` (String, Sensitive) The basic authentication password.
+- `token` (String, Sensitive) The bearer token.
+- `user` (String) The basic authentication user.
 
 
 
