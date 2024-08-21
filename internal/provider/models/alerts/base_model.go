@@ -135,9 +135,11 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 	},
 	"alert_payload": schema.SingleNestedAttribute{
 		Required: true,
-		Description: "Configure where the alert will be sent, including choosing a service " +
+		MarkdownDescription: "Configure where the alert will be sent, including choosing a service " +
 			"and throttling options. All options for the chosen `service` will be required. " +
-			"All text fields support templating.",
+			"All text fields support templating, e.g. `{{.my_field}}` as long as those values " +
+			"can be coerced to a string. For more information, see " +
+			"[our documentation](https://docs.mezmo.com/telemetry-pipelines/syntax-for-editing-pipeline-component-configuration-values#templates).",
 		Attributes: map[string]schema.Attribute{
 			"service": schema.SingleNestedAttribute{
 				Required:    true,
@@ -155,8 +157,11 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 						Description: "The URI of the service (Slack, PagerDuty, Webhook).",
 					},
 					"message_text": schema.StringAttribute{
-						Optional:    true,
-						Description: "The text value of the notification message (Slack, Webhook).",
+						Optional: true,
+						Description: "The text value of the notification message (Slack, Webhook). " +
+							"When using a Webhook, this value may be a text string or " +
+							"stringified JSON. If the Webhook's message can be parsed as JSON, it will be " +
+							"sent as such.",
 					},
 					"summary": schema.StringAttribute{
 						Optional:    true,
@@ -200,22 +205,26 @@ var baseAlertSchemaAttributes = SchemaAttributes{
 						Description: "Configures HTTP authentication (Webhook).",
 						Attributes: map[string]schema.Attribute{
 							"strategy": schema.StringAttribute{
-								Required:   true,
-								Validators: []validator.String{stringvalidator.OneOf("basic", "bearer")},
+								Required:    true,
+								Description: "Choose basic or token-based authentication.",
+								Validators:  []validator.String{stringvalidator.OneOf("basic", "bearer")},
 							},
 							"user": schema.StringAttribute{
-								Optional:   true,
-								Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+								Optional:    true,
+								Description: "The basic authentication user.",
+								Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 							},
 							"password": schema.StringAttribute{
-								Sensitive:  true,
-								Optional:   true,
-								Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+								Sensitive:   true,
+								Optional:    true,
+								Description: "The basic authentication password.",
+								Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 							},
 							"token": schema.StringAttribute{
-								Sensitive:  true,
-								Optional:   true,
-								Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
+								Sensitive:   true,
+								Optional:    true,
+								Description: "The bearer token.",
+								Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 							},
 						},
 					},
