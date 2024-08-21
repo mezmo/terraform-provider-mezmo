@@ -18,7 +18,7 @@ import (
 )
 
 type ProcessorModel interface {
-	AggregateV2ProcessorModel |
+	AggregateProcessorModel |
 		CompactFieldsProcessorModel |
 		DecryptFieldsProcessorModel |
 		DedupeProcessorModel |

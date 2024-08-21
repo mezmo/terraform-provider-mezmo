@@ -22,7 +22,7 @@ resource "mezmo_http_source" "curl" {
   decoding    = "json"
 }
 
-resource "mezmo_aggregate_v2_processor" "processor1" {
+resource "mezmo_aggregate_processor" "processor1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My aggregate v2 processor"
   description = "Aggregate my metrics via tumbling window"
@@ -30,7 +30,7 @@ resource "mezmo_aggregate_v2_processor" "processor1" {
   interval    = 3600
 }
 
-resource "mezmo_aggregate_v2_processor" "processor2" {
+resource "mezmo_aggregate_processor" "processor2" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My aggregate v2 processor"
   description = "Aggregate my metrics via sliding window"
