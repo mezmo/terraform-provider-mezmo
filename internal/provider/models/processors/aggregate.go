@@ -11,10 +11,10 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
 )
 
-const AGGREGATE_PROCESSOR_NODE_NAME = "aggregate-v2"
-const AGGREGATE_PROCESSOR_TYPE_NAME = "aggregate_v2"
+const AGGREGATE_PROCESSOR_NODE_NAME = "aggregate"
+const AGGREGATE_PROCESSOR_TYPE_NAME = "aggregate"
 
-type AggregateV2ProcessorModel struct {
+type AggregateProcessorModel struct {
 	Id             String              `tfsdk:"id"`
 	PipelineId     String              `tfsdk:"pipeline_id"`
 	Title          String              `tfsdk:"title"`
@@ -31,7 +31,7 @@ type AggregateV2ProcessorModel struct {
 	EventTimestamp String              `tfsdk:"event_timestamp" user_config:"true"`
 }
 
-var AggregateV2ProcessorResourceSchema = schema.Schema{
+var AggregateProcessorResourceSchema = schema.Schema{
 	Description: "Aggregates multiple metric events into a single metric event using either a tumbling interval window or a sliding interval window",
 	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
 		"window_type": schema.StringAttribute{
@@ -80,7 +80,7 @@ var AggregateV2ProcessorResourceSchema = schema.Schema{
 	}),
 }
 
-func windowConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[string]any, dd *diag.Diagnostics) {
+func windowConfigFromModel(plan *AggregateProcessorModel, userConfig map[string]any, dd *diag.Diagnostics) {
 	windowConfig := make(map[string]any)
 	windowConfig["type"] = plan.WindowType.ValueString()
 	windowConfig["interval"] = plan.Interval.ValueInt64()
@@ -90,7 +90,7 @@ func windowConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[strin
 	userConfig["window"] = windowConfig
 }
 
-func evaluateConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[string]any, dd *diag.Diagnostics) {
+func evaluateConfigFromModel(plan *AggregateProcessorModel, userConfig map[string]any, dd *diag.Diagnostics) {
 	isOperationSet := !(plan.Operation.IsNull() || plan.Operation.IsUnknown())
 	isScripSet := !(plan.Script.IsNull() || plan.Script.IsUnknown())
 	evaluateConfig := make(map[string]any)
@@ -114,7 +114,7 @@ func evaluateConfigFromModel(plan *AggregateV2ProcessorModel, userConfig map[str
 	userConfig["evaluate"] = evaluateConfig
 }
 
-func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousState *AggregateV2ProcessorModel) (*Processor, diag.Diagnostics) {
+func AggregateProcessorFromModel(plan *AggregateProcessorModel, previousState *AggregateProcessorModel) (*Processor, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
 	component := Processor{
 		BaseNode: BaseNode{
@@ -151,7 +151,7 @@ func AggregateV2ProcessorFromModel(plan *AggregateV2ProcessorModel, previousStat
 	return &component, dd
 }
 
-func AggregateV2ProcessorToModel(plan *AggregateV2ProcessorModel, component *Processor) {
+func AggregateProcessorToModel(plan *AggregateProcessorModel, component *Processor) {
 	plan.Id = basetypes.NewStringValue(component.Id)
 	if component.Title != "" {
 		plan.Title = basetypes.NewStringValue(component.Title)

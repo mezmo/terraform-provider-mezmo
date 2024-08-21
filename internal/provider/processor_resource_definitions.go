@@ -7,15 +7,15 @@ import (
 	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/processors"
 )
 
-func NewAggregateV2ProcessorResource() resource.Resource {
-	return &ProcessorResource[AggregateV2ProcessorModel]{
+func NewAggregateProcessorResource() resource.Resource {
+	return &ProcessorResource[AggregateProcessorModel]{
 		typeName:          AGGREGATE_PROCESSOR_TYPE_NAME,
 		nodeName:          AGGREGATE_PROCESSOR_NODE_NAME,
-		fromModelFunc:     AggregateV2ProcessorFromModel,
-		toModelFunc:       AggregateV2ProcessorToModel,
-		getIdFunc:         func(m *AggregateV2ProcessorModel) basetypes.StringValue { return m.Id },
-		getPipelineIdFunc: func(m *AggregateV2ProcessorModel) basetypes.StringValue { return m.PipelineId },
-		schema:            AggregateV2ProcessorResourceSchema,
+		fromModelFunc:     AggregateProcessorFromModel,
+		toModelFunc:       AggregateProcessorToModel,
+		getIdFunc:         func(m *AggregateProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *AggregateProcessorModel) basetypes.StringValue { return m.PipelineId },
+		schema:            AggregateProcessorResourceSchema,
 	}
 }
 
