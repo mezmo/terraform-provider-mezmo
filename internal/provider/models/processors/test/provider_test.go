@@ -9,8 +9,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	"github.com/mezmo/terraform-provider-mezmo/internal/provider"
-	"github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
+	"github.com/mezmo/terraform-provider-mezmo/v4/internal/provider"
+	"github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/providertest"
 )
 
 var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, error){

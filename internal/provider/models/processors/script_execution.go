@@ -6,8 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/modelutils"
 )
 
 const SCRIPT_EXECUTION_PROCESSOR_NODE_NAME = "js-script"

@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
+	"github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/modelutils"
 )
 
 type validationError struct {

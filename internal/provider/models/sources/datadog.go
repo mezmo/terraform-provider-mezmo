@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
 )
 
 const DATADOG_SOURCE_NODE_NAME = "mezmo-datadog-source"
