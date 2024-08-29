@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/mezmo/terraform-provider-mezmo/internal/provider"
+	"github.com/mezmo/terraform-provider-mezmo/v4/internal/provider"
 )
 
 // Note that Terraform Provider Framework expects a binary called `terraform-provider-{name-of-the-provider}`

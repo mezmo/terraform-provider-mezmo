@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/providertest"
 )
 
 func TestAccDatadogLogsDestinationResource(t *testing.T) {

@@ -13,8 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/modelutils"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/modelutils"
 )
 
 const PARSE_SEQUENTIALLY_PROCESSOR_TYPE_NAME = "parse_sequentially"

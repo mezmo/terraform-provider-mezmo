@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/providertest"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/providertest"
 )
 
 // Note that this test is not able to test all the possible use cases for this resource.

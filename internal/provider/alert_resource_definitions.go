@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/alerts"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/alerts"
 )
 
 func NewThresholdAlertResource() resource.Resource {

@@ -12,9 +12,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/mezmo/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/provider/models/sources"
+	"github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/sources"
 )
 
 type SourceModel interface {

@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
 )
 
 type AccessKeyResourceModel struct {

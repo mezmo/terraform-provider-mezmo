@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
-	. "github.com/mezmo/terraform-provider-mezmo/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
 )
 
 const WEBHOOK_SOURCE_TYPE_NAME = "webhook"
