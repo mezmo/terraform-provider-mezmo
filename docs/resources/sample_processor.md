@@ -83,5 +83,6 @@ Required:
 Optional:
 
 - `case_sensitive` (Boolean) Perform case sensitive comparison?
+- `negate` (Boolean) Negate the operator?
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string

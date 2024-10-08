@@ -43,6 +43,11 @@ resource "mezmo_threshold_alert" "order_count" {
         field        = ".order_count"
         operator     = "greater"
         value_number = 100
+      },
+      {
+        field        = ".status"
+        operator     = "less_or_equal"
+        value_number = 300
       }
     ],
   }

@@ -64,6 +64,16 @@ var SampleProcessorResourceSchema = schema.Schema{
 						stringvalidator.OneOf(Non_Change_Operator_Labels...),
 					},
 				},
+				"negate": schema.BoolAttribute{
+					Optional:    true,
+					Computed:    true,
+					Description: "Negate the operator?",
+					Validators: []validator.Bool{
+						boolvalidator.AlsoRequires(
+							path.MatchRelative().AtParent().AtName("operator"),
+						),
+					},
+				},
 				"value_string": schema.StringAttribute{
 					Optional:    true,
 					Description: "The operand to compare the field value with, when the value is a string",
@@ -126,6 +136,7 @@ func SampleProcessorFromModel(plan *SampleProcessorModel, previousState *SampleP
 			component_map["case_sensitive"] = GetAttributeValue[Bool](plan_map, "case_sensitive").ValueBool()
 		}
 
+		component_map["negate"] = GetAttributeValue[Bool](plan_map, "negate").ValueBool()
 		component.UserConfig["always_include"] = component_map
 	}
 
@@ -161,6 +172,7 @@ func SampleProcessorToModel(plan *SampleProcessorModel, component *Processor) {
 		plan_map["value_number"] = Float64Null()
 		plan_map["value_string"] = StringNull()
 		plan_map["case_sensitive"] = BoolNull()
+		plan_map["negate"] = BoolNull()
 		if value, ok := alwaysIncludeObj["value"]; ok {
 			if valueString, ok := value.(string); ok {
 				if valueString != "" {
@@ -174,6 +186,9 @@ func SampleProcessorToModel(plan *SampleProcessorModel, component *Processor) {
 		}
 		if case_sensitive, ok := alwaysIncludeObj["case_sensitive"]; ok {
 			plan_map["case_sensitive"] = BoolValue(case_sensitive.(bool))
+		}
+		if negate, ok := alwaysIncludeObj["negate"]; ok {
+			plan_map["negate"] = BoolValue(negate.(bool))
 		}
 		objT := plan.AlwaysInclude.AttributeTypes(context.Background())
 		if len(objT) == 0 {

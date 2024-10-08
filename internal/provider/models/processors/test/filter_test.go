@@ -134,6 +134,42 @@ func TestAccFilterProcessor(t *testing.T) {
 					}`,
 				ExpectError: regexp.MustCompile(`(?s)Attribute "conditional.expressions\[0\].value_number" cannot be specified when.*"conditional.expressions\[0\].value_string" is specified`),
 			},
+			// single expression with negation
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_filter_processor" "with_negation" {
+						title = "processor title"
+						description = "processor desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs = [mezmo_http_source.my_source.id]
+						action = "allow"
+						conditional = {
+							expressions = [
+								{
+									field = ".status"
+									operator = "equal"
+									value_number = 200
+									negate = true
+								}
+							]
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_filter_processor.with_negation", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"title":                                  "processor title",
+						"description":                            "processor desc",
+						"generation_id":                          "0",
+						"inputs.#":                               "1",
+						"conditional.expressions.#":              "1",
+						"conditional.expressions.0.field":        ".status",
+						"conditional.expressions.0.operator":     "equal",
+						"conditional.expressions.0.value_number": "200",
+						"conditional.expressions.0.negate":       "true",
+					}),
+				),
+			},
+
 			// Single expression
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -164,6 +200,7 @@ func TestAccFilterProcessor(t *testing.T) {
 						"conditional.expressions.0.field":        ".status",
 						"conditional.expressions.0.operator":     "equal",
 						"conditional.expressions.0.value_number": "200",
+						"conditional.expressions.0.negate":       "false",
 					}),
 				),
 			},
@@ -254,13 +291,16 @@ func TestAccFilterProcessor(t *testing.T) {
 						"conditional.expressions_group.0.expressions.0.field":                            ".label",
 						"conditional.expressions_group.0.expressions.0.operator":                         "equal",
 						"conditional.expressions_group.0.expressions.0.value_string":                     "account",
+						"conditional.expressions_group.0.expressions.0.negate":                           "false",
 						"conditional.expressions_group.0.expressions.1.field":                            ".app_name",
 						"conditional.expressions_group.0.expressions.1.operator":                         "ends_with",
 						"conditional.expressions_group.0.expressions.1.value_string":                     "service",
+						"conditional.expressions_group.0.expressions.1.negate":                           "false",
 						"conditional.expressions_group.1.expressions_group.0.expressions.#":              "2",
 						"conditional.expressions_group.1.expressions_group.0.logical_operation":          "OR",
 						"conditional.expressions_group.1.expressions_group.0.expressions.0.field":        ".level",
 						"conditional.expressions_group.1.expressions_group.0.expressions.0.operator":     "greater_or_equal",
+						"conditional.expressions_group.1.expressions_group.0.expressions.0.negate":       "false",
 						"conditional.expressions_group.1.expressions_group.0.expressions.0.value_number": "300",
 						"conditional.expressions_group.1.expressions_group.0.expressions.1.field":        ".tag",
 						"conditional.expressions_group.1.expressions_group.0.expressions.1.operator":     "contains",

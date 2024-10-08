@@ -25,6 +25,71 @@ func TestAccChangeAlert_success(t *testing.T) {
 					}`),
 			},
 
+			// alert with negation operator
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_change_alert" "with_negation" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my change alert"
+						event_type = "metric"
+						operation = "sum"
+						conditional = {
+							expressions = [
+								{
+									field = ".some_value"
+									operator = "value_change_greater"
+									value_number = 500
+									negate = true
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+								name = "log_analysis"
+								subject = "Change Alert"
+								body = "You received a change alert"
+								ingestion_key = "abc123"
+								severity = "INFO"
+							}
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_change_alert.with_negation", "id", regexp.MustCompile(`[\w-]{36}`),
+					),
+					StateHasExpectedValues("mezmo_change_alert.with_negation", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"inputs.#":                               "1",
+						"inputs.0":                               "#mezmo_http_source.my_source.id",
+						"active":                                 "true",
+						"component_id":                           "#mezmo_http_source.my_source.id",
+						"component_kind":                         "source",
+						"conditional.%":                          "3",
+						"conditional.expressions.#":              "1",
+						"conditional.expressions.0.field":        ".some_value",
+						"conditional.expressions.0.operator":     "value_change_greater",
+						"conditional.expressions.0.value_number": "500",
+						"conditional.expressions.0.negate":       "true",
+						"conditional.logical_operation":          "AND",
+						"event_type":                             "metric",
+						"name":                                   "my change alert",
+						"operation":                              "sum",
+						"window_duration_minutes":                "5",
+						"window_type":                            "tumbling",
+						"alert_payload.service.name":             "log_analysis",
+						"alert_payload.service.ingestion_key":    "abc123",
+						"alert_payload.service.body":             "You received a change alert",
+						"alert_payload.service.severity":         "INFO",
+						"alert_payload.service.subject":          "Change Alert",
+						"alert_payload.throttling.window_secs":   "60",
+						"alert_payload.throttling.threshold":     "1",
+					}),
+				),
+			},
+
 			// CREATE Change Alert for metric, minimal configuration
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -71,6 +136,7 @@ func TestAccChangeAlert_success(t *testing.T) {
 						"conditional.expressions.0.field":        ".some_value",
 						"conditional.expressions.0.operator":     "value_change_greater",
 						"conditional.expressions.0.value_number": "500",
+						"conditional.expressions.0.negate":       "false",
 						"conditional.logical_operation":          "AND",
 						"event_type":                             "metric",
 						"name":                                   "my change alert",
@@ -139,6 +205,7 @@ func TestAccChangeAlert_success(t *testing.T) {
 						"conditional.expressions.0.field":        ".other_value",
 						"conditional.expressions.0.operator":     "value_change_less_or_equal",
 						"conditional.expressions.0.value_number": "100",
+						"conditional.expressions.0.negate":       "false",
 						"script":                                 "function myFunc(a, e, m) { return a }",
 						"window_duration_minutes":                "10",
 						"window_type":                            "sliding",
@@ -200,6 +267,7 @@ func TestAccChangeAlert_success(t *testing.T) {
 						"conditional.expressions.0.field":        ".some_value",
 						"conditional.expressions.0.operator":     "percent_change_less",
 						"conditional.expressions.0.value_number": "10",
+						"conditional.expressions.0.negate":       "false",
 						"conditional.logical_operation":          "AND",
 						"event_type":                             "log",
 						"event_timestamp":                        ".timestamp",

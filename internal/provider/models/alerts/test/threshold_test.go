@@ -25,6 +25,73 @@ func TestAccThresholdAlert_success(t *testing.T) {
 					}`),
 			},
 
+			// alert with negation operator
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_threshold_alert" "with_negation" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						component_kind = "source"
+						component_id = mezmo_http_source.my_source.id
+						inputs = [mezmo_http_source.my_source.id]
+						name = "my threshold alert"
+						event_type = "metric"
+						operation = "sum"
+						conditional = {
+							expressions = [
+								{
+									field = ".event_count"
+									operator = "greater"
+									value_number = 5000
+									negate = true
+								}
+							],
+						}
+						alert_payload = {
+							service = {
+								name = "log_analysis"
+								subject = "Threshold Alert"
+								body = "You received a threshold alert"
+								ingestion_key = "abc123"
+								severity = "INFO"
+							}
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_threshold_alert.with_negation", "id", regexp.MustCompile(`[\w-]{36}`),
+					),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.with_negation", "alert_payload.service.auth"),
+					resource.TestCheckNoResourceAttr("mezmo_threshold_alert.with_negation", "alert_payload.service.headers"),
+					StateHasExpectedValues("mezmo_threshold_alert.with_negation", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"inputs.#":                               "1",
+						"inputs.0":                               "#mezmo_http_source.my_source.id",
+						"active":                                 "true",
+						"component_id":                           "#mezmo_http_source.my_source.id",
+						"component_kind":                         "source",
+						"conditional.%":                          "3",
+						"conditional.expressions.#":              "1",
+						"conditional.expressions.0.field":        ".event_count",
+						"conditional.expressions.0.operator":     "greater",
+						"conditional.expressions.0.value_number": "5000",
+						"conditional.expressions.0.negate":       "true",
+						"conditional.logical_operation":          "AND",
+						"event_type":                             "metric",
+						"name":                                   "my threshold alert",
+						"operation":                              "sum",
+						"window_duration_minutes":                "5",
+						"window_type":                            "tumbling",
+						"alert_payload.service.name":             "log_analysis",
+						"alert_payload.service.ingestion_key":    "abc123",
+						"alert_payload.service.body":             "You received a threshold alert",
+						"alert_payload.service.severity":         "INFO",
+						"alert_payload.service.subject":          "Threshold Alert",
+						"alert_payload.throttling.window_secs":   "60",
+						"alert_payload.throttling.threshold":     "1",
+					}),
+				),
+			},
+
 			// CREATE Threshold Alert for metric, minimal configuration
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -73,6 +140,7 @@ func TestAccThresholdAlert_success(t *testing.T) {
 						"conditional.expressions.0.field":        ".event_count",
 						"conditional.expressions.0.operator":     "greater",
 						"conditional.expressions.0.value_number": "5000",
+						"conditional.expressions.0.negate":       "false",
 						"conditional.logical_operation":          "AND",
 						"event_type":                             "metric",
 						"name":                                   "my threshold alert",
@@ -200,6 +268,7 @@ func TestAccThresholdAlert_success(t *testing.T) {
 						"conditional.expressions.0.field":        ".event_count",
 						"conditional.expressions.0.operator":     "greater",
 						"conditional.expressions.0.value_number": "5000",
+						"conditional.expressions.0.negate":       "false",
 						"conditional.logical_operation":          "AND",
 						"event_type":                             "log",
 						"event_timestamp":                        ".timestamp",

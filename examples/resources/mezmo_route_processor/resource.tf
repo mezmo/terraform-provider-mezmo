@@ -45,6 +45,7 @@ resource "mezmo_route_processor" "processor1" {
               field        = ".app_name"
               operator     = "ends_with"
               value_string = "service"
+              negate       = true
             },
           ]
         },

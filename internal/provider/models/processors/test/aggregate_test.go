@@ -193,6 +193,7 @@ func TestAccAggregateProcessor(t *testing.T) {
 						"conditional.expressions.0.field":        ".status",
 						"conditional.expressions.0.operator":     "equal",
 						"conditional.expressions.0.value_number": "200",
+						"conditional.expressions.0.negate":       "false",
 					}),
 					StateDoesNotHaveFields("mezmo_aggregate_processor.my_processor", []string{"script"}),
 				),
@@ -325,6 +326,94 @@ func TestAccAggregateProcessor(t *testing.T) {
 					StateHasExpectedValues("mezmo_aggregate_processor.event_timestamp_processor", map[string]any{
 						"event_timestamp": ".my_ts_field",
 					}),
+				),
+			},
+
+			// create and update with negation
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_aggregate_processor" "with_negation" {
+						title = "new title"
+						description = "new desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs 		= [mezmo_http_source.my_source.id]
+						window_type = "sliding"
+						window_min  = 10
+						operation	= "average"
+						interval    = 10
+						conditional = {
+							expressions = [
+								{
+									field = ".status"
+									operator = "equal"
+									value_number = 200
+									negate = true
+								}
+							]
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_aggregate_processor.with_negation", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"title":                                  "new title",
+						"description":                            "new desc",
+						"generation_id":                          "0",
+						"inputs.#":                               "1",
+						"inputs.0":                               "#mezmo_http_source.my_source.id",
+						"window_type":                            "sliding",
+						"window_min":                             "10",
+						"operation":                              "average",
+						"interval":                               "10",
+						"conditional.expressions.#":              "1",
+						"conditional.expressions.0.field":        ".status",
+						"conditional.expressions.0.operator":     "equal",
+						"conditional.expressions.0.value_number": "200",
+						"conditional.expressions.0.negate":       "true",
+					}),
+					StateDoesNotHaveFields("mezmo_aggregate_processor.with_negation", []string{"script"}),
+				),
+			},
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_aggregate_processor" "with_negation" {
+						title = "new title"
+						description = "new desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs 		= [mezmo_http_source.my_source.id]
+						window_type = "sliding"
+						window_min  = 10
+						operation	= "average"
+						interval    = 10
+						conditional = {
+							expressions = [
+								{
+									field = ".status"
+									operator = "equal"
+									value_number = 200
+									negate = false
+								}
+							]
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_aggregate_processor.with_negation", map[string]any{
+						"pipeline_id":                            "#mezmo_pipeline.test_parent.id",
+						"title":                                  "new title",
+						"description":                            "new desc",
+						"generation_id":                          "1",
+						"inputs.#":                               "1",
+						"inputs.0":                               "#mezmo_http_source.my_source.id",
+						"window_type":                            "sliding",
+						"window_min":                             "10",
+						"operation":                              "average",
+						"interval":                               "10",
+						"conditional.expressions.#":              "1",
+						"conditional.expressions.0.field":        ".status",
+						"conditional.expressions.0.operator":     "equal",
+						"conditional.expressions.0.value_number": "200",
+						"conditional.expressions.0.negate":       "false",
+					}),
+					StateDoesNotHaveFields("mezmo_aggregate_processor.with_negation", []string{"script"}),
 				),
 			},
 

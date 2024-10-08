@@ -57,6 +57,11 @@ resource "mezmo_change_alert" "order_spike" {
         field        = ".order_count"
         operator     = "percent_change_greater"
         value_number = 20
+      },
+      {
+        field        = ".status"
+        operator     = "value_change_greater"
+        value_number = 300
       }
     ],
   }
@@ -184,6 +189,7 @@ Required:
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -207,6 +213,7 @@ Required:
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -230,6 +237,7 @@ Required:
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -253,6 +261,7 @@ Required:
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -276,6 +285,7 @@ Required:
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -299,6 +309,7 @@ Required:
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -321,5 +332,6 @@ Required:
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string

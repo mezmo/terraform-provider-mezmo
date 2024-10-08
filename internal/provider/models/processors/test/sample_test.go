@@ -54,6 +54,37 @@ func TestAccSampleProcessor(t *testing.T) {
 				ExpectError: regexp.MustCompile("(?s)Attribute \"always_include.value_string\" must be specified when.*\"always_include.case_sensitive\" is specified"),
 			},
 
+			// Create with negation
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_sample_processor" "my_new_processor" {
+						title = "test title"
+						description = "test desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						always_include = {
+							field = ".my_field"
+							operator = "exists"
+							negate = true
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_sample_processor.my_new_processor", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_sample_processor.my_new_processor", map[string]any{
+						"pipeline_id":             "#mezmo_pipeline.test_parent.id",
+						"title":                   "test title",
+						"description":             "test desc",
+						"generation_id":           "0",
+						"inputs.#":                "0",
+						"rate":                    "10",
+						"always_include.field":    ".my_field",
+						"always_include.operator": "exists",
+						"always_include.negate":   "true",
+					}),
+				),
+			},
+
 			// Create with defaults
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -116,6 +147,7 @@ func TestAccSampleProcessor(t *testing.T) {
 						"rate":                    "3444",
 						"always_include.field":    ".my_field",
 						"always_include.operator": "exists",
+						"always_include.negate":   "false",
 					}),
 				),
 			},
@@ -254,7 +286,6 @@ func TestAccSampleProcessor(t *testing.T) {
 				// verify resource will be re-created after refresh
 				ExpectNonEmptyPlan: true,
 			},
-
 			// Delete testing automatically occurs in TestCase
 		},
 	})

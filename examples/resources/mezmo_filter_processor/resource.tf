@@ -38,6 +38,7 @@ resource "mezmo_filter_processor" "processor1" {
         field        = ".level"
         operator     = "contains"
         value_string = "info"
+        negate       = true
       }
     ]
     logical_operation = "OR"
