@@ -50,8 +50,9 @@ resource "mezmo_reduce_processor" "processor1" {
         },
         {
           field        = ".status"
-          operator     = "equal"
-          value_number = 201
+          operator     = "less_or_equal"
+          value_number = 300
+          negate       = true
         }
       ],
       logical_operation = "OR"

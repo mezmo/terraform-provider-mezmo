@@ -43,6 +43,11 @@ resource "mezmo_change_alert" "order_spike" {
         field        = ".order_count"
         operator     = "percent_change_greater"
         value_number = 20
+      },
+      {
+        field        = ".status"
+        operator     = "value_change_greater"
+        value_number = 300
       }
     ],
   }

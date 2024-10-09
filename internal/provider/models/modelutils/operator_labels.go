@@ -18,10 +18,6 @@ var Non_Change_Operator_Labels = []string{
 	"is_string",
 	"less",
 	"less_or_equal",
-	"not_contains",
-	"not_equal",
-	"not_exists",
-	"not_regex_match",
 	"regex_match",
 	"starts_with",
 }

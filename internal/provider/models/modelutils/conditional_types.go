@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/boolvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/listvalidator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -19,6 +20,7 @@ var ExpressionTypes = map[string]attr.Type{
 	"operator":     StringType{},
 	"value_number": Float64Type{},
 	"value_string": StringType{},
+	"negate":       BoolType{},
 }
 
 func expressionAttributes(operators []string) map[string]schema.Attribute {
@@ -52,6 +54,16 @@ func expressionAttributes(operators []string) map[string]schema.Attribute {
 		"value_number": schema.Float64Attribute{
 			Optional:    true,
 			Description: "The operand to compare the field value with, when the value is a number",
+		},
+		"negate": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Description: "Negate the operator",
+			Validators: []validator.Bool{
+				boolvalidator.AlsoRequires(
+					path.MatchRelative().AtParent().AtName("operator"),
+				),
+			},
 		},
 	}
 }
@@ -201,6 +213,10 @@ func parseExpressionsItem(component map[string]any, level int, operators []strin
 		"operator":     NewStringValue(component["str_operator"].(string)),
 		"value_number": NewFloat64Null(),
 		"value_string": NewStringNull(),
+		"negate":       NewBoolValue(false),
+	}
+	if negate, ok := component["negate"].(bool); ok {
+		attributeValues["negate"] = NewBoolValue(negate)
 	}
 	if valueNumber, ok := component["value"].(float64); ok {
 		attributeValues["value_number"] = NewFloat64Value(valueNumber)
@@ -240,6 +256,11 @@ func UnwindConditionalFromModel(v attr.Value) map[string]any {
 				elem["value"] = propVals["value_string"].(StringValue).ValueString()
 			} else {
 				elem["value"] = propVals["value_number"].(Float64Value).ValueFloat64()
+			}
+			if propVals["negate"].IsNull() {
+				elem["negate"] = NewBoolValue(false)
+			} else {
+				elem["negate"] = propVals["negate"].(BoolValue).ValueBool()
 			}
 			result = append(result, elem)
 		}

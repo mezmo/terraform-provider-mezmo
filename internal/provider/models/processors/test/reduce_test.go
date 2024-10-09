@@ -167,7 +167,50 @@ func TestAccReduceProcessor(t *testing.T) {
 					}),
 				),
 			},
+			// single level flush condition with operator negation
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_reduce_processor" "with_negation" {
+						title = "processor title"
+						description = "processor desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs = [mezmo_http_source.my_source.id]
 
+						flush_condition = {
+							when = "starts_when"
+							conditional = {
+								expressions = [
+									{
+										field = ".status"
+										operator = "equal"
+										value_number = 400
+										negate = true
+									}
+								]
+							},
+						}
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestMatchResourceAttr(
+						"mezmo_reduce_processor.with_negation", "id", regexp.MustCompile(`[\w-]{36}`)),
+
+					StateHasExpectedValues("mezmo_reduce_processor.with_negation", map[string]any{
+						"pipeline_id":          "#mezmo_pipeline.test_parent.id",
+						"title":                "processor title",
+						"description":          "processor desc",
+						"generation_id":        "0",
+						"inputs.#":             "1",
+						"inputs.0":             "#mezmo_http_source.my_source.id",
+						"flush_condition.when": "starts_when",
+						"flush_condition.conditional.expressions.#":              "1",
+						"flush_condition.conditional.expressions.0.field":        ".status",
+						"flush_condition.conditional.expressions.0.operator":     "equal",
+						"flush_condition.conditional.expressions.0.value_number": "400",
+						"flush_condition.conditional.logical_operation":          "AND",
+						"flush_condition.conditional.expressions.0.negate":       "true",
+					}),
+				),
+			},
 			// Single level flush_condition, default logical_operation
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -207,6 +250,7 @@ func TestAccReduceProcessor(t *testing.T) {
 						"flush_condition.conditional.expressions.0.operator":     "equal",
 						"flush_condition.conditional.expressions.0.value_number": "400",
 						"flush_condition.conditional.logical_operation":          "AND",
+						"flush_condition.conditional.expressions.0.negate":       "false",
 					}),
 				),
 			},
@@ -326,9 +370,11 @@ func TestAccReduceProcessor(t *testing.T) {
 						"flush_condition.conditional.expressions_group.0.expressions.0.field":                            ".level",
 						"flush_condition.conditional.expressions_group.0.expressions.0.operator":                         "equal",
 						"flush_condition.conditional.expressions_group.0.expressions.0.value_string":                     "ERROR",
+						"flush_condition.conditional.expressions_group.0.expressions.0.negate":                           "false",
 						"flush_condition.conditional.expressions_group.0.expressions.1.field":                            ".app",
 						"flush_condition.conditional.expressions_group.0.expressions.1.operator":                         "equal",
 						"flush_condition.conditional.expressions_group.0.expressions.1.value_string":                     "worker",
+						"flush_condition.conditional.expressions_group.0.expressions.1.negate":                           "false",
 						"flush_condition.conditional.expressions_group.0.logical_operation":                              "AND",
 						"flush_condition.conditional.expressions_group.1.expressions.0.field":                            ".status",
 						"flush_condition.conditional.expressions_group.1.expressions.0.operator":                         "equal",

@@ -147,6 +147,49 @@ func TestAccRouteProcessor(t *testing.T) {
 				ExpectError: regexp.MustCompile("(?s)Attribute.*value_number.*cannot be.*value_string"),
 			},
 
+			// single expression with negation
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_route_processor" "with_negation" {
+						title = "processor title"
+						description = "processor desc"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs = [mezmo_http_source.my_source.id]
+
+						conditionals = [
+							{
+								expressions = [
+									{
+										field = ".status"
+										operator = "equal"
+										value_number = 200
+										negate = true
+									}
+								]
+								label = "success logs"
+							}
+						]
+					}`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_route_processor.with_negation", map[string]any{
+						"pipeline_id":                               "#mezmo_pipeline.test_parent.id",
+						"title":                                     "processor title",
+						"description":                               "processor desc",
+						"generation_id":                             "0",
+						"inputs.#":                                  "1",
+						"conditionals.#":                            "1",
+						"conditionals.0.label":                      "success logs",
+						"conditionals.0.expressions.#":              "1",
+						"conditionals.0.expressions.0.field":        ".status",
+						"conditionals.0.expressions.0.operator":     "equal",
+						"conditionals.0.expressions.0.value_number": "200",
+						"conditionals.0.expressions.0.negate":       "true",
+						"conditionals.0.output_name":                regexp.MustCompile(`^.+\..+$`),
+						"unmatched":                                 regexp.MustCompile(`^.+\..+$`),
+					}),
+				),
+			},
+
 			// Single expression
 			{
 				Config: GetCachedConfig(cacheKey) + `
@@ -182,6 +225,7 @@ func TestAccRouteProcessor(t *testing.T) {
 						"conditionals.0.expressions.0.field":        ".status",
 						"conditionals.0.expressions.0.operator":     "equal",
 						"conditionals.0.expressions.0.value_number": "200",
+						"conditionals.0.expressions.0.negate":       "false",
 						"conditionals.0.output_name":                regexp.MustCompile(`^.+\..+$`),
 						"unmatched":                                 regexp.MustCompile(`^.+\..+$`),
 					}),

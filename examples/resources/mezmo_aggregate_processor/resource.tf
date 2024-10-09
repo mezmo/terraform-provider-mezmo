@@ -48,6 +48,7 @@ resource "mezmo_aggregate_processor" "processor2" {
         field        = ".tags.app"
         operator     = "contains"
         value_string = "my_app"
+        negate       = true
       }
     ]
     logical_operation = "OR"

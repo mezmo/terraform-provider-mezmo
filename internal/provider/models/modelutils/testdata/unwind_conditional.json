@@ -23,13 +23,15 @@
           "field": ".field",
           "operator": "equal",
           "value_string": "foo",
-          "value_number": "null"
+          "value_number": "null",
+          "negate": false
         },
         {
           "field": ".field2",
           "operator": "greater",
           "value_number": 10,
-          "value_string": "null"
+          "value_string": "null",
+          "negate": false
         }
       ],
       "expressions_group": "null",
@@ -79,13 +81,15 @@
               "field": ".field",
               "operator": "equal",
               "value_number": "null",
-              "value_string": "info"
+              "value_string": "info",
+              "negate": false
             },
             {
               "field": ".field2",
               "operator": "starts_with",
               "value_number": "null",
-              "value_string": "pipeline"
+              "value_string": "pipeline",
+              "negate": false
             }
           ],
           "expressions_group": "null",
@@ -97,13 +101,15 @@
               "field": ".field3",
               "operator": "ends_with",
               "value_number": "null",
-              "value_string": "error"
+              "value_string": "error",
+              "negate": false
             },
             {
               "field": ".field4",
               "operator": "equal",
               "value_number": "null",
-              "value_string": "foo"
+              "value_string": "foo",
+              "negate": false
             }
           ],
           "expressions_group": "null",
@@ -181,13 +187,15 @@
               "field": ".field",
               "operator": "equal",
               "value_string": "foo",
-              "value_number": "null"
+              "value_number": "null",
+              "negate": false
             },
             {
               "field": ".field2",
               "operator": "greater",
               "value_number": 10,
-              "value_string": "null"
+              "value_string": "null",
+              "negate": false
             }
           ],
           "expressions_group": "null",
@@ -202,13 +210,15 @@
                   "field": ".field3",
                   "value_number": 15,
                   "operator": "less",
-                  "value_string": "null"
+                  "value_string": "null",
+                  "negate": false
                 },
                 {
                   "field": ".field4",
                   "value_string": "null",
                   "operator": "is_array",
-                  "value_number": "null"
+                  "value_number": "null",
+                  "negate": false
                 }
               ],
               "expressions_group": "null",
@@ -220,25 +230,29 @@
                   "field": ".field5",
                   "value_number": 19,
                   "operator": "less_or_equal",
-                  "value_string": "null"
+                  "value_string": "null",
+                  "negate": false
                 },
                 {
                   "field": ".field6",
                   "value_string": "null",
                   "operator": "exists",
-                  "value_number": "null"
+                  "value_number": "null",
+                  "negate": false
                 },
                 {
                   "field": ".field7",
                   "value_string": "null",
                   "operator": "not_exists",
-                  "value_number": "null"
+                  "value_number": "null",
+                  "negate": false
                 },
                 {
                   "field": ".field8",
                   "value_string": "foo",
                   "operator": "contains",
-                  "value_number": "null"
+                  "value_number": "null",
+                  "negate": false
                 }
               ],
               "expressions_group": "null",

@@ -60,6 +60,7 @@ resource "mezmo_route_processor" "processor1" {
               field        = ".app_name"
               operator     = "ends_with"
               value_string = "service"
+              negate       = true
             },
           ]
         },
@@ -166,10 +167,11 @@ Read-Only:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, regex_match or starts_with.
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -189,10 +191,11 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, regex_match or starts_with.
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -212,10 +215,11 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, regex_match or starts_with.
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -235,10 +239,11 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, regex_match or starts_with.
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -258,10 +263,11 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, regex_match or starts_with.
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -281,10 +287,11 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, regex_match or starts_with.
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
 
@@ -303,9 +310,10 @@ Optional:
 Required:
 
 - `field` (String) The field path whose value will be used in the comparison
-- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, not_contains, not_equal, not_exists, not_regex_match, regex_match or starts_with.
+- `operator` (String) The comparison operator. Possible values are: contains, ends_with, equal, exists, greater, greater_or_equal, is_array, is_boolean, is_empty, is_ip_in_cidr_range, is_metric, is_null, is_number, is_object, is_string, less, less_or_equal, regex_match or starts_with.
 
 Optional:
 
+- `negate` (Boolean) Negate the operator
 - `value_number` (Number) The operand to compare the field value with, when the value is a number
 - `value_string` (String) The operand to compare the field value with, when the value is a string
