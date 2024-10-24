@@ -37,6 +37,7 @@ type ProcessorModel interface {
 		SetTimestampProcessorModel |
 		ScriptExecutionProcessorModel |
 		StringifyProcessorModel |
+		ThrottleProcessorModel |
 		UnrollProcessorModel
 }
 

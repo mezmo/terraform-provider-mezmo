@@ -246,3 +246,15 @@ func NewSetTimestampProcessorResource() resource.Resource {
 		schema:            SetTimestampProcessorResourceSchema,
 	}
 }
+
+func NewThrottleProcessorResource() resource.Resource {
+	return &ProcessorResource[ThrottleProcessorModel]{
+		typeName:          THROTTLE_PROCESSOR_TYPE_NAME,
+		nodeName:          THROTTLE_PROCESSOR_NODE_NAME,
+		fromModelFunc:     ThrottleProcessorFromModel,
+		toModelFunc:       ThrottleProcessorToModel,
+		getIdFunc:         func(m *ThrottleProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *ThrottleProcessorModel) basetypes.StringValue { return m.PipelineId },
+		schema:            ThrottleProcessorResourceSchema,
+	}
+}
