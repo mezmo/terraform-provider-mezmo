@@ -142,6 +142,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewSetTimestampProcessorResource,
 		NewStringifyProcessorResource,
 		NewUnrollProcessorResource,
+		NewThrottleProcessorResource,
 
 		// Destinations
 		NewAzureBlobStorageDestinationResource,

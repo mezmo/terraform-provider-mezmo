@@ -23,7 +23,7 @@ test-unit:
 .PHONY: test-acceptance
 test-acceptance:
 	docker-compose -f compose/base.yml pull && docker-compose \
-	-p terraform-provider-mezmo-$(BUILD_TAG) \
+	-p terraform-provider-mezmo-$(shell echo $$BUILD_TAG | tr '[:upper:]' '[:lower:]') \
 	-f compose/base.yml -f compose/test.yml \
 	up --remove-orphans --exit-code-from terraform-provider-mezmo --build
 
