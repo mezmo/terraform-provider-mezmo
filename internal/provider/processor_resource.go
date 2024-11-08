@@ -20,6 +20,7 @@ import (
 type ProcessorModel interface {
 	AggregateProcessorModel |
 		CompactFieldsProcessorModel |
+		DataProfilerProcessorModel |
 		DecryptFieldsProcessorModel |
 		DedupeProcessorModel |
 		DropFieldsProcessorModel |

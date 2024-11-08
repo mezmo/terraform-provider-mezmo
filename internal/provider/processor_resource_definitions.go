@@ -258,3 +258,15 @@ func NewThrottleProcessorResource() resource.Resource {
 		schema:            ThrottleProcessorResourceSchema,
 	}
 }
+
+func NewDataProfilerProcessorResource() resource.Resource {
+	return &ProcessorResource[DataProfilerProcessorModel]{
+		typeName:          DATA_PROFILER_PROCESSOR_TYPE_NAME,
+		nodeName:          DATA_PROFILER_PROCESSOR_NODE_NAME,
+		fromModelFunc:     DataProfilerProcessorFromModel,
+		toModelFunc:       DataProfilerProcessorToModel,
+		getIdFunc:         func(m *DataProfilerProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *DataProfilerProcessorModel) basetypes.StringValue { return m.PipelineId },
+		schema:            DataProfilerProcessorResourceSchema,
+	}
+}
