@@ -27,12 +27,13 @@ func TestSharedSourceResource(t *testing.T) {
 					}`) + `
 					resource "mezmo_shared_source" "my_source" {
 						title = "HTTP Shared"
-            type = "http"
-          }
+						type = "http"
+					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchOutput("shared_source_key", regexp.MustCompile(`\w+`)),
 					resource.TestMatchResourceAttr("mezmo_shared_source.my_source", "id", IDRegex),
+					resource.TestMatchResourceAttr("mezmo_shared_source.my_source", "consumer_id", IDRegex),
 					StateHasExpectedValues("mezmo_shared_source.my_source", map[string]any{
 						"title": "HTTP Shared",
 						"type":  "http",
@@ -44,13 +45,14 @@ func TestSharedSourceResource(t *testing.T) {
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_shared_source" "my_source" {
 						title = "updated title"
-            description = "updated description"
+						description = "updated description"
 						type = "http"
-          }
+					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchOutput("shared_source_key", regexp.MustCompile(`\w+`)),
 					resource.TestMatchResourceAttr("mezmo_shared_source.my_source", "id", IDRegex),
+					resource.TestMatchResourceAttr("mezmo_shared_source.my_source", "consumer_id", IDRegex),
 					StateHasExpectedValues("mezmo_shared_source.my_source", map[string]any{
 						"title":       "updated title",
 						"description": "updated description",
@@ -63,11 +65,12 @@ func TestSharedSourceResource(t *testing.T) {
 					resource "mezmo_shared_source" "my_source" {
 						title = "updated title"
 						type = "kinesis-firehose"
-          }
+					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchOutput("shared_source_key", regexp.MustCompile(`\w+`)),
 					resource.TestMatchResourceAttr("mezmo_shared_source.my_source", "id", IDRegex),
+					resource.TestMatchResourceAttr("mezmo_shared_source.my_source", "consumer_id", IDRegex),
 					resource.TestCheckResourceAttrPair("mezmo_access_key.shared", "source_id", "mezmo_shared_source.my_source", "id"),
 					StateHasExpectedValues("mezmo_shared_source.my_source", map[string]any{
 						"title": "updated title",
@@ -95,9 +98,9 @@ func TestSharedSourceResourceErrors(t *testing.T) {
 				Config: `
 					resource "mezmo_shared_source" "my_source" {
 						title = ""
-            description = ""
-            type = ""
-          }
+						description = ""
+						type = ""
+					}
 				`,
 			},
 		},

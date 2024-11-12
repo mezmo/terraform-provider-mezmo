@@ -58,4 +58,5 @@ resource "mezmo_shared_source" "http" {
 
 ### Read-Only
 
+- `consumer_id` (String) Consumer ID of the shared source.
 - `id` (String) The id of the shared source.

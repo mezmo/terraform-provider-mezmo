@@ -27,6 +27,7 @@ var PUSH_SOURCE_TYPES = []string{
 
 type SharedSourceResourceModel struct {
 	Id          StringValue `tfsdk:"id"`
+	ConsumerId  StringValue `tfsdk:"consumer_id"`
 	Title       StringValue `tfsdk:"title" user_config:"true"`
 	Description StringValue `tfsdk:"description" user_config:"true"`
 	Type        StringValue `tfsdk:"type" user_config:"true"`
@@ -37,6 +38,10 @@ func SharedSourceResourceSchema() schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				Description: "The id of the shared source.",
+				Computed:    true,
+			},
+			"consumer_id": schema.StringAttribute{
+				Description: "Consumer ID of the shared source.",
 				Computed:    true,
 			},
 			"title": schema.StringAttribute{
@@ -88,6 +93,7 @@ func SharedSourceFromModel(plan *SharedSourceResourceModel) *SharedSource {
 // From an API response to a terraform model
 func SharedSourceToModel(plan *SharedSourceResourceModel, source *SharedSource) {
 	plan.Id = NewStringValue(source.Id)
+	plan.ConsumerId = NewStringValue(source.ConsumerId)
 	plan.Title = NewStringValue(source.Title)
 	plan.Type = NewStringValue(source.Type)
 	if source.Description != "" {
