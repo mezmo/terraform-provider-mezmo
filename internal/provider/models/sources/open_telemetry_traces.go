@@ -13,18 +13,17 @@ const OPEN_TELEMETRY_TRACES_SOURCE_TYPE_NAME = "open_telemetry_traces"
 const OPEN_TELEMETRY_TRACES_SOURCE_NODE_NAME = "open-telemetry-traces"
 
 type OpenTelemetryTracesSourceModel struct {
-	Id              String `tfsdk:"id"`
-	PipelineId      String `tfsdk:"pipeline_id"`
-	Title           String `tfsdk:"title"`
-	Description     String `tfsdk:"description"`
-	GenerationId    Int64  `tfsdk:"generation_id"`
-	SharedSourceId  String `tfsdk:"shared_source_id"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
+	Id             String `tfsdk:"id"`
+	PipelineId     String `tfsdk:"pipeline_id"`
+	Title          String `tfsdk:"title"`
+	Description    String `tfsdk:"description"`
+	GenerationId   Int64  `tfsdk:"generation_id"`
+	SharedSourceId String `tfsdk:"shared_source_id"`
 }
 
 var OpenTelemetryTracesSourceResourceSchema = schema.Schema{
 	Description: "Represents a Open Telemetry Traces source.",
-	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "shared_source_id"}),
+	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"shared_source_id"}),
 }
 
 func OpenTelemetryTracesSourceFromModel(plan *OpenTelemetryTracesSourceModel, previousState *OpenTelemetryTracesSourceModel) (*Source, diag.Diagnostics) {
@@ -35,9 +34,7 @@ func OpenTelemetryTracesSourceFromModel(plan *OpenTelemetryTracesSourceModel, pr
 			Type:        OPEN_TELEMETRY_TRACES_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
-			UserConfig: map[string]any{
-				"capture_metadata": plan.CaptureMetadata.ValueBool(),
-			},
+			UserConfig:  map[string]any{},
 		},
 	}
 
@@ -73,7 +70,6 @@ func OpenTelemetryTracesSourceToModel(plan *OpenTelemetryTracesSourceModel, comp
 	if component.Description != "" {
 		plan.Description = StringValue(component.Description)
 	}
-	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.SharedSourceId = StringValue(component.SharedSourceId)
 }

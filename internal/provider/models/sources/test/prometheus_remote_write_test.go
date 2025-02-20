@@ -43,11 +43,10 @@ func TestAccPrometheusRemoteWriteSource(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_prometheus_remote_write_source.my_source", "shared_source_id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_prometheus_remote_write_source.my_source", map[string]any{
-						"description":      "my prometheus remote write description",
-						"generation_id":    "0",
-						"title":            "my prometheus remote write title",
-						"capture_metadata": "false",
-						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
+						"description":   "my prometheus remote write description",
+						"generation_id": "0",
+						"title":         "my prometheus remote write title",
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
 					}),
 				),
 			},
@@ -71,14 +70,12 @@ func TestAccPrometheusRemoteWriteSource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
 						description = "new description"
-						capture_metadata = "true"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_prometheus_remote_write_source.my_source", map[string]any{
-						"description":      "new description",
-						"generation_id":    "1",
-						"title":            "new title",
-						"capture_metadata": "true",
+						"description":   "new description",
+						"generation_id": "1",
+						"title":         "new title",
 					}),
 				),
 			},
@@ -106,7 +103,6 @@ func TestAccPrometheusRemoteWriteSource(t *testing.T) {
 						"description":      "This source provides shared_source_id",
 						"generation_id":    "0",
 						"title":            "A shared prometheus remote write source",
-						"capture_metadata": "false",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 						"shared_source_id": "#mezmo_prometheus_remote_write_source.parent_source.shared_source_id",
 					}),

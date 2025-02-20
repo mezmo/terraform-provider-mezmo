@@ -6,6 +6,5 @@
   "type": "webhook",
   "generation_id": 0,
   "user_config": {
-    "capture_metadata": true
   }
 }

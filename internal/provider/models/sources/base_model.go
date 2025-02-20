@@ -5,7 +5,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
@@ -41,13 +40,6 @@ var baseSourceSchemaAttributes = SchemaAttributes{
 }
 
 var addSchemas = map[string]schema.Attribute{
-	"capture_metadata": schema.BoolAttribute{
-		Computed: true,
-		Optional: true,
-		Default:  booldefault.StaticBool(false),
-		Description: "Enable the inclusion of all http headers and query string parameters " +
-			"that were sent from the source",
-	},
 	"shared_source_id": schema.StringAttribute{
 		Computed: true,
 		Optional: true,

@@ -43,18 +43,16 @@ func TestAccKinesisFirehoseSourceResource(t *testing.T) {
 						title = "test title"
 						description = "test description"
 						decoding = "text"
-						capture_metadata = true
 					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestMatchResourceAttr(
 						"mezmo_kinesis_firehose_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 					providertest.StateHasExpectedValues("mezmo_kinesis_firehose_source.my_source", map[string]any{
-						"title":            "test title",
-						"description":      "test description",
-						"generation_id":    "0",
-						"decoding":         "text",
-						"capture_metadata": "true",
+						"title":         "test title",
+						"description":   "test description",
+						"generation_id": "0",
+						"decoding":      "text",
 					}),
 				),
 			},
@@ -66,7 +64,6 @@ func TestAccKinesisFirehoseSourceResource(t *testing.T) {
 						title = "test title"
 						description = "test description"
 						decoding = "text"
-						capture_metadata = true
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_kinesis_firehose_source.import_target",
@@ -80,16 +77,14 @@ func TestAccKinesisFirehoseSourceResource(t *testing.T) {
 						title = "new title"
 						description = "new description"
 						decoding = "json"
-						capture_metadata = false
 					}
 				`,
 				Check: resource.ComposeTestCheckFunc(
 					providertest.StateHasExpectedValues("mezmo_kinesis_firehose_source.my_source", map[string]any{
-						"title":            "new title",
-						"description":      "new description",
-						"generation_id":    "1",
-						"decoding":         "json",
-						"capture_metadata": "false",
+						"title":         "new title",
+						"description":   "new description",
+						"generation_id": "1",
+						"decoding":      "json",
 					}),
 				),
 			},
@@ -119,7 +114,6 @@ func TestAccKinesisFirehoseSourceResource(t *testing.T) {
 						"description":      "shared kinesis source",
 						"generation_id":    "0",
 						"decoding":         "json",
-						"capture_metadata": "false",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 						"shared_source_id": "#mezmo_kinesis_firehose_source.parent_source.shared_source_id",
 					}),

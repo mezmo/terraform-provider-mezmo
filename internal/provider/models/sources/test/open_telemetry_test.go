@@ -34,10 +34,6 @@ resource "mezmo_open_telemetry_{{.Type}}_source" "{{.SourceName}}" {
 	pipeline_id = mezmo_pipeline.{{.PipelineName}}.id
 	title       = "{{.SourceTitle}}"
 	description = "{{.SourceDesc}}"
-
-	{{if .CaptureMetadata}}
-	capture_metadata = "{{.CaptureMetadata}}"
-	{{end}}
 }
 
 {{if .GatewayResourceID}}
@@ -137,7 +133,6 @@ func TestAccOpenTelemetrySources(t *testing.T) {
 						resource.TestCheckResourceAttr(resourceName, "description", "my open telemetry description"),
 						resource.TestCheckResourceAttr(resourceName, "generation_id", "0"),
 						resource.TestCheckResourceAttr(resourceName, "title", "my open telemetry title"),
-						resource.TestCheckResourceAttr(resourceName, "capture_metadata", "false"),
 						resource.TestCheckResourceAttrPair(resourceName, "pipeline_id", "mezmo_pipeline.test_parent", "id"),
 					}...),
 				},
@@ -155,7 +150,6 @@ func TestAccOpenTelemetrySources(t *testing.T) {
 					Check: resource.ComposeTestCheckFunc([]resource.TestCheckFunc{
 						resource.TestCheckResourceAttr(resourceName, "generation_id", "1"),
 						resource.TestCheckResourceAttr(resourceName, "title", "my open telemetry title updated"),
-						resource.TestCheckResourceAttr(resourceName, "capture_metadata", "true"),
 					}...),
 				},
 				// Supply shared_source_id

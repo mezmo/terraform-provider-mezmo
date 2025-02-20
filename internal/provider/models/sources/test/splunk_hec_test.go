@@ -39,11 +39,10 @@ func TestAccSplunkHecSource(t *testing.T) {
 						"mezmo_splunk_hec_source.my_source", "shared_source_id", regexp.MustCompile(`[\w-]{36}`)),
 
 					StateHasExpectedValues("mezmo_splunk_hec_source.my_source", map[string]any{
-						"description":      "my description",
-						"title":            "my title",
-						"generation_id":    "0",
-						"capture_metadata": "false",
-						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
+						"description":   "my description",
+						"title":         "my title",
+						"generation_id": "0",
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
 					}),
 				),
 			},
@@ -67,14 +66,12 @@ func TestAccSplunkHecSource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
 						description = "new description"
-						capture_metadata = "true"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_splunk_hec_source.my_source", map[string]any{
-						"description":      "new description",
-						"generation_id":    "1",
-						"title":            "new title",
-						"capture_metadata": "true",
+						"description":   "new description",
+						"generation_id": "1",
+						"title":         "new title",
 					}),
 				),
 			},
@@ -102,7 +99,6 @@ func TestAccSplunkHecSource(t *testing.T) {
 						"description":      "This source provides shared_source_id",
 						"title":            "A shared splunk HEC source",
 						"generation_id":    "0",
-						"capture_metadata": "false",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 						"shared_source_id": "#mezmo_splunk_hec_source.parent_source.shared_source_id",
 					}),
