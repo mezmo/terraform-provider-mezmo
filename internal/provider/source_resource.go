@@ -27,6 +27,7 @@ type SourceModel interface {
 		KafkaSourceModel |
 		KinesisFirehoseSourceModel |
 		LogAnalysisSourceModel |
+		LogAnalysisIngestionSourceModel |
 		LogStashSourceModel |
 		OpenTelemetryLogsSourceModel |
 		OpenTelemetryMetricsSourceModel |

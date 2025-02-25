@@ -163,6 +163,18 @@ func NewLogAnalysisSourceResource() resource.Resource {
 	}
 }
 
+func NewLogAnalysisIngestionSourceResource() resource.Resource {
+	return &SourceResource[LogAnalysisIngestionSourceModel]{
+		typeName:          LOG_ANALYSIS_INGESTION_SOURCE_TYPE_NAME,
+		nodeName:          LOG_ANALYSIS_INGESTION_SOURCE_NODE_NAME,
+		fromModelFunc:     LogAnalysisIngestionSourceFromModel,
+		toModelFunc:       LogAnalysisIngestionSourceToModel,
+		getIdFunc:         func(m *LogAnalysisIngestionSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *LogAnalysisIngestionSourceModel) basetypes.StringValue { return m.PipelineId },
+		schema:            LogAnalysisIngestionSourceResourceSchema,
+	}
+}
+
 func NewWebhookSourceResource() resource.Resource {
 	return &SourceResource[WebhookSourceModel]{
 		typeName:          WEBHOOK_SOURCE_TYPE_NAME,
