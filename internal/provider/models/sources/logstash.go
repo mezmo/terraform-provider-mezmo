@@ -16,14 +16,13 @@ const LOGSTASH_SOURCE_TYPE_NAME = "logstash"
 const LOGSTASH_SOURCE_NODE_NAME = LOGSTASH_SOURCE_TYPE_NAME
 
 type LogStashSourceModel struct {
-	Id              String `tfsdk:"id"`
-	PipelineId      String `tfsdk:"pipeline_id"`
-	Title           String `tfsdk:"title"`
-	Description     String `tfsdk:"description"`
-	GenerationId    Int64  `tfsdk:"generation_id"`
-	SharedSourceId  String `tfsdk:"shared_source_id"`
-	Format          String `tfsdk:"format" user_config:"true"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
+	Id             String `tfsdk:"id"`
+	PipelineId     String `tfsdk:"pipeline_id"`
+	Title          String `tfsdk:"title"`
+	Description    String `tfsdk:"description"`
+	GenerationId   Int64  `tfsdk:"generation_id"`
+	SharedSourceId String `tfsdk:"shared_source_id"`
+	Format         String `tfsdk:"format" user_config:"true"`
 }
 
 var LogStashSourceResourceSchema = schema.Schema{
@@ -36,7 +35,7 @@ var LogStashSourceResourceSchema = schema.Schema{
 			Description: "The format of the logstash data",
 			Validators:  []validator.String{stringvalidator.OneOf("json", "text")},
 		},
-	}, []string{"capture_metadata", "shared_source_id"}),
+	}, []string{"shared_source_id"}),
 }
 
 func LogStashSourceFromModel(plan *LogStashSourceModel, previousState *LogStashSourceModel) (*Source, diag.Diagnostics) {
@@ -48,8 +47,7 @@ func LogStashSourceFromModel(plan *LogStashSourceModel, previousState *LogStashS
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{
-				"format":           plan.Format.ValueString(),
-				"capture_metadata": plan.CaptureMetadata.ValueBool(),
+				"format": plan.Format.ValueString(),
 			},
 		},
 	}
@@ -86,7 +84,6 @@ func LogStashSourceToModel(plan *LogStashSourceModel, component *Source) {
 	if component.Description != "" {
 		plan.Description = StringValue(component.Description)
 	}
-	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	plan.Format = StringValue(component.UserConfig["format"].(string))
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.SharedSourceId = StringValue(component.SharedSourceId)

@@ -16,14 +16,13 @@ const HTTP_SOURCE_TYPE_NAME = "http"
 const HTTP_SOURCE_NODE_NAME = HTTP_SOURCE_TYPE_NAME
 
 type HttpSourceModel struct {
-	Id              String `tfsdk:"id"`
-	PipelineId      String `tfsdk:"pipeline_id"`
-	Title           String `tfsdk:"title"`
-	Description     String `tfsdk:"description"`
-	GenerationId    Int64  `tfsdk:"generation_id"`
-	SharedSourceId  String `tfsdk:"shared_source_id"`
-	Decoding        String `tfsdk:"decoding" user_config:"true"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
+	Id             String `tfsdk:"id"`
+	PipelineId     String `tfsdk:"pipeline_id"`
+	Title          String `tfsdk:"title"`
+	Description    String `tfsdk:"description"`
+	GenerationId   Int64  `tfsdk:"generation_id"`
+	SharedSourceId String `tfsdk:"shared_source_id"`
+	Decoding       String `tfsdk:"decoding" user_config:"true"`
 }
 
 var HttpSourceResourceSchema = schema.Schema{
@@ -39,7 +38,7 @@ var HttpSourceResourceSchema = schema.Schema{
 				stringvalidator.OneOf("bytes", "json", "ndjson", "auto"),
 			},
 		},
-	}, []string{"capture_metadata", "shared_source_id"}),
+	}, []string{"shared_source_id"}),
 }
 
 func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) (*Source, diag.Diagnostics) {
@@ -51,8 +50,7 @@ func HttpSourceFromModel(plan *HttpSourceModel, previousState *HttpSourceModel) 
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{
-				"decoding":         plan.Decoding.ValueString(),
-				"capture_metadata": plan.CaptureMetadata.ValueBool(),
+				"decoding": plan.Decoding.ValueString(),
 			},
 		},
 	}
@@ -90,7 +88,6 @@ func HttpSourceToModel(plan *HttpSourceModel, component *Source) {
 		plan.Description = StringValue(component.Description)
 	}
 	plan.Decoding = StringValue(component.UserConfig["decoding"].(string))
-	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.SharedSourceId = StringValue(component.SharedSourceId)
 }

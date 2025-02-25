@@ -17,14 +17,13 @@ const KINESIS_FIREHOSE_SOURCE_TYPE_NAME = "kinesis_firehose"
 const KINESIS_FIREHOSE_SOURCE_NODE_NAME = "kinesis-firehose"
 
 type KinesisFirehoseSourceModel struct {
-	Id              String `tfsdk:"id"`
-	PipelineId      String `tfsdk:"pipeline_id"`
-	Title           String `tfsdk:"title"`
-	Description     String `tfsdk:"description"`
-	GenerationId    Int64  `tfsdk:"generation_id"`
-	SharedSourceId  String `tfsdk:"shared_source_id"`
-	Decoding        String `tfsdk:"decoding" user_config:"true"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
+	Id             String `tfsdk:"id"`
+	PipelineId     String `tfsdk:"pipeline_id"`
+	Title          String `tfsdk:"title"`
+	Description    String `tfsdk:"description"`
+	GenerationId   Int64  `tfsdk:"generation_id"`
+	SharedSourceId String `tfsdk:"shared_source_id"`
+	Decoding       String `tfsdk:"decoding" user_config:"true"`
 }
 
 var KinesisFirehoseSourceResourceSchema = schema.Schema{
@@ -40,7 +39,7 @@ var KinesisFirehoseSourceResourceSchema = schema.Schema{
 				stringvalidator.OneOf("text", "json"),
 			},
 		},
-	}, []string{"capture_metadata", "shared_source_id"}),
+	}, []string{"shared_source_id"}),
 }
 
 func KinesisFirehoseSourceFromModel(plan *KinesisFirehoseSourceModel, previousState *KinesisFirehoseSourceModel) (*Source, diag.Diagnostics) {
@@ -51,8 +50,7 @@ func KinesisFirehoseSourceFromModel(plan *KinesisFirehoseSourceModel, previousSt
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			UserConfig: map[string]any{
-				"format":           plan.Decoding.ValueString(),
-				"capture_metadata": plan.CaptureMetadata.ValueBool(),
+				"format": plan.Decoding.ValueString(),
 			},
 		},
 	}
@@ -88,6 +86,5 @@ func KinesisFirehoseSourceToModel(plan *KinesisFirehoseSourceModel, component *S
 	}
 	plan.Decoding = StringValue(component.UserConfig["format"].(string))
 	plan.GenerationId = Int64Value(component.GenerationId)
-	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	plan.SharedSourceId = StringValue(component.SharedSourceId)
 }

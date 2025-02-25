@@ -40,11 +40,10 @@ func TestAccAgentSourceResource(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_agent_source.my_source", "shared_source_id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_agent_source.my_source", map[string]any{
-						"description":      "my agent description",
-						"generation_id":    "0",
-						"title":            "my agent title",
-						"capture_metadata": "false",
-						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
+						"description":   "my agent description",
+						"generation_id": "0",
+						"title":         "my agent title",
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
 					}),
 				),
 			},
@@ -55,14 +54,12 @@ func TestAccAgentSourceResource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
 						description = "new description"
-						capture_metadata = "true"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_agent_source.my_source", map[string]any{
-						"description":      "new description",
-						"generation_id":    "1",
-						"title":            "new title",
-						"capture_metadata": "true",
+						"description":   "new description",
+						"generation_id": "1",
+						"title":         "new title",
 					}),
 				),
 			},
@@ -73,7 +70,6 @@ func TestAccAgentSourceResource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "bad new title"
 						description = "new description"
-						capture_metadata = "true"
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_agent_source.import_target",
@@ -104,7 +100,6 @@ func TestAccAgentSourceResource(t *testing.T) {
 						"description":      "This source provides shared_source_id",
 						"generation_id":    "0",
 						"title":            "A shared agent source",
-						"capture_metadata": "false",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 						"shared_source_id": "#mezmo_agent_source.my_source.shared_source_id",
 					}),

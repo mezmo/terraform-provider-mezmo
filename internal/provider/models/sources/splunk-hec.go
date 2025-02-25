@@ -13,20 +13,19 @@ const SPLUNK_HEC_SOURCE_TYPE_NAME = "splunk_hec"
 const SPLUNK_HEC_SOURCE_NODE_NAME = "splunk-hec"
 
 type SplunkHecSourceModel struct {
-	Id              String `tfsdk:"id"`
-	PipelineId      String `tfsdk:"pipeline_id"`
-	Title           String `tfsdk:"title"`
-	Description     String `tfsdk:"description"`
-	GenerationId    Int64  `tfsdk:"generation_id"`
-	SharedSourceId  String `tfsdk:"shared_source_id"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
+	Id             String `tfsdk:"id"`
+	PipelineId     String `tfsdk:"pipeline_id"`
+	Title          String `tfsdk:"title"`
+	Description    String `tfsdk:"description"`
+	GenerationId   Int64  `tfsdk:"generation_id"`
+	SharedSourceId String `tfsdk:"shared_source_id"`
 }
 
 var SplunkHecSourceResourceSchema = schema.Schema{
 	Description: "Receive Splunk logs",
 	Attributes: ExtendBaseAttributes(
 		map[string]schema.Attribute{},
-		[]string{"capture_metadata", "shared_source_id"},
+		[]string{"shared_source_id"},
 	),
 }
 
@@ -37,9 +36,7 @@ func SplunkHecSourceFromModel(plan *SplunkHecSourceModel, previousState *SplunkH
 			Type:        SPLUNK_HEC_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
-			UserConfig: map[string]any{
-				"capture_metadata": plan.CaptureMetadata.ValueBool(),
-			},
+			UserConfig:  map[string]any{},
 		},
 	}
 
@@ -75,7 +72,6 @@ func SplunkHecSourceToModel(plan *SplunkHecSourceModel, component *Source) {
 	if component.Description != "" {
 		plan.Description = StringValue(component.Description)
 	}
-	plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	plan.SharedSourceId = StringValue(component.SharedSourceId)
 	plan.GenerationId = Int64Value(component.GenerationId)
 }

@@ -13,18 +13,17 @@ const AGENT_SOURCE_TYPE_NAME = "agent"
 const AGENT_SOURCE_NODE_NAME = "mezmo-agent"
 
 type AgentSourceModel struct {
-	Id              String `tfsdk:"id"`
-	PipelineId      String `tfsdk:"pipeline_id"`
-	Title           String `tfsdk:"title"`
-	Description     String `tfsdk:"description"`
-	GenerationId    Int64  `tfsdk:"generation_id"`
-	SharedSourceId  String `tfsdk:"shared_source_id"`
-	CaptureMetadata Bool   `tfsdk:"capture_metadata" user_config:"true"`
+	Id             String `tfsdk:"id"`
+	PipelineId     String `tfsdk:"pipeline_id"`
+	Title          String `tfsdk:"title"`
+	Description    String `tfsdk:"description"`
+	GenerationId   Int64  `tfsdk:"generation_id"`
+	SharedSourceId String `tfsdk:"shared_source_id"`
 }
 
 var AgentSourceResourceSchema = schema.Schema{
 	Description: "Represents a Mezmo agent source.",
-	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"capture_metadata", "shared_source_id"}),
+	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"shared_source_id"}),
 }
 
 func AgentSourceFromModel(plan *AgentSourceModel, previousState *AgentSourceModel) (*Source, diag.Diagnostics) {
@@ -35,9 +34,7 @@ func AgentSourceFromModel(plan *AgentSourceModel, previousState *AgentSourceMode
 			Type:        AGENT_SOURCE_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
-			UserConfig: map[string]any{
-				"capture_metadata": plan.CaptureMetadata.ValueBool(),
-			},
+			UserConfig:  map[string]any{},
 		},
 	}
 
@@ -72,9 +69,6 @@ func AgentSourceToModel(plan *AgentSourceModel, component *Source) {
 	}
 	if component.Description != "" {
 		plan.Description = StringValue(component.Description)
-	}
-	if component.UserConfig["capture_metadata"] != nil {
-		plan.CaptureMetadata = BoolValue(component.UserConfig["capture_metadata"].(bool))
 	}
 	plan.GenerationId = Int64Value(component.GenerationId)
 	plan.SharedSourceId = StringValue(component.SharedSourceId)

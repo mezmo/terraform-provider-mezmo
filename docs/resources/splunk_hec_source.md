@@ -46,7 +46,6 @@ resource "mezmo_splunk_hec_source" "splunk_source" {
 
 ### Optional
 
-- `capture_metadata` (Boolean) Enable the inclusion of all http headers and query string parameters that were sent from the source
 - `description` (String) A user-defined value describing the source component
 - `shared_source_id` (String) The uuid of a pipeline source or shared source to be used as the input for this component. This can only be provided on resource creation (not update).
 - `title` (String) A user-defined title for the source component

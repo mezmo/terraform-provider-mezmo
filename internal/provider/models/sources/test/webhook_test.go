@@ -36,10 +36,9 @@ func TestAccWebhookSource(t *testing.T) {
 					resource.TestMatchResourceAttr("mezmo_webhook_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 					resource.TestMatchResourceAttr("mezmo_webhook_source.my_source", "shared_source_id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_webhook_source.my_source", map[string]any{
-						"description":      "my description",
-						"title":            "my title",
-						"generation_id":    "0",
-						"capture_metadata": "false",
+						"description":   "my description",
+						"title":         "my title",
+						"generation_id": "0",
 					}),
 				),
 			},
@@ -65,14 +64,12 @@ func TestAccWebhookSource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						description = "new description"
 						title = "new title"
-						capture_metadata = "true"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_webhook_source.my_source", map[string]any{
-						"description":      "new description",
-						"title":            "new title",
-						"generation_id":    "1",
-						"capture_metadata": "true",
+						"description":   "new description",
+						"title":         "new title",
+						"generation_id": "1",
 					}),
 				),
 			},
@@ -101,7 +98,6 @@ func TestAccWebhookSource(t *testing.T) {
 						"description":      "This source provides shared_source_id",
 						"generation_id":    "0",
 						"title":            "A shared source",
-						"capture_metadata": "false",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 						"shared_source_id": "#mezmo_webhook_source.parent_source.shared_source_id",
 					}),

@@ -46,11 +46,10 @@ func TestAccLogStashSource(t *testing.T) {
 					resource.TestMatchResourceAttr("mezmo_logstash_source.my_source", "id", regexp.MustCompile(`[\w-]{36}`)),
 					resource.TestMatchResourceAttr("mezmo_logstash_source.my_source", "shared_source_id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_logstash_source.my_source", map[string]any{
-						"description":      "my description",
-						"title":            "my title",
-						"generation_id":    "0",
-						"format":           "json",
-						"capture_metadata": "false",
+						"description":   "my description",
+						"title":         "my title",
+						"generation_id": "0",
+						"format":        "json",
 					}),
 				),
 			},
@@ -62,7 +61,6 @@ func TestAccLogStashSource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "bad new title"
 						description = "new description"
-						capture_metadata = "true"
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_logstash_source.import_target",
@@ -78,15 +76,13 @@ func TestAccLogStashSource(t *testing.T) {
 						description = "new description"
 						title = "new title"
 						format = "text"
-						capture_metadata = "true"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_logstash_source.my_source", map[string]any{
-						"description":      "new description",
-						"title":            "new title",
-						"generation_id":    "1",
-						"format":           "text",
-						"capture_metadata": "true",
+						"description":   "new description",
+						"title":         "new title",
+						"generation_id": "1",
+						"format":        "text",
 					}),
 				),
 			},
@@ -116,7 +112,6 @@ func TestAccLogStashSource(t *testing.T) {
 						"generation_id":    "0",
 						"title":            "A shared source",
 						"format":           "json",
-						"capture_metadata": "false",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 						"shared_source_id": "#mezmo_logstash_source.parent_source.shared_source_id",
 					}),

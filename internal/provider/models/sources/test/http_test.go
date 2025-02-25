@@ -46,12 +46,11 @@ func TestAccHttpSource(t *testing.T) {
 					resource.TestMatchResourceAttr(
 						"mezmo_http_source.my_source", "shared_source_id", regexp.MustCompile(`[\w-]{36}`)),
 					StateHasExpectedValues("mezmo_http_source.my_source", map[string]any{
-						"description":      "my http description",
-						"generation_id":    "0",
-						"title":            "my http title",
-						"decoding":         "auto",
-						"capture_metadata": "false",
-						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
+						"description":   "my http description",
+						"generation_id": "0",
+						"title":         "my http title",
+						"decoding":      "auto",
+						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
 					}),
 				),
 			},
@@ -76,15 +75,13 @@ func TestAccHttpSource(t *testing.T) {
 						title = "new title"
 						description = "new description"
 						decoding = "ndjson"
-						capture_metadata = "true"
 					}`,
 				Check: resource.ComposeTestCheckFunc(
 					StateHasExpectedValues("mezmo_http_source.my_source", map[string]any{
-						"description":      "new description",
-						"generation_id":    "1",
-						"title":            "new title",
-						"decoding":         "ndjson",
-						"capture_metadata": "true",
+						"description":   "new description",
+						"generation_id": "1",
+						"title":         "new title",
+						"decoding":      "ndjson",
 					}),
 				),
 			},
@@ -113,7 +110,6 @@ func TestAccHttpSource(t *testing.T) {
 						"generation_id":    "0",
 						"title":            "A shared http source",
 						"decoding":         "auto",
-						"capture_metadata": "false",
 						"pipeline_id":      "#mezmo_pipeline.test_parent.id",
 						"shared_source_id": "#mezmo_http_source.parent_source.shared_source_id",
 					}),
