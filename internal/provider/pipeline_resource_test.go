@@ -1,10 +1,14 @@
 package provider
 
 import (
+	"context"
+	"fmt"
 	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
+	"github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/providertest"
 )
 
@@ -32,6 +36,34 @@ func TestPipelineResource(t *testing.T) {
 					// Verify computed properties
 					resource.TestCheckResourceAttrSet("mezmo_pipeline.test", "id"),
 					resource.TestCheckResourceAttrSet("mezmo_pipeline.test", "created_at"),
+					func(s *terraform.State) error {
+
+						// Read mezmo_pipeline.test local state
+						model, ok := s.RootModule().Resources["mezmo_pipeline.test"]
+
+						if !ok {
+							return fmt.Errorf("PipelineResourceModel not found in terraform.State")
+						}
+
+						// Get id and ctx to call Mezmo API in test with the NewTestClient constructor
+						id := model.Primary.Attributes["id"]
+						ctx := context.Background()
+						c := NewTestClient()
+
+						// Pipeline from Mezmo API call
+						pipeline, api_err := c.Pipeline(id, ctx)
+
+						if api_err != nil {
+							return fmt.Errorf("Pipeline id %s not found in mezmo api call", id)
+						}
+
+						// Verify origin in remote Mezmo API is indeed set to "terraform"
+						if pipeline.Origin != client.ORIGIN_TERRAFORM {
+							return fmt.Errorf("Pipeline created with origin set to \"%v\" but expected \"terraform\"", pipeline.Origin)
+						}
+
+						return nil
+					},
 				),
 			},
 			// Update and Read testing

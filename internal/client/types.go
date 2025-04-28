@@ -4,12 +4,19 @@ import (
 	"time"
 )
 
+type Origin string
+
+const (
+	ORIGIN_TERRAFORM Origin = "terraform"
+)
+
 // Represents a Pipeline.
 type Pipeline struct {
 	Id        string     `json:"id,omitempty"`
 	Title     string     `json:"title"`
 	CreatedAt *time.Time `json:"created_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	Origin    Origin     `json:"origin"`
 }
 
 // Represents a source, processor or destination.

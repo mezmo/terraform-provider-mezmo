@@ -78,6 +78,7 @@ func TestAccUnrollProcessor(t *testing.T) {
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_unroll_processor" "import_target" {
 						title = "processor title"
+						origin = "terraform"
 						description = "processor desc"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						field = ".thing1"
