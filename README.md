@@ -39,6 +39,8 @@ provider_installation {
 Then, you can `plan` or `apply` a terraform files. This example assumes that there are `.tf`
 files in `my-terraform-test` ready to be used.
 
+Keep in mind if you have run the provider previously in your `my-terraform-test` directory before updating your config for dev_overrides your provider will be pinned to the remote repository version and will ignore your dev_overrides. To remedy this you will have to delete the .terraform in your `my-terraform-test` directory.
+
 ```bash
 cd my-terraform-test
 terraform init

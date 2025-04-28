@@ -41,3 +41,6 @@ website/vendor
 
 # Test report
 results.xml
+
+# Vim
+Session.vim
