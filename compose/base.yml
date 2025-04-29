@@ -88,6 +88,7 @@ services:
       SAMPLES_AWS_SECRET_KEY: abcd
       RESHAPE_MESSAGE_IN_VECTOR: 1
       ACCOUNT_SERVICE_URL: http://account-service:8030
+      ENABLE_TAIL_BASED_TRACE_SAMPLING: true
 
   account-service:
     image: us.gcr.io/logdna-k8s/account-service:1-latest

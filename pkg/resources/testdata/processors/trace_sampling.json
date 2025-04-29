@@ -1,0 +1,71 @@
+{
+  "id": "749ec935-1541-4a2d-b67a-fbb09ae12ec1",
+  "title": "trace sampling processor title",
+  "description": "trace sampling processor description",
+  "account_id": "7b212506-23cb-11ed-b300-4ef12c27e273",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "generation_id": 1,
+  "type": "trace-sampling",
+  "deploy_type": "saas",
+  "inputs": [
+    "2d3145e0-5ed9-4571-b71b-28770bde6ce2"
+  ],
+  "user_config": {
+    "sample_type": "tail",
+    "trace_id_field": ".trace_id",
+    "parent_span_id_field": ".parent_span_id",
+    "conditionals": [
+      {
+        "rate": 1,
+        "conditional": {
+          "expressions": [
+            {
+              "field": ".status",
+              "value": "500",
+              "str_operator": "greater_or_equal"
+            }
+          ]
+        },
+        "_output_name": "abc"
+      },
+      {
+        "rate": 10,
+        "conditional": {
+          "expressions": [
+            {
+              "field": ".status",
+              "value": "400",
+              "str_operator": "greater_or_equal"
+            },
+            {
+              "field": ".status",
+              "value": "500",
+              "str_operator": "less"
+            }
+          ],
+          "logical_operation": "AND"
+        },
+        "_output_name": "def"
+      },
+      {
+        "rate": 100,
+        "conditional": {
+          "expressions": [
+            {
+              "field": ".status",
+              "value": "200",
+              "str_operator": "greater_or_equal"
+            },
+            {
+              "field": ".status",
+              "value": "300",
+              "str_operator": "less"
+            }
+          ],
+          "logical_operation": "AND"
+        },
+        "_output_name": "ghi"
+      }
+    ]
+  }
+}
