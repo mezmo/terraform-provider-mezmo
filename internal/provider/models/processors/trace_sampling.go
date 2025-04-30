@@ -161,7 +161,11 @@ func TraceSamplingProcessorToModel(plan *TraceSamplingProcessorModel, component 
 		if rate, ok := component.UserConfig["rate"].(float64); ok {
 			plan.Rate = types.Int64Value(int64(rate))
 		}
+
+		plan.ParentSpanIdField = types.StringNull()
 	} else if plan.SampleType.ValueString() == "tail" {
+		plan.Rate = types.Int64Null()
+
 		if parent_span_id_field, ok := component.UserConfig["parent_span_id_field"].(string); ok {
 			plan.ParentSpanIdField = types.StringValue(parent_span_id_field)
 		}
