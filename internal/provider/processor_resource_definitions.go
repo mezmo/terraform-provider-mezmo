@@ -259,6 +259,18 @@ func NewThrottleProcessorResource() resource.Resource {
 	}
 }
 
+func NewTraceSamplingProcessorResource() resource.Resource {
+	return &ProcessorResource[TraceSamplingProcessorModel]{
+		typeName:          TRACE_SAMPLING_PROCESSOR_TYPE_NAME,
+		nodeName:          TRACE_SAMPLING_PROCESSOR_NODE_NAME,
+		fromModelFunc:     TraceSamplingProcessorFromModel,
+		toModelFunc:       TraceSamplingProcessorToModel,
+		getIdFunc:         func(m *TraceSamplingProcessorModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *TraceSamplingProcessorModel) basetypes.StringValue { return m.PipelineId },
+		schema:            TraceSamplingProcessorResourceSchema,
+	}
+}
+
 func NewDataProfilerProcessorResource() resource.Resource {
 	return &ProcessorResource[DataProfilerProcessorModel]{
 		typeName:          DATA_PROFILER_PROCESSOR_TYPE_NAME,

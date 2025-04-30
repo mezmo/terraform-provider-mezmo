@@ -39,6 +39,7 @@ type ProcessorModel interface {
 		ScriptExecutionProcessorModel |
 		StringifyProcessorModel |
 		ThrottleProcessorModel |
+		TraceSamplingProcessorModel |
 		UnrollProcessorModel
 }
 
