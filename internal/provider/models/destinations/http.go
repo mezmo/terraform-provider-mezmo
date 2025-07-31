@@ -80,21 +80,18 @@ var HttpDestinationResourceSchema = schema.Schema{
 				"user": schema.StringAttribute{
 					Optional:   true,
 					Computed:   true,
-					Default:    stringdefault.StaticString(""),
 					Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 				"password": schema.StringAttribute{
 					Sensitive:  true,
 					Optional:   true,
 					Computed:   true,
-					Default:    stringdefault.StaticString(""),
 					Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 				"token": schema.StringAttribute{
 					Sensitive:  true,
 					Optional:   true,
 					Computed:   true,
-					Default:    stringdefault.StaticString(""),
 					Validators: []validator.String{stringvalidator.LengthAtLeast(1)},
 				},
 			},
@@ -229,13 +226,17 @@ func HttpDestinationFromModel(plan *HttpDestinationModel, previousState *HttpDes
 		user_config["auth"] = auth
 
 		if auth["strategy"] == "basic" {
-			if auth["user"] == "" || auth["password"] == "" {
+			_, has_user := auth["user"].(string)
+			_, has_password := auth["password"].(string)
+
+			if !has_user || !has_password {
 				dd.AddError(
 					"Error in plan",
 					"Basic auth requires user and password fields to be defined")
 			}
 		} else {
-			if auth["token"] == "" {
+			_, has_token := auth["token"].(string)
+			if !has_token {
 				dd.AddError(
 					"Error in plan",
 					"Bearer auth requires token field to be defined")
@@ -333,7 +334,19 @@ func HttpDestinationToModel(plan *HttpDestinationModel, component *Destination) 
 			if len(objT) == 0 {
 				objT = HttpDestinationResourceSchema.Attributes["auth"].GetType().(ObjectType).AttrTypes
 			}
-			plan.Auth = NewObjectValueMust(objT, MapAnyToMapValues(auth))
+			attributesToSetNil := []string{}
+			switch auth["strategy"] {
+			case "basic":
+				attributesToSetNil = append(attributesToSetNil, "token")
+			case "bearer":
+				attributesToSetNil = append(attributesToSetNil, "user", "password")
+			}
+
+			mappedValues := MapAnyToMapValues(auth)
+			for _, attr := range attributesToSetNil {
+				mappedValues[attr] = NewStringNull()
+			}
+			plan.Auth = NewObjectValueMust(objT, mappedValues)
 		}
 	}
 
