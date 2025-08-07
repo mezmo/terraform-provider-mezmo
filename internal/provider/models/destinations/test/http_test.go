@@ -48,7 +48,37 @@ func TestAccHttpDestination(t *testing.T) {
 				ExpectError: regexp.MustCompile("Basic auth requires user and password fields to be defined"),
 			},
 
-			// Error: basic auth fields required
+			// Error: basic auth requires non empty user and password
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_http_destination" "my_destination" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						uri = "https://example.com"
+						auth = {
+							strategy = "bearer"
+							password = "pass"
+							user = ""
+						}
+					}`,
+				ExpectError: regexp.MustCompile("(?s)Attribute auth.user string length must be at least 1"),
+			},
+
+			// Error: basic auth requires non empty user and password
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_http_destination" "my_destination" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						uri = "https://example.com"
+						auth = {
+							strategy = "bearer"
+							password = ""
+							user = "user"
+						}
+					}`,
+				ExpectError: regexp.MustCompile("(?s)Attribute auth.password string length must be at least 1"),
+			},
+
+			// Error: bearer auth fields required
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_http_destination" "my_destination" {
@@ -59,6 +89,19 @@ func TestAccHttpDestination(t *testing.T) {
 						}
 					}`,
 				ExpectError: regexp.MustCompile("Bearer auth requires token field to be defined"),
+			},
+			// Error: bearer auth requires non empty token
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_http_destination" "my_destination" {
+						pipeline_id = mezmo_pipeline.test_parent.id
+						uri = "https://example.com"
+						auth = {
+							strategy = "bearer"
+							token = ""
+						}
+					}`,
+				ExpectError: regexp.MustCompile("(?s)Attribute auth.token string length must be at least 1"),
 			},
 
 			// Error: must set both payload_prefix and payload_suffix

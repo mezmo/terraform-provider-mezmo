@@ -11,8 +11,10 @@ You can download this repo to create your own local provider or you can use the 
 - [Go](https://golang.org/doc/install) >= 1.20
 
 ## Building the Provider Locally
+
 Building the provider will build the provider binary in the project root. It's not very useful in most
 cases, so see the instructions in [Running the Provider Locally](#running-the-provider-locally).
+
 ```shell
 go build ./...
 ```
@@ -28,7 +30,8 @@ If you want to use the local provider, you need to reference it by placing a fil
 This setting tells terraform to override the remote registry where the provider is usually downloaded from in favor of a local directory.
 The value of this setting should be your `$GOPATH`, which is where the installed binary gets placed.
 This value is usually `$HOME/go/bin`.
-```
+
+```hcl
 provider_installation {
   dev_overrides {
       "registry.terraform.io/mezmo/mezmo" = "/Users/<YOUR USERNAME>/go/bin"
@@ -71,6 +74,7 @@ shows the loaded API routes. In a separate window, run:
 ```sh
 make start
 ```
+
 Each test command will be preceeded by loading the proper environment variables. Depending
 on the noted shell, that is done by:
 
@@ -80,12 +84,13 @@ fish> env (cat env/local.env) #...rest of command
 ```
 
 ### ENV vars for Unit Tests
+
 Optional environment variables can be provided on the test command line to display
 additional debugging information when writing tests. Note that `fmt.Println` does not
 work when running the provider directly, so these variables have no effect then. See
-[Trace Logging During Execution](#trace-logging-during-execution) for logging while using the provider.
+[Trace Logging During Execution](#trace-logging-during-execution-and-testing) for logging while using the provider.
 
-* `DEBUG_ATTRIBUTES=1` - Displays the loaded state attributes when using the `StateHasExpectedValues` assertion
+- `DEBUG_ATTRIBUTES=1` - Displays the loaded state attributes when using the `StateHasExpectedValues` assertion
 
 ### Trace Logging During Execution and Testing
 
@@ -94,24 +99,26 @@ For this, set `TF_LOG_PROVIDER_MEZMO=TRACE`, but be aware that it could print se
 This should only be used when debugging provider execution locally (including integration tests)!
 
 #### Examples
-* `-run` accepts a regex for the test name, and the path
-* The path given shoulid match where the test file resides
-* `TF_LOG_PROVIDER_MEZMO=TRACE` can be provided to see all api requests/responses/errors
 
-**Run all tests**
+- `-run` accepts a regex for the test name, and the path
+
+- The path given shoulid match where the test file resides
+- `TF_LOG_PROVIDER_MEZMO=TRACE` can be provided to see all api requests/responses/errors
+
+#### Run all tests
 
 ```sh
 make local-test
 ``````
-**Run a singular test**
+
+#### Run a singular test
 
 ```sh
 npm run local -- _TF_LOG_PROVIDER_MEZMO=TRACE go test -v -run 'TestAccAbsenceAlert_success' ./internal/provider/models/alerts/test
 ```
 
-**Run a group of tests**
+#### Run a group of tests
 
 ```sh
-npm run local -- test -v -run 'TestAccChangeAlert.*_errors' ./internal/provider/models/alerts/test
+npm run local -- test -v -run 'TestAccChangeAlert.*_errors' go test -run ./internal/provider/models/alerts/test
 ```
-
