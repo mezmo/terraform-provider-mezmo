@@ -49,7 +49,7 @@ build-snapshot-binary:
 	-e GOARCH=${GOARCH} \
 	-v $(PWD):/opt/app \
 	-w /opt/app \
-	goreleaser/goreleaser:v2.0.0 \
+	goreleaser/goreleaser:v2.11.1 \
 		build \
 		--single-target \
 		--snapshot \
