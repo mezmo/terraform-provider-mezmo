@@ -49,7 +49,6 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 						title = "My destination"
 						description = "my destination description"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						ingestion_key = "my_key"
 					}
 					`,
 				Check: resource.ComposeTestCheckFunc(
@@ -57,14 +56,14 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 						"mezmo_logs_destination.my_destination", "id", regexp.MustCompile(`[\w-]{36}`)),
 
 					StateHasExpectedValues("mezmo_logs_destination.my_destination", map[string]any{
-						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
-						"title":         "My destination",
-						"description":   "my destination description",
-						"generation_id": "0",
-						"ack_enabled":   "true",
-						"inputs.#":      "0",
-						"host":          "logs.logdna.com",
-						"ingestion_key": "my_key",
+						"pipeline_id":       "#mezmo_pipeline.test_parent.id",
+						"title":             "My destination",
+						"description":       "my destination description",
+						"generation_id":     "0",
+						"ack_enabled":       "true",
+						"inputs.#":          "0",
+						"host":              "logs.logdna.com",
+						"use_ingestion_key": "false",
 					}),
 				),
 			},
@@ -76,7 +75,6 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 						title = "My destination"
 						description = "my destination description"
 						pipeline_id = mezmo_pipeline.test_parent.id
-						ingestion_key = "my_key"
 					}`,
 				ImportState:       true,
 				ResourceName:      "mezmo_logs_destination.import_target",
@@ -95,6 +93,7 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 						ack_enabled = "false"
 						host = "zzz.mezmo.com"
 						ingestion_key = "key2"
+						use_ingestion_key = "true"
 						log_construction_scheme = "pass-through"
 						query = {
 							hostname = "{{ .host }}",
@@ -115,6 +114,7 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 						"ack_enabled":             "false",
 						"host":                    "zzz.mezmo.com",
 						"ingestion_key":           "key2",
+						"use_ingestion_key":       "true",
 						"log_construction_scheme": "pass-through",
 						"query.hostname":          "{{ .host }}",
 						"query.mac":               "{{metadata.query.mac}}",
@@ -133,7 +133,6 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 						description = "new description"
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_http_source.my_source.id]
-						ingestion_key = "key3"
 						log_construction_scheme = "explicit"
 						explicit_scheme_options = {
 							line       = ".thing_one",
@@ -153,7 +152,7 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 						"inputs.0":                           "#mezmo_http_source.my_source.id",
 						"ack_enabled":                        "true",
 						"host":                               "logs.logdna.com",
-						"ingestion_key":                      "key3",
+						"use_ingestion_key":                  "false",
 						"log_construction_scheme":            "explicit",
 						"explicit_scheme_options.line":       ".thing_one",
 						"explicit_scheme_options.app":        "{{metadata.query.app}}",
@@ -167,12 +166,13 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 			{
 				Config: GetCachedConfig(cacheKey) + `
 					resource "mezmo_logs_destination" "my_destination" {
-						title         = "My destination"
-						description   = "my destination description"
-						pipeline_id   = mezmo_pipeline.test_parent.id
-						inputs        = [mezmo_http_source.my_source.id]
-						ingestion_key = "my_key"
-						host          = "invalid.host.com"
+						title         		= "My destination"
+						description   		= "my destination description"
+						pipeline_id   		= mezmo_pipeline.test_parent.id
+						inputs        		= [mezmo_http_source.my_source.id]
+						ingestion_key 		= "my_key"
+						use_ingestion_key 	= "true"
+						host          		= "invalid.host.com"
 					}
 					`,
 				ExpectError: regexp.MustCompile("match pattern"),
@@ -190,7 +190,6 @@ func TestAccMezmoDestinationResource(t *testing.T) {
 					pipeline_id = mezmo_pipeline.test_parent2.id
 					title 			= "new title"
 					inputs 			= [mezmo_http_source.my_source2.id]
-					ingestion_key = "my_key"
 				}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestMatchResourceAttr(

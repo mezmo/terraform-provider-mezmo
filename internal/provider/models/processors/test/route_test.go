@@ -473,6 +473,7 @@ func TestAccRouteProcessor(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						inputs = [mezmo_route_processor.with_outputs.conditionals.1.output_name]
 						ingestion_key = "my_key"
+						use_ingestion_key = "true"
 					}
 					`,
 				Check: resource.ComposeTestCheckFunc(

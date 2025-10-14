@@ -62,11 +62,10 @@ resource "mezmo_parse_sequentially_processor" "processor1" {
 }
 
 resource "mezmo_logs_destination" "destination1" {
-  pipeline_id   = mezmo_pipeline.pipeline1.id
-  title         = "My destination"
-  description   = "Send logs to Mezmo Log Analysis"
-  inputs        = [mezmo_parse_sequentially_processor.processor1.parsers.0.output_name]
-  ingestion_key = var.my_ingestion_key
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My destination"
+  description = "Send logs to Mezmo Log Analysis"
+  inputs      = [mezmo_parse_sequentially_processor.processor1.parsers.0.output_name]
 }
 
 resource "mezmo_blackhole_destination" "destination2" {

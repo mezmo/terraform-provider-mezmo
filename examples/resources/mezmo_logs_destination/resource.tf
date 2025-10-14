@@ -27,9 +27,8 @@ resource "mezmo_demo_source" "source1" {
 }
 
 resource "mezmo_logs_destination" "destination1" {
-  pipeline_id   = mezmo_pipeline.pipeline1.id
-  title         = "My destination"
-  description   = "Send logs to Mezmo Log Analysis"
-  inputs        = [mezmo_demo_source.source1.id]
-  ingestion_key = var.my_ingestion_key
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My destination"
+  description = "Send logs to Mezmo Log Analysis"
+  inputs      = [mezmo_demo_source.source1.id]
 }

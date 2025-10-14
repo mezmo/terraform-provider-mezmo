@@ -42,11 +42,10 @@ resource "mezmo_demo_source" "source1" {
 }
 
 resource "mezmo_logs_destination" "destination1" {
-  pipeline_id   = mezmo_pipeline.pipeline1.id
-  title         = "My destination"
-  description   = "Send logs to Mezmo Log Analysis"
-  inputs        = [mezmo_demo_source.source1.id]
-  ingestion_key = var.my_ingestion_key
+  pipeline_id = mezmo_pipeline.pipeline1.id
+  title       = "My destination"
+  description = "Send logs to Mezmo Log Analysis"
+  inputs      = [mezmo_demo_source.source1.id]
 }
 ```
 
@@ -55,7 +54,6 @@ resource "mezmo_logs_destination" "destination1" {
 
 ### Required
 
-- `ingestion_key` (String, Sensitive) Ingestion key
 - `pipeline_id` (String) The uuid of the pipeline
 
 ### Optional
@@ -64,10 +62,12 @@ resource "mezmo_logs_destination" "destination1" {
 - `description` (String) A user-defined value describing the destination
 - `explicit_scheme_options` (Attributes) Log construction options for the explicit scheme (see [below for nested schema](#nestedatt--explicit_scheme_options))
 - `host` (String) The host for your Log Analysis environment
+- `ingestion_key` (String, Sensitive) Ingestion key
 - `inputs` (List of String) The ids of the input components
 - `log_construction_scheme` (String) How to construct the log message
 - `query` (Attributes) Query Parameters (see [below for nested schema](#nestedatt--query))
 - `title` (String) A user-defined title for the destination
+- `use_ingestion_key` (Boolean) Whether to use the provided ingestion key for ingestion
 
 ### Read-Only
 
