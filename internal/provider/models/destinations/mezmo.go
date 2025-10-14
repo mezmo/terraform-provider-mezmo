@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
@@ -29,6 +30,7 @@ type MezmoDestinationModel struct {
 	AckEnabled            Bool   `tfsdk:"ack_enabled" user_config:"true"`
 	Host                  String `tfsdk:"host" user_config:"true"`
 	IngestionKey          String `tfsdk:"ingestion_key" user_config:"true"`
+	UseIngestionKey       Bool   `tfsdk:"use_ingestion_key" user_config:"true"`
 	Query                 Object `tfsdk:"query" user_config:"true"`
 	LogConstructionScheme String `tfsdk:"log_construction_scheme" user_config:"true"`
 	ExplicitSchemeOptions Object `tfsdk:"explicit_scheme_options" user_config:"true"`
@@ -50,10 +52,16 @@ var MezmoDestinationResourceSchema = schema.Schema{
 			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
 		},
 		"ingestion_key": schema.StringAttribute{
-			Required:    true,
+			Optional:    true,
 			Sensitive:   true,
 			Description: "Ingestion key",
 			Validators:  []validator.String{stringvalidator.LengthAtLeast(1)},
+		},
+		"use_ingestion_key": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(false),
+			Description: "Whether to use the provided ingestion key for ingestion",
 		},
 		"query": schema.SingleNestedAttribute{
 			Optional:    true,
@@ -163,17 +171,31 @@ var MezmoDestinationResourceSchema = schema.Schema{
 func MezmoDestinationFromModel(plan *MezmoDestinationModel, previousState *MezmoDestinationModel) (*Destination, diag.Diagnostics) {
 	dd := diag.Diagnostics{}
 
+	ingestion_key := plan.IngestionKey.ValueString()
+	var use_ingestion_key bool
+	if plan.UseIngestionKey.IsNull() || plan.UseIngestionKey.IsUnknown() {
+		use_ingestion_key = ingestion_key != ""
+	} else {
+		use_ingestion_key = plan.UseIngestionKey.ValueBool()
+	}
+
+	user_config := map[string]any{
+		"ack_enabled":       plan.AckEnabled.ValueBool(),
+		"mezmo_host":        plan.Host.ValueString(),
+		"use_ingestion_key": use_ingestion_key,
+	}
+
+	if use_ingestion_key {
+		user_config["ingestion_key"] = ingestion_key
+	}
+
 	component := Destination{
 		BaseNode: BaseNode{
 			Type:        MEZMO_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
 			Inputs:      StringListValueToStringSlice(plan.Inputs),
-			UserConfig: map[string]any{
-				"ack_enabled":   plan.AckEnabled.ValueBool(),
-				"mezmo_host":    plan.Host.ValueString(),
-				"ingestion_key": plan.IngestionKey.ValueString(),
-			},
+			UserConfig:  user_config,
 		},
 	}
 
@@ -228,7 +250,16 @@ func MezmoDestinationToModel(plan *MezmoDestinationModel, component *Destination
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
 	plan.Host = StringValue(component.UserConfig["mezmo_host"].(string))
-	plan.IngestionKey = StringValue(component.UserConfig["ingestion_key"].(string))
+
+	if ingestion_key, ok := component.UserConfig["ingestion_key"]; ok {
+		plan.IngestionKey = StringValue(ingestion_key.(string))
+	}
+
+	if use_ingestion_key, ok := component.UserConfig["use_ingestion_key"]; ok {
+		plan.UseIngestionKey = BoolValue(use_ingestion_key.(bool))
+	} else {
+		plan.UseIngestionKey = BoolValue(false)
+	}
 
 	if component.UserConfig["query"] != nil {
 		component_map, _ := component.UserConfig["query"].(map[string]any)

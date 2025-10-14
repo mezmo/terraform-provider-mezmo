@@ -80,6 +80,7 @@ services:
       S3_BUCKET: pipeline-vector-config
       PIPELINE_CONTROL_KEY: mezmo
       LOG_ANALYSIS_HOSTNAME: logs.use.dev.logdna.net
+      LOG_ANALYSIS_INTERNAL_HOSTNAME: logs.internal
       DEFAULT_PARTITION_ID: test0
       VECTOR_DATA_DIR: /tmp
       VECTOR_DNS_TEMPLATE: localhost
