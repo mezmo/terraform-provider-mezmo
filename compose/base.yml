@@ -102,6 +102,8 @@ services:
       VENDOR: 'logdna'
       FEATURE_FLAGS_BACKEND: 'memory'
       IN_MEMORY_FEATURE_FLAGS: 'pipeline_per_account_limit:true,pipeline_node_limit:true'
+      ORB_API_KEY: 'fake-key'
+      ALERT_WATCHER_URL: 'http://alert-watcher:80'
     healthcheck:
       test:
         - CMD
