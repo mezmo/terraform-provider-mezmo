@@ -15,20 +15,20 @@ const AZURE_BLOB_STORAGE_DESTINATION_TYPE_NAME = "azure_blob_storage"
 const AZURE_BLOB_STORAGE_DESTINATION_NODE_NAME = "azure-blob-storage"
 
 type AzureBlobStorageDestinationModel struct {
-	Id                  String                      `tfsdk:"id"`
-	PipelineId          String                      `tfsdk:"pipeline_id"`
-	Title               String                      `tfsdk:"title"`
-	Description         String                      `tfsdk:"description"`
-	Inputs              List                        `tfsdk:"inputs"`
-	GenerationId        Int64                       `tfsdk:"generation_id"`
-	AckEnabled          Bool                        `tfsdk:"ack_enabled" user_config:"true"`
-	BatchTimeoutSeconds Int64                       `tfsdk:"batch_timeout_secs" user_config:"true"`
-	Encoding            String                      `tfsdk:"encoding" user_config:"true"`
-	Compression         String                      `tfsdk:"compression" user_config:"true"`
-	ContainerName       String                      `tfsdk:"container_name" user_config:"true"`
-	ConnectionString    String                      `tfsdk:"connection_string" user_config:"true"`
-	Prefix              String                      `tfsdk:"prefix" user_config:"true"`
-	FileConsolidation   *BlobFileConsolidationModel `tfsdk:"file_consolidation"`
+	Id                  String `tfsdk:"id"`
+	PipelineId          String `tfsdk:"pipeline_id"`
+	Title               String `tfsdk:"title"`
+	Description         String `tfsdk:"description"`
+	Inputs              List   `tfsdk:"inputs"`
+	GenerationId        Int64  `tfsdk:"generation_id"`
+	AckEnabled          Bool   `tfsdk:"ack_enabled" user_config:"true"`
+	BatchTimeoutSeconds Int64  `tfsdk:"batch_timeout_secs" user_config:"true"`
+	Encoding            String `tfsdk:"encoding" user_config:"true"`
+	Compression         String `tfsdk:"compression" user_config:"true"`
+	ContainerName       String `tfsdk:"container_name" user_config:"true"`
+	ConnectionString    String `tfsdk:"connection_string" user_config:"true"`
+	Prefix              String `tfsdk:"prefix" user_config:"true"`
+	FileConsolidation   Object `tfsdk:"file_consolidation"`
 }
 
 var AzureBlobStorageResourceSchema = schema.Schema{
@@ -92,8 +92,8 @@ func AzureBlobStorageFromModel(plan *AzureBlobStorageDestinationModel, previousS
 		component.UserConfig["prefix"] = plan.Prefix.ValueString()
 	}
 
-	if plan.FileConsolidation != nil {
-		component.UserConfig["file_consolidation"] = plan.FileConsolidation.ToMap()
+	if !plan.FileConsolidation.IsNull() && !plan.FileConsolidation.IsUnknown() {
+		component.UserConfig["file_consolidation"] = MapValuesToMapAny(plan.FileConsolidation, &dd)
 	}
 
 	if previousState != nil {
@@ -123,13 +123,7 @@ func AzureBlobStorageToModel(plan *AzureBlobStorageDestinationModel, component *
 	if component.UserConfig["prefix"] != nil {
 		plan.Prefix = StringValue(component.UserConfig["prefix"].(string))
 	}
-
 	if fc, ok := component.UserConfig["file_consolidation"].(map[string]any); ok {
-		plan.FileConsolidation = &BlobFileConsolidationModel{
-			Enabled:             BoolValue(fc["enabled"].(bool)),
-			ProcessEverySeconds: Int64Value(int64(fc["process_every_seconds"].(float64))),
-			RequestSizeBytes:    Int64Value(int64(fc["requested_size_bytes"].(float64))),
-			BasePath:            StringValue(fc["base_path"].(string)),
-		}
+		plan.FileConsolidation = ToFileConsolidationObject(fc)
 	}
 }
