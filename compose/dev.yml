@@ -20,3 +20,5 @@ services:
   account-service:
     logging:
       driver: none
+    ports:
+      - "8030:8030"

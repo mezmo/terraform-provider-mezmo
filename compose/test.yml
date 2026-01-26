@@ -37,3 +37,4 @@ services:
       TF_ACC: "1"
       TEST_ENDPOINT: http://pipeline-service:3000
       TEST_CONTROL_TOKEN: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0ZXN0LXN1aXRlIiwiYXVkIjoicGlwZWxpbmUtc2VydmljZSIsImlhdCI6MTY4NjY0NDQwMn0.06PBED8GQp3BBzCSPvFy71EpqXBfZ-3GImN6pS4Z4eY"
+      ACCOUNT_SERVICE_ENDPOINT: http://account-service:8030
