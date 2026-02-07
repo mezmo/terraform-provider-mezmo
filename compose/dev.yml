@@ -22,3 +22,7 @@ services:
       driver: none
     ports:
       - "8030:8030"
+
+  dragonfly:
+    ports:
+      - '6379:6379'
