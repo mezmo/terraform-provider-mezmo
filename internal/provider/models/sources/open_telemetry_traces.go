@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
-	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
 )
 
 const OPEN_TELEMETRY_TRACES_SOURCE_TYPE_NAME = "open_telemetry_traces"

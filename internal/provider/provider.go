@@ -17,7 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	"github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
+	"github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
 )
 
 const PROVIDER_TYPE_NAME = "mezmo"

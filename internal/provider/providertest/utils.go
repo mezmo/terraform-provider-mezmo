@@ -17,8 +17,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	"github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
-	"github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/modelutils"
+	"github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
+	"github.com/mezmo/terraform-provider-mezmo/v5/internal/provider/models/modelutils"
 )
 
 const authAccountId = "9d3b3a8ae3"

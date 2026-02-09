@@ -10,8 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	. "github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/modelutils"
+	. "github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v5/internal/provider/models/modelutils"
 )
 
 const DATA_PROFILER_PROCESSOR_TYPE_NAME = "data_profiler"
