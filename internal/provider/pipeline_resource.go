@@ -12,8 +12,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models"
+	"github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v5/internal/provider/models"
 )
 
 var (

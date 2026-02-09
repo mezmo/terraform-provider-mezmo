@@ -12,8 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	types "github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
-	client "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
-	modelutils "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/modelutils"
+	client "github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
+	modelutils "github.com/mezmo/terraform-provider-mezmo/v5/internal/provider/models/modelutils"
 )
 
 const TRACE_SAMPLING_PROCESSOR_NODE_NAME = "trace-sampling"

@@ -8,8 +8,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"github.com/hashicorp/terraform-plugin-testing/terraform"
-	"github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/providertest"
+	"github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v5/internal/provider/providertest"
 )
 
 func TestPipelineResource(t *testing.T) {

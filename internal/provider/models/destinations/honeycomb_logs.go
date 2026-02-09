@@ -6,8 +6,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
-	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/client"
-	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/modelutils"
+	. "github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
+	. "github.com/mezmo/terraform-provider-mezmo/v5/internal/provider/models/modelutils"
 )
 
 const HONEYCOMB_LOGS_DESTINATION_TYPE_NAME = "honeycomb_logs"

@@ -10,7 +10,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	. "github.com/mezmo/terraform-provider-mezmo/v4/internal/provider/models/modelutils"
+	. "github.com/mezmo/terraform-provider-mezmo/v5/internal/provider/models/modelutils"
 )
 
 type Client interface {
