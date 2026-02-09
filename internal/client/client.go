@@ -74,7 +74,7 @@ func (c *client) newRequest(method string, url string, body io.Reader) *http.Req
 		}
 	}
 
-	if method != http.MethodGet {
+	if body != nil {
 		req.Header.Add("Content-Type", "application/json")
 	}
 	return req

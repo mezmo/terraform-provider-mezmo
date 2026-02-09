@@ -343,7 +343,6 @@ func makeDeleteRequest(urlPath string) error {
 	}
 	req.Header.Add("x-account-id", authAccountId)
 	req.Header.Add("x-auth-user-email", authUserEmail)
-	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {

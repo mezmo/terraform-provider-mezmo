@@ -39,6 +39,14 @@ services:
     environment:
       SERVICES: s3
 
+  dragonfly:
+    image: ghcr.io/dragonflydb/dragonfly:v1.30.1
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+
 # To build pipeline-service locally, set `context` equal to your `pipeline-service` location
 #    build:
 #      context: ../../pipeline-service
@@ -56,6 +64,8 @@ services:
       localstack:
         condition: service_healthy
       account-service:
+        condition: service_healthy
+      dragonfly:
         condition: service_healthy
     command:
       - /bin/bash
@@ -90,6 +100,7 @@ services:
       RESHAPE_MESSAGE_IN_VECTOR: 1
       ACCOUNT_SERVICE_URL: http://account-service:8030
       ENABLE_TAIL_BASED_TRACE_SAMPLING: true
+      KV_STATELESS_URL: redis://dragonfly:6379/0
 
   account-service:
     image: us.gcr.io/logdna-k8s/account-service:1-latest
