@@ -7,9 +7,7 @@
   "generation_id": 3,
   "type": "blackhole",
   "deploy_type": "saas",
-  "user_config": {
-    "ack_enabled": true
-  },
+  "user_config": {},
   "inputs": [
     "ad6ebb62-63ae-11ee-9b45-26dab184329f",
     "79551faa-6c6a-11ee-be81-6671faf7df66"

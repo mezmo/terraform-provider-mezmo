@@ -48,6 +48,12 @@ type HttpDestinationModel struct {
 var HttpDestinationResourceSchema = schema.Schema{
 	Description: "Represents an HTTP destination.",
 	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"ack_enabled": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "Acknowledge data from the source when it reaches the destination",
+		},
 		"uri": schema.StringAttribute{
 			Required: true,
 			Description: "The full URI to make HTTP requests to. This should include the " +

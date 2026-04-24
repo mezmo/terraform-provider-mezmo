@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -40,12 +39,6 @@ var baseDestinationSchemaAttributes = SchemaAttributes{
 	"generation_id": schema.Int64Attribute{
 		Computed:    true,
 		Description: "An internal field used for component versioning",
-	},
-	"ack_enabled": schema.BoolAttribute{
-		Optional:    true,
-		Computed:    true,
-		Default:     booldefault.StaticBool(true),
-		Description: "Acknowledge data from the source when it reaches the destination",
 	},
 	"inputs": schema.ListAttribute{
 		ElementType: types.StringType,

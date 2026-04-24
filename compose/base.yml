@@ -1,9 +1,7 @@
-version: '2.4'
-
 services:
 
   timescaledb-service:
-    image: timescale/timescaledb:2.16.1-pg14
+    image: timescale/timescaledb-ha:pg14-ts2.16
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
@@ -19,7 +17,7 @@ services:
       retries: 50
 
   timescaledb-metrics:
-    image: timescale/timescaledb:2.16.1-pg14
+    image: timescale/timescaledb-ha:pg14-ts2.16
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password

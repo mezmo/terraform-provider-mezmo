@@ -40,6 +40,12 @@ type KafkaDestinationModel struct {
 var KafkaDestinationResourceSchema = schema.Schema{
 	Description: "Represents a Kafka destination.",
 	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"ack_enabled": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "Acknowledge data from the source when it reaches the destination",
+		},
 		"encoding": schema.StringAttribute{
 			Optional:    true,
 			Computed:    true,

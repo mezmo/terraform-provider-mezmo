@@ -19,7 +19,6 @@ type BlackholeDestinationModel struct {
 	Description  String `tfsdk:"description"`
 	Inputs       List   `tfsdk:"inputs"`
 	GenerationId Int64  `tfsdk:"generation_id"`
-	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 }
 
 var BlackholeDestinationResourceSchema = schema.Schema{
@@ -34,9 +33,7 @@ func BlackholeDestinationFromModel(plan *BlackholeDestinationModel, previousStat
 			Type:        BLACKHOLE_DESTINATION_NODE_NAME,
 			Title:       plan.Title.ValueString(),
 			Description: plan.Description.ValueString(),
-			UserConfig: map[string]any{
-				"ack_enabled": plan.AckEnabled.ValueBool(),
-			},
+			UserConfig:  map[string]any{},
 		},
 	}
 
@@ -72,9 +69,5 @@ func BlackholeDestinationToModel(plan *BlackholeDestinationModel, component *Des
 			inputs = append(inputs, StringValue(v))
 		}
 		plan.Inputs = ListValueMust(StringType, inputs)
-	}
-	if component.UserConfig["ack_enabled"] != nil {
-		value, _ := component.UserConfig["ack_enabled"].(bool)
-		plan.AckEnabled = BoolValue(value)
 	}
 }

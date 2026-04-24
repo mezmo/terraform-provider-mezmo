@@ -40,8 +40,7 @@ resource "mezmo_demo_source" "source1" {
 resource "mezmo_blackhole_destination" "destination1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My destination"
-  description = "Trash the data without acking"
-  ack_enabled = false
+  description = "Trash the data"
   inputs      = [mezmo_demo_source.source1.id]
 }
 ```
@@ -55,7 +54,6 @@ resource "mezmo_blackhole_destination" "destination1" {
 
 ### Optional
 
-- `ack_enabled` (Boolean) Acknowledge data from the source when it reaches the destination
 - `description` (String) A user-defined value describing the destination
 - `inputs` (List of String) The ids of the input components
 - `title` (String) A user-defined title for the destination

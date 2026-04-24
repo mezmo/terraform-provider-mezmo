@@ -38,7 +38,6 @@ func TestAccBlackholeDestinationResource(t *testing.T) {
 						"description":   "my destination description",
 						"generation_id": "0",
 						"title":         "my destination title",
-						"ack_enabled":   "true",
 						"inputs.#":      "0",
 					}),
 				),
@@ -70,7 +69,6 @@ func TestAccBlackholeDestinationResource(t *testing.T) {
 						pipeline_id = mezmo_pipeline.test_parent.id
 						title = "new title"
 						description = "new description"
-						ack_enabled = false
 						inputs = [mezmo_demo_source.my_source.id]
 					}`,
 				Check: resource.ComposeTestCheckFunc(
@@ -78,7 +76,6 @@ func TestAccBlackholeDestinationResource(t *testing.T) {
 						"description":   "new description",
 						"generation_id": "1",
 						"title":         "new title",
-						"ack_enabled":   "false",
 						"inputs.#":      "1",
 					}),
 				),

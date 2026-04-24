@@ -71,8 +71,7 @@ resource "mezmo_logs_destination" "destination1" {
 resource "mezmo_blackhole_destination" "destination2" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "My destination"
-  description = "Trash the data without acking"
-  ack_enabled = false
+  description = "Trash the data"
   inputs      = [mezmo_parse_sequentially_processor.processor1.parsers.1.output_name]
 }
 
