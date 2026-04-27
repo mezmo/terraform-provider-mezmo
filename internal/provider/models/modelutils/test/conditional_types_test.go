@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mezmo/terraform-provider-mezmo/v5/internal/provider/models/modelutils"
+	"github.com/mezmo/terraform-provider-mezmo/v6/internal/provider/models/modelutils"
 	"github.com/stretchr/testify/assert"
 )
 

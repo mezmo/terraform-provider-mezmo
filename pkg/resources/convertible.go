@@ -6,8 +6,8 @@ import (
 	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/mezmo/terraform-provider-mezmo/v5/internal/client"
-	"github.com/mezmo/terraform-provider-mezmo/v5/internal/provider"
+	"github.com/mezmo/terraform-provider-mezmo/v6/internal/client"
+	"github.com/mezmo/terraform-provider-mezmo/v6/internal/provider"
 )
 
 type PipelineApiModel = client.Pipeline
