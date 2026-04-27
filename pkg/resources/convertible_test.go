@@ -13,7 +13,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mezmo/terraform-provider-mezmo/v5/internal/provider"
+	"github.com/mezmo/terraform-provider-mezmo/v6/internal/provider"
 )
 
 var (
