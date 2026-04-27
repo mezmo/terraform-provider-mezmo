@@ -6,6 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
@@ -33,6 +34,12 @@ var PrometheusRemoteWriteDestinationResourceSchema = schema.Schema{
 	Description: "Represents Prometheus remote-write destination that publishes metrics to a " +
 		"Prometheus endpoint",
 	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"ack_enabled": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "Acknowledge data from the source when it reaches the destination",
+		},
 		"endpoint": schema.StringAttribute{
 			Required: true,
 			Description: "The full URI to make HTTP requests to. This should include the " +

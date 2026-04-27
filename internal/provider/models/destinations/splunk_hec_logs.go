@@ -55,6 +55,12 @@ var splunkValueTypeAttributes = map[string]schema.Attribute{
 var SplunkHecLogsDestinationResourceSchema = schema.Schema{
 	Description: "Publishes log events to a Splunk HTTP Event Collector",
 	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"ack_enabled": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "Acknowledge data from the source when it reaches the destination",
+		},
 		"compression": schema.StringAttribute{
 			Optional:    true,
 			Computed:    true,

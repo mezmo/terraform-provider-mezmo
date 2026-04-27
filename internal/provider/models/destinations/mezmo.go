@@ -44,6 +44,12 @@ var log_construction_schemes = map[string]string{
 var MezmoDestinationResourceSchema = schema.Schema{
 	Description: "Represents a Mezmo destination.",
 	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"ack_enabled": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "Acknowledge data from the source when it reaches the destination",
+		},
 		"host": schema.StringAttribute{
 			Optional:    true,
 			Computed:    true,

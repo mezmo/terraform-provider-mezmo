@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	. "github.com/hashicorp/terraform-plugin-framework/types"
@@ -36,6 +37,12 @@ type ElasticSearchDestinationModel struct {
 var ElasticSearchDestinationResourceSchema = schema.Schema{
 	Description: "Represents an ElasticSearch destination.",
 	Attributes: ExtendBaseAttributes(map[string]schema.Attribute{
+		"ack_enabled": schema.BoolAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     booldefault.StaticBool(true),
+			Description: "Acknowledge data from the source when it reaches the destination",
+		},
 		"compression": schema.StringAttribute{
 			Optional:    true,
 			Computed:    true,
