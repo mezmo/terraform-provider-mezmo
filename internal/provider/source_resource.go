@@ -24,6 +24,7 @@ type SourceModel interface {
 		DemoSourceModel |
 		FluentSourceModel |
 		HttpSourceModel |
+		HttpClientSourceModel |
 		KafkaSourceModel |
 		KinesisFirehoseSourceModel |
 		LogAnalysisSourceModel |

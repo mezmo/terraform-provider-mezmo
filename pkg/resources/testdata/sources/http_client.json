@@ -1,0 +1,24 @@
+{
+  "id": "0bf994e6-5c7e-11ee-b816-26dab222222f",
+  "pipeline_id": "0bf994e6-5c7e-11ee-b816-26dab184329f",
+  "title": "http client source",
+  "description": "http client description",
+  "type": "http-client",
+  "generation_id": 0,
+  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab222222f",
+  "user_config": {
+    "endpoint": "https://example.com/data",
+    "method": "GET",
+    "scrape_interval_secs": 30,
+    "scrape_timeout_secs": 10,
+    "decoding_codec": "json",
+    "auth": {
+      "strategy": "basic",
+      "user": "myuser",
+      "password": "mypassword"
+    },
+    "headers": [
+      {"header_name": "X-Custom", "header_value": "custom-value"}
+    ]
+  }
+}

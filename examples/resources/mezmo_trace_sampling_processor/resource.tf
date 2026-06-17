@@ -98,11 +98,11 @@ resource "mezmo_trace_sampling_processor" "processor2" {
 resource "mezmo_blackhole_destination" "destination1" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "Tail based logs destination"
-  inputs      = [mezmo_trace_sampling_processor.processor1]
+  inputs      = [mezmo_trace_sampling_processor.processor1.id]
 }
 
 resource "mezmo_blackhole_destination" "destination2" {
   pipeline_id = mezmo_pipeline.pipeline1.id
   title       = "Head based logs destination"
-  inputs      = [mezmo_trace_sampling_processor.processor2]
+  inputs      = [mezmo_trace_sampling_processor.processor2.id]
 }

@@ -223,6 +223,18 @@ func NewOpenTelemetryMetricsSourceResource() resource.Resource {
 	}
 }
 
+func NewHttpClientSourceResource() resource.Resource {
+	return &SourceResource[HttpClientSourceModel]{
+		typeName:          HTTP_CLIENT_SOURCE_TYPE_NAME,
+		nodeName:          HTTP_CLIENT_SOURCE_NODE_NAME,
+		fromModelFunc:     HttpClientSourceFromModel,
+		toModelFunc:       HttpClientSourceToModel,
+		getIdFunc:         func(m *HttpClientSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *HttpClientSourceModel) basetypes.StringValue { return m.PipelineId },
+		schema:            HttpClientSourceResourceSchema,
+	}
+}
+
 func NewOpenTelemetryTracesSourceResource() resource.Resource {
 	return &SourceResource[OpenTelemetryTracesSourceModel]{
 		typeName:          OPEN_TELEMETRY_TRACES_SOURCE_TYPE_NAME,

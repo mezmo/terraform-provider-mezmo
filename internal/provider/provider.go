@@ -108,6 +108,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewDemoSourceResource,
 		NewFluentSourceResource,
 		NewHttpSourceResource,
+		NewHttpClientSourceResource,
 		NewKafkaSourceResource,
 		NewKinesisFirehoseSourceResource,
 		NewLogAnalysisSourceResource,
