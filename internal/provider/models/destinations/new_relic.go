@@ -24,6 +24,7 @@ type NewRelicDestinationModel struct {
 	GenerationId Int64  `tfsdk:"generation_id"`
 	AckEnabled   Bool   `tfsdk:"ack_enabled" user_config:"true"`
 	Api          String `tfsdk:"api" user_config:"true"`
+	Region       String `tfsdk:"region" user_config:"true"`
 	AccountId    String `tfsdk:"account_id" user_config:"true"`
 	LicenseKey   String `tfsdk:"license_key" user_config:"true"`
 }
@@ -43,6 +44,13 @@ var NewRelicDestinationResourceSchema = schema.Schema{
 			Default:     stringdefault.StaticString("logs"),
 			Description: "New Relic API endpoint type",
 			Validators:  []validator.String{stringvalidator.OneOf("logs", "metrics")},
+		},
+		"region": schema.StringAttribute{
+			Optional:    true,
+			Computed:    true,
+			Default:     stringdefault.StaticString("us"),
+			Description: "New Relic region to submit data to",
+			Validators:  []validator.String{stringvalidator.OneOf("us", "eu")},
 		},
 		"account_id": schema.StringAttribute{
 			Required:    true,
@@ -71,6 +79,7 @@ func NewRelicDestinationFromModel(plan *NewRelicDestinationModel, previousState 
 			UserConfig: map[string]any{
 				"ack_enabled": plan.AckEnabled.ValueBool(),
 				"api":         plan.Api.ValueString(),
+				"region":      plan.Region.ValueString(),
 				"account_id":  plan.AccountId.ValueString(),
 				"license_key": plan.LicenseKey.ValueString(),
 			},
@@ -97,6 +106,10 @@ func NewRelicDestinationToModel(plan *NewRelicDestinationModel, component *Desti
 	plan.Inputs = SliceToStringListValue(component.Inputs)
 	plan.AckEnabled = BoolValue(component.UserConfig["ack_enabled"].(bool))
 	plan.Api = StringValue(component.UserConfig["api"].(string))
+	if component.UserConfig["region"] != nil {
+		value, _ := component.UserConfig["region"].(string)
+		plan.Region = StringValue(value)
+	}
 	plan.AccountId = StringValue(component.UserConfig["account_id"].(string))
 	plan.LicenseKey = StringValue(component.UserConfig["license_key"].(string))
 }

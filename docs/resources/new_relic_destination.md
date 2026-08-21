@@ -51,6 +51,7 @@ resource "mezmo_new_relic_destination" "destination1" {
   inputs      = [mezmo_demo_source.source1.id]
   account_id  = var.my_new_relic_account_id
   license_key = var.my_license_key
+  region      = "eu"
 }
 ```
 
@@ -69,6 +70,7 @@ resource "mezmo_new_relic_destination" "destination1" {
 - `api` (String) New Relic API endpoint type
 - `description` (String) A user-defined value describing the destination
 - `inputs` (List of String) The ids of the input components
+- `region` (String) New Relic region to submit data to
 - `title` (String) A user-defined title for the destination
 
 ### Read-Only

@@ -42,6 +42,17 @@ func TestAccNewRelicDestinationResource(t *testing.T) {
 					}`,
 				ExpectError: regexp.MustCompile("The argument \"license_key\" is required"),
 			},
+			{
+				Config: GetProviderConfig() + `
+					resource "mezmo_new_relic_destination" "my_destination" {
+						inputs      = ["abc"]
+						pipeline_id = "pip1"
+						account_id = "acc1"
+						license_key = "key1"
+						region = "ap"
+					}`,
+				ExpectError: regexp.MustCompile("Attribute region value must be one of"),
+			},
 
 			// Create test defaults
 			{
@@ -75,6 +86,7 @@ func TestAccNewRelicDestinationResource(t *testing.T) {
 						"account_id":    "acc1",
 						"license_key":   "key1",
 						"api":           "logs",
+						"region":        "us",
 					}),
 				),
 			},
@@ -107,6 +119,7 @@ func TestAccNewRelicDestinationResource(t *testing.T) {
 						account_id  = "acc2"
 						license_key = "key2"
 						api         = "metrics"
+						region      = "eu"
 						ack_enabled = false
 					}
 					`,
@@ -122,6 +135,7 @@ func TestAccNewRelicDestinationResource(t *testing.T) {
 						"account_id":    "acc2",
 						"license_key":   "key2",
 						"api":           "metrics",
+						"region":        "eu",
 					}),
 				),
 			},
