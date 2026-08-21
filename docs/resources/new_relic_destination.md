@@ -29,6 +29,7 @@ variable "my_new_relic_account_id" {
 variable "my_license_key" {
   type = string
 }
+
 provider "mezmo" {
   auth_key = "my secret"
 }
