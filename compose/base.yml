@@ -101,7 +101,7 @@ services:
       KV_STATELESS_URL: redis://dragonfly:6379/0
 
   account-service:
-    image: us.gcr.io/logdna-k8s/account-service:1-latest
+    image: us.gcr.io/logdna-k8s/account-service:1.7-latest
     environment:
       LOGLEVEL: info
       HTTP_PORT: 8030
