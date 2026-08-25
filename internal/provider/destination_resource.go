@@ -35,7 +35,8 @@ type DestinationModel interface {
 		NewRelicDestinationModel |
 		PrometheusRemoteWriteDestinationModel |
 		S3DestinationModel |
-		SplunkHecLogsDestinationModel
+		SplunkHecLogsDestinationModel |
+		SQSSinkModel
 }
 
 type DestinationResource[T DestinationModel] struct {
