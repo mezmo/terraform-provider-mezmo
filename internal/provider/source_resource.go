@@ -30,6 +30,7 @@ type SourceModel interface {
 		LogAnalysisSourceModel |
 		LogAnalysisIngestionSourceModel |
 		LogStashSourceModel |
+		OpenTelemetryCombinedSourceModel |
 		OpenTelemetryLogsSourceModel |
 		OpenTelemetryMetricsSourceModel |
 		OpenTelemetryTracesSourceModel |
