@@ -122,6 +122,7 @@ func (p *MezmoProvider) Resources(ctx context.Context) []func() resource.Resourc
 		NewOpenTelemetryLogsSourceResource,
 		NewOpenTelemetryTracesSourceResource,
 		NewOpenTelemetryMetricsSourceResource,
+		NewOpenTelemetryCombinedSourceResource,
 
 		// Processors
 		NewAggregateProcessorResource,

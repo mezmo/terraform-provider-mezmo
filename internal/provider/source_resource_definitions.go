@@ -235,6 +235,18 @@ func NewHttpClientSourceResource() resource.Resource {
 	}
 }
 
+func NewOpenTelemetryCombinedSourceResource() resource.Resource {
+	return &SourceResource[OpenTelemetryCombinedSourceModel]{
+		typeName:          OPEN_TELEMETRY_COMBINED_SOURCE_TYPE_NAME,
+		nodeName:          OPEN_TELEMETRY_COMBINED_SOURCE_NODE_NAME,
+		fromModelFunc:     OpenTelemetryCombinedSourceFromModel,
+		toModelFunc:       OpenTelemetryCombinedSourceToModel,
+		getIdFunc:         func(m *OpenTelemetryCombinedSourceModel) basetypes.StringValue { return m.Id },
+		getPipelineIdFunc: func(m *OpenTelemetryCombinedSourceModel) basetypes.StringValue { return m.PipelineId },
+		schema:            OpenTelemetryCombinedSourceResourceSchema,
+	}
+}
+
 func NewOpenTelemetryTracesSourceResource() resource.Resource {
 	return &SourceResource[OpenTelemetryTracesSourceModel]{
 		typeName:          OPEN_TELEMETRY_TRACES_SOURCE_TYPE_NAME,
