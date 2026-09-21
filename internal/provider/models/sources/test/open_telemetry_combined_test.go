@@ -40,10 +40,13 @@ func TestAccOpenTelemetryCombinedSource(t *testing.T) {
 					resource.TestCheckNoResourceAttr("mezmo_open_telemetry_combined_source.my_source", "shared_source_id"),
 
 					StateHasExpectedValues("mezmo_open_telemetry_combined_source.my_source", map[string]any{
-						"description":   "my source description",
-						"generation_id": "0",
-						"title":         "my source title",
-						"pipeline_id":   "#mezmo_pipeline.test_parent.id",
+						"description":       "my source description",
+						"generation_id":     "0",
+						"title":             "my source title",
+						"pipeline_id":       "#mezmo_pipeline.test_parent.id",
+						"logs_output_id":    regexp.MustCompile(`^.+\..+$`),
+						"metrics_output_id": regexp.MustCompile(`^.+\..+$`),
+						"traces_output_id":  regexp.MustCompile(`^.+\..+$`),
 					}),
 					resource.TestCheckResourceAttrSet("mezmo_open_telemetry_combined_source.my_source", "generation_id"),
 				),
