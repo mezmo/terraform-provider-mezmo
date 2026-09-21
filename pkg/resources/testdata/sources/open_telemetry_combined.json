@@ -5,5 +5,19 @@
   "description": "open telemetry combined description",
   "type": "open-telemetry",
   "generation_id": 0,
-  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab333333f"
+  "gateway_route_id": "0bf994e6-5c7e-11ee-b816-26dab333333f",
+  "outputs": [
+    {
+      "id": "0bf994e6-5c7e-11ee-b816-26dab333333f.logs",
+      "label": "Logs"
+    },
+    {
+      "id": "0bf994e6-5c7e-11ee-b816-26dab333333f.metrics",
+      "label": "Metrics"
+    },
+    {
+      "id": "0bf994e6-5c7e-11ee-b816-26dab333333f.traces",
+      "label": "Traces"
+    }
+  ]
 }

@@ -44,6 +44,10 @@ type Alert struct {
 type Source struct {
 	BaseNode
 	SharedSourceId string `json:"gateway_route_id,omitempty"`
+	Outputs        []struct {
+		Id    string `json:"id"`
+		Label string `json:"label"`
+	} `json:"outputs,omitempty"`
 }
 
 type Processor struct {
