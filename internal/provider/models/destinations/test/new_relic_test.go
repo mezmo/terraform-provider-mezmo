@@ -53,6 +53,17 @@ func TestAccNewRelicDestinationResource(t *testing.T) {
 					}`,
 				ExpectError: regexp.MustCompile("Attribute region value must be one of"),
 			},
+			{
+				Config: GetProviderConfig() + `
+					resource "mezmo_new_relic_destination" "my_destination" {
+						inputs      = ["abc"]
+						pipeline_id = "pip1"
+						account_id = "acc1"
+						license_key = "key1"
+						api = "events"
+					}`,
+				ExpectError: regexp.MustCompile("Attribute api value must be one of"),
+			},
 
 			// Create test defaults
 			{
@@ -136,6 +147,29 @@ func TestAccNewRelicDestinationResource(t *testing.T) {
 						"license_key":   "key2",
 						"api":           "metrics",
 						"region":        "eu",
+					}),
+				),
+			},
+
+			// Update api to traces
+			{
+				Config: GetCachedConfig(cacheKey) + `
+					resource "mezmo_new_relic_destination" "my_destination" {
+						title = "new title"
+						description = "new description"
+						pipeline_id = mezmo_pipeline.test_parent.id
+						inputs      = [mezmo_http_source.my_source.id]
+						account_id  = "acc2"
+						license_key = "key2"
+						api         = "traces"
+						region      = "eu"
+						ack_enabled = false
+					}
+					`,
+				Check: resource.ComposeTestCheckFunc(
+					StateHasExpectedValues("mezmo_new_relic_destination.my_destination", map[string]any{
+						"generation_id": "2",
+						"api":           "traces",
 					}),
 				),
 			},
