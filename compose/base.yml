@@ -53,7 +53,7 @@ services:
 #        - GITHUB_TOKEN
 #        - VECTOR_VERSION
   pipeline-service:
-    image: us.gcr.io/logdna-k8s/pipeline-service:3-latest
+    image: us.gcr.io/logdna-k8s/pipeline-service:8-latest
     depends_on:
       timescaledb-service:
         condition: service_healthy
@@ -99,6 +99,11 @@ services:
       ACCOUNT_SERVICE_URL: http://account-service:8030
       ENABLE_TAIL_BASED_TRACE_SAMPLING: true
       KV_STATELESS_URL: redis://dragonfly:6379/0
+      ENVIRONMENT_NAME: local-environment
+      AUTH_PROVIDER_SERVICE_URL: http://auth-provider-service:3001
+      SECONDS_BETWEEN_AURA_INVESTIGATIONS: 1800
+      FEATURE_FLAGS_BACKEND: memory
+      FEATURE_FLAGS_API_KEY: abc123
 
   account-service:
     image: us.gcr.io/logdna-k8s/account-service:1.7-latest
