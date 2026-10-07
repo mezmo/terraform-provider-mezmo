@@ -43,7 +43,7 @@ var NewRelicDestinationResourceSchema = schema.Schema{
 			Computed:    true,
 			Default:     stringdefault.StaticString("logs"),
 			Description: "New Relic API endpoint type",
-			Validators:  []validator.String{stringvalidator.OneOf("logs", "metrics")},
+			Validators:  []validator.String{stringvalidator.OneOf("logs", "metrics", "traces")},
 		},
 		"region": schema.StringAttribute{
 			Optional:    true,

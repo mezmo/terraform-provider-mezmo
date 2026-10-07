@@ -117,7 +117,7 @@ func TestAccTraceHeadSamplingSuccess(t *testing.T) {
 						"inputs.#":             "1",
 						"sample_type":          "head",
 						"rate":                 "10",
-						"trace_id_field":       ".trace_id",
+						"trace_id_field":       ".record.traceId",
 						"parent_span_id_field": nil, // used in tail sampling
 						"conditionals":         nil, // used in tail sampling
 					}),
@@ -247,8 +247,8 @@ func TestAccTraceTailSamplingSuccess(t *testing.T) {
 						"inputs.#":                    "1",
 						"sample_type":                 "tail",
 						"rate":                        nil, // used in head sampling
-						"trace_id_field":              ".trace_id",
-						"parent_span_id_field":        ".parent_span_id",
+						"trace_id_field":              ".record.traceId",
+						"parent_span_id_field":        ".record.parentSpanId",
 						"conditionals.#":              "1",
 						"conditionals.0.rate":         "15",
 						"conditionals.0._output_name": "ab1869cd",
