@@ -3,12 +3,12 @@
 page_title: "mezmo_open_telemetry_metrics_source Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  Represents a Open Telemetry Metrics source.
+  Represents a Open Telemetry Metrics source. Deprecated: The mezmo_open_telemetry_metrics_source resource is deprecated and will be removed in a future release. Please migrate to mezmo_open_telemetry_combined_source, which receives logs, metrics and traces from a single source and exposes a separate output for each.
 ---
 
 # mezmo_open_telemetry_metrics_source (Resource)
 
-Represents a Open Telemetry Metrics source.
+Represents a Open Telemetry Metrics source. **Deprecated:** The mezmo_open_telemetry_metrics_source resource is deprecated and will be removed in a future release. Please migrate to mezmo_open_telemetry_combined_source, which receives logs, metrics and traces from a single source and exposes a separate output for each.
 
 ## Example Usage
 
