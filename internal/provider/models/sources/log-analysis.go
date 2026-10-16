@@ -10,6 +10,10 @@ import (
 const LOG_ANALYSIS_SOURCE_TYPE_NAME = "log_analysis"
 const LOG_ANALYSIS_SOURCE_NODE_NAME = "log-analysis"
 
+const logAnalysisDeprecationMessage = "The mezmo_log_analysis_source resource is deprecated and will be removed " +
+	"in a future release. Please migrate to mezmo_log_analysis_ingestion_source, which redirects all " +
+	"data sent to the logs.mezmo.com endpoint directly to a pipeline."
+
 type LogAnalysisSourceModel struct {
 	Id           StringValue `tfsdk:"id"`
 	PipelineId   StringValue `tfsdk:"pipeline_id"`
@@ -19,8 +23,10 @@ type LogAnalysisSourceModel struct {
 }
 
 var LogAnalysisSourceResourceSchema = schema.Schema{
-	Description: "Receive data directly from your Mezmo Log Analysis account",
-	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, nil),
+	Description: "Receive data directly from your Mezmo Log Analysis account. " +
+		"**Deprecated:** " + logAnalysisDeprecationMessage,
+	DeprecationMessage: logAnalysisDeprecationMessage,
+	Attributes:         ExtendBaseAttributes(map[string]schema.Attribute{}, nil),
 }
 
 func LogAnalysisSourceFromModel(plan *LogAnalysisSourceModel, previousState *LogAnalysisSourceModel) (*Source, diag.Diagnostics) {

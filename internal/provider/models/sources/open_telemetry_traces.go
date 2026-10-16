@@ -12,6 +12,10 @@ import (
 const OPEN_TELEMETRY_TRACES_SOURCE_TYPE_NAME = "open_telemetry_traces"
 const OPEN_TELEMETRY_TRACES_SOURCE_NODE_NAME = "open-telemetry-traces"
 
+const openTelemetryTracesDeprecationMessage = "The mezmo_open_telemetry_traces_source resource is deprecated and will be removed " +
+	"in a future release. Please migrate to mezmo_open_telemetry_combined_source, which receives " +
+	"logs, metrics and traces from a single source and exposes a separate output for each."
+
 type OpenTelemetryTracesSourceModel struct {
 	Id             String `tfsdk:"id"`
 	PipelineId     String `tfsdk:"pipeline_id"`
@@ -22,8 +26,10 @@ type OpenTelemetryTracesSourceModel struct {
 }
 
 var OpenTelemetryTracesSourceResourceSchema = schema.Schema{
-	Description: "Represents a Open Telemetry Traces source.",
-	Attributes:  ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"shared_source_id"}),
+	Description: "Represents a Open Telemetry Traces source. " +
+		"**Deprecated:** " + openTelemetryTracesDeprecationMessage,
+	DeprecationMessage: openTelemetryTracesDeprecationMessage,
+	Attributes:         ExtendBaseAttributes(map[string]schema.Attribute{}, []string{"shared_source_id"}),
 }
 
 func OpenTelemetryTracesSourceFromModel(plan *OpenTelemetryTracesSourceModel, previousState *OpenTelemetryTracesSourceModel) (*Source, diag.Diagnostics) {

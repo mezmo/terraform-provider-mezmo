@@ -3,12 +3,12 @@
 page_title: "mezmo_log_analysis_source Resource - terraform-provider-mezmo"
 subcategory: ""
 description: |-
-  Receive data directly from your Mezmo Log Analysis account
+  Receive data directly from your Mezmo Log Analysis account. Deprecated: The mezmo_log_analysis_source resource is deprecated and will be removed in a future release. Please migrate to mezmo_log_analysis_ingestion_source, which redirects all data sent to the logs.mezmo.com endpoint directly to a pipeline.
 ---
 
 # mezmo_log_analysis_source (Resource)
 
-Receive data directly from your Mezmo Log Analysis account
+Receive data directly from your Mezmo Log Analysis account. **Deprecated:** The mezmo_log_analysis_source resource is deprecated and will be removed in a future release. Please migrate to mezmo_log_analysis_ingestion_source, which redirects all data sent to the logs.mezmo.com endpoint directly to a pipeline.
 
 ## Example Usage
 
