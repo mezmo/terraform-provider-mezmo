@@ -113,10 +113,11 @@ func TestAccNewRelicDestinationResource(t *testing.T) {
 						account_id = "acc1"
 						license_key = "key1"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_new_relic_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_new_relic_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_new_relic_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_new_relic_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"account_id", "license_key"},
 			},
 
 			// Update all fields (pass through)

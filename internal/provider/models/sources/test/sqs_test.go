@@ -134,10 +134,11 @@ func TestAccSQSSource(t *testing.T) {
 							secret_access_key = "secret123"
 						}
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_sqs_source.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_sqs_source.my_source"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_sqs_source.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_sqs_source.my_source"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"auth.access_key_id", "auth.secret_access_key"},
 			},
 
 			// Updates

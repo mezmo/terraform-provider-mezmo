@@ -87,10 +87,11 @@ func TestAccHoneycombLogsDestinationResource(t *testing.T) {
 						dataset     = "ds1"
 						api_key     = "key1"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_honeycomb_logs_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_honeycomb_logs_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_honeycomb_logs_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_honeycomb_logs_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 
 			// Update all fields

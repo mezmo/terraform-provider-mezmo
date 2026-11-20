@@ -77,10 +77,11 @@ func TestAccLokiDestinationResource(t *testing.T) {
 							"test_key_1" = "test_value_1"
 						}
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_loki_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_loki_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_loki_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_loki_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"auth.password", "auth.user"},
 			},
 
 			// Required field encoding

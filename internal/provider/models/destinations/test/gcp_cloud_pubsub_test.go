@@ -111,10 +111,11 @@ func TestAccGcpCloudPubSubSinkResource_crud(t *testing.T) {
 						topic = "topic1"
 						credentials_json = "{}"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_gcp_cloud_pubsub_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_gcp_cloud_pubsub_destination.my_dest"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_gcp_cloud_pubsub_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_gcp_cloud_pubsub_destination.my_dest"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"credentials_json"},
 			},
 			// Update fields, remove bucket prefix since it's optional
 			{

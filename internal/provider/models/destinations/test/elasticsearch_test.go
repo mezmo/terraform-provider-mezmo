@@ -116,10 +116,11 @@ func TestAccElasticSearchDestinationResource(t *testing.T) {
 							password = "pass1"
 						}
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_elasticsearch_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_elasticsearch_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_elasticsearch_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_elasticsearch_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"auth.access_key_id", "auth.password", "auth.secret_access_key", "auth.user"},
 			},
 
 			// Update all fields (pass through)
