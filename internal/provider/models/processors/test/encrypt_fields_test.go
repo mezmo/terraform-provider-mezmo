@@ -171,10 +171,11 @@ func TestAccEncryptFieldsProcessor(t *testing.T) {
 						iv_field = ".some_iv_field"
 						field = ".something"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_encrypt_fields_processor.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_encrypt_fields_processor.my_processor"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_encrypt_fields_processor.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_encrypt_fields_processor.my_processor"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"key"},
 			},
 
 			// Update fields

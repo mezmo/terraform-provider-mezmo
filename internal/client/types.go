@@ -28,6 +28,7 @@ type BaseNode struct {
 	Description  string         `json:"description,omitempty"`
 	UserConfig   map[string]any `json:"user_config"`
 	GenerationId int64          `json:"generation_id"`
+	MaskedFields []string       `json:"masked_fields,omitempty"`
 }
 
 // Represents an Alert, which is similar to a component, but not treated as such.

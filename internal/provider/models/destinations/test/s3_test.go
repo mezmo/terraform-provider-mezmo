@@ -185,10 +185,11 @@ func TestAccS3DestinationResource(t *testing.T) {
 						}
 						bucket = "mybucket"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_s3_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_s3_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_s3_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_s3_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"auth.access_key_id", "auth.secret_access_key"},
 			},
 
 			// Update all fields

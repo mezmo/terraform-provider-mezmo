@@ -102,10 +102,11 @@ func TestAccDatadogMetricsDestinationResource(t *testing.T) {
 						site        = "us3"
 						api_key     = "<secret-api-key>"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_datadog_metrics_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_datadog_metrics_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_datadog_metrics_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_datadog_metrics_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 
 			// Update all fields

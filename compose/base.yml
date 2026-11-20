@@ -104,6 +104,7 @@ services:
       SECONDS_BETWEEN_AURA_INVESTIGATIONS: 1800
       FEATURE_FLAGS_BACKEND: memory
       FEATURE_FLAGS_API_KEY: abc123
+      MASK_SENSITIVE_USER_CONFIG_FIELDS: "true"
 
   account-service:
     image: us.gcr.io/logdna-k8s/account-service:1.7-latest

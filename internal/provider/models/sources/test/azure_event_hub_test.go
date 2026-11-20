@@ -207,10 +207,11 @@ func TestAccAzureEventHubSourceResource(t *testing.T) {
 						group_id = "test_group_id"
 						topics = ["topic1", "topic2"]
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_azure_event_hub_source.import_target",
-				ImportStateIdFunc: providertest.ComputeImportId("mezmo_azure_event_hub_source.my_source"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_azure_event_hub_source.import_target",
+				ImportStateIdFunc:       providertest.ComputeImportId("mezmo_azure_event_hub_source.my_source"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"connection_string"},
 			},
 			{
 				Config: providertest.GetCachedConfig(cacheKey) + `

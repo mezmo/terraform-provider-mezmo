@@ -122,7 +122,6 @@ func TestAccAzureBlobStorageDestinationResource(t *testing.T) {
 						"encoding":           "text",
 						"compression":        "none",
 						"container_name":     "bar",
-						"connection_string":  "foo",
 						"file_consolidation": map[string]any{
 							"enabled":               true,
 							"process_every_seconds": float64(600),
@@ -141,7 +140,6 @@ func TestAccAzureBlobStorageDestinationResource(t *testing.T) {
 						"encoding":           "text",
 						"compression":        "none",
 						"container_name":     "bar",
-						"connection_string":  "foo",
 						"file_consolidation": map[string]any{
 							"enabled":               true,
 							"process_every_seconds": float64(420),
@@ -163,10 +161,11 @@ func TestAccAzureBlobStorageDestinationResource(t *testing.T) {
 						connection_string = "abc://defg.com"
 						container_name    = "my_container"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_azure_blob_storage_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_azure_blob_storage_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_azure_blob_storage_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_azure_blob_storage_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"connection_string"},
 			},
 
 			// Update all fields
