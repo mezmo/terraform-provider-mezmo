@@ -123,10 +123,11 @@ func TestAccDatadogLogsDestinationResource(t *testing.T) {
 						api_key     = "<secret-api-key>"
 						compression = "gzip"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_datadog_logs_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_datadog_logs_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_datadog_logs_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_datadog_logs_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 
 			// Update all fields

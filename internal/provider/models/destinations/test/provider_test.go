@@ -36,6 +36,9 @@ func testAccBackend(resourceName string, userConfig map[string]any) resource.Tes
 			return err
 		}
 
+		for _, field := range destination.MaskedFields {
+			delete(destination.UserConfig, field)
+		}
 		// Check the backend UserConfig matches the passed userConfig
 		return providertest.ValidateUserConfig(destination.UserConfig, userConfig)
 	}

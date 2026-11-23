@@ -113,10 +113,11 @@ func TestAccSplunkHecLogsDestinationResource(t *testing.T) {
 						endpoint    = "https://google.com"
 						token       = "my_token"
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_splunk_hec_logs_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_splunk_hec_logs_destination.my_destination"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_splunk_hec_logs_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_splunk_hec_logs_destination.my_destination"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"token"},
 			},
 
 			// Update source fields and others

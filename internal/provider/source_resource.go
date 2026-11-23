@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/mezmo/terraform-provider-mezmo/v6/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/v6/internal/client"
 	. "github.com/mezmo/terraform-provider-mezmo/v6/internal/provider/models/sources"
@@ -125,6 +126,7 @@ func (r *SourceResource[T]) Create(ctx context.Context, req resource.CreateReque
 		return
 	}
 
+	restoreMaskedUserConfigFields(stored.UserConfig, stored.MaskedFields, component.UserConfig)
 	NullifyPlanFields(&plan, r.schema)
 
 	r.toModelFunc(&plan, stored)
@@ -180,6 +182,17 @@ func (r *SourceResource[T]) Read(ctx context.Context, req resource.ReadRequest, 
 		return
 	}
 
+	if len(component.MaskedFields) > 0 && !isImportedState(ctx, req.State) {
+		prior, dd := r.fromModelFunc(&state, &state)
+		if dd.HasError() {
+			tflog.Warn(ctx, "Could not restore masked user_config fields from state", map[string]any{
+				"diagnostics": fmt.Sprint(dd.Errors()),
+			})
+		} else {
+			restoreMaskedUserConfigFields(component.UserConfig, component.MaskedFields, prior.UserConfig)
+		}
+	}
+
 	NullifyPlanFields(&state, r.schema)
 
 	r.toModelFunc(&state, component)
@@ -213,6 +226,7 @@ func (r *SourceResource[T]) Update(ctx context.Context, req resource.UpdateReque
 		return
 	}
 
+	restoreMaskedUserConfigFields(stored.UserConfig, stored.MaskedFields, component.UserConfig)
 	NullifyPlanFields(&plan, r.schema)
 
 	r.toModelFunc(&plan, stored)
@@ -256,6 +270,8 @@ func (r *SourceResource[T]) ImportState(ctx context.Context, req resource.Import
 	}
 
 	if !resp.Diagnostics.HasError() {
+		// Set only the ids. isImportedState needs generation_id null after import, or Read
+		// restores masked user_config fields from a state that holds no real values.
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), nodeId)...)
 		resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("pipeline_id"), pipelineId)...)
 	}

@@ -114,10 +114,11 @@ func TestAccGcpCloudMonitoringSinkResource_crud(t *testing.T) {
 							somekey = "someval"
 						}
 					}`,
-				ImportState:       true,
-				ResourceName:      "mezmo_gcp_cloud_monitoring_destination.import_target",
-				ImportStateIdFunc: ComputeImportId("mezmo_gcp_cloud_monitoring_destination.my_dest"),
-				ImportStateVerify: true,
+				ImportState:             true,
+				ResourceName:            "mezmo_gcp_cloud_monitoring_destination.import_target",
+				ImportStateIdFunc:       ComputeImportId("mezmo_gcp_cloud_monitoring_destination.my_dest"),
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"credentials_json"},
 			},
 			// update
 			{
